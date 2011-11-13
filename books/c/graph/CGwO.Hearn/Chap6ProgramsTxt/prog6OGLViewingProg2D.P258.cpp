@@ -23,7 +23,7 @@ void init (void)
      * OpenGL裁剪函数使用 -1 到 1 的规范化坐标范围.
      * gluOrtho2D 函数的默认参数为: (-1, 1, -1, 1).
      * */
-    gluOrtho2D (-100.0, 100.0, -100.0, 100.0);
+    gluOrtho2D (-50.0, 100.0, -100.0, 100.0);
 
     /*  Set mode for constructing geometric transformation matrix.  */
     glMatrixMode (GL_MODELVIEW);
