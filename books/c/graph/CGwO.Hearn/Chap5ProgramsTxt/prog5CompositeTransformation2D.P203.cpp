@@ -37,6 +37,7 @@ void matrix3x3SetIdentity (Matrix3x3 matIdent3x3)
 }
 
 /* Premultiply matrix m1 times matrix m2, store result in m2. */
+/* m2 = m1 * m2 */
 void matrix3x3PreMultiply (Matrix3x3 m1, Matrix3x3 m2)
 {
     GLint row, col;
@@ -103,6 +104,11 @@ void scale2D (GLfloat sx, GLfloat sy, wcPt2D fixedPt)
 }
 
 /* Using the composite matrix, calculate transformed coordinates. */
+//
+//               |A00  A01  A02|   |x|   |A00 * x + A01 * y + A02|
+// V' = M * V =  |A10  A11  A12| * |y| = |A10 * x + A11 * y + A12|
+//               |A20  A21  A22|   |1|   |          1            |
+//
 void transformVerts2D (GLint nVerts, wcPt2D * verts)
 {
     GLint k;
@@ -162,11 +168,35 @@ void displayFcn (void)
     matrix3x3SetIdentity (matComposite);
 
     /*  Construct composite matrix for transformation sequence.  */
+    //
+    // M' = (Mt * (Mr * (Ms * M)))  // (B)
+    //    = (((Mt * Mr) * Ms) * M)  // (A)
+    //
+    // 按 (A) 或 (B) 的方式去理解都可以:
+    //     A. 按局部坐标系去理解. 每一次变换(矩阵相乘)都会改变该局部坐标系, 因
+    //        此无论之前发生了什么变换, 到画图渲染时, 都相对于该局部坐标系, 且
+    //        物体永远在该局部坐标系的原点. 比如: 不论之前发生了什么变换, 若当
+    //        前变换是旋转, 则该旋转的"基准点"是该局部坐标系相对点, 所以旋转的
+    //        结果是绕该局部坐标系相对点进行旋转.
+    //     B. 按全局坐标系去理解. 每一次变换都会改变物体在该全局坐标系中坐标,
+    //        因此无论之前发生了什么变换, 到画图渲染时, 都相对于该全局坐标系,
+    //        且物体的坐标是不断地改变的. 比如: 如果之前发生了移动变换, 而当前
+    //        的变换是旋转, 但该旋转的"基准点"的坐标在该全局坐标系中并没有改变
+    //        , 所以旋转的结果是以该基准点为圆心, 以物体的当前位置到该基准点的
+    //        距离为半径画弧. 数学上, 一般是以该种方式进行推导的.
+    //
+    // 这与OpenGL的是不一样的. OpenGL的旋转和缩放变换的基准点是只能是原点, 但
+    // 这里的可以把任意点作为基准点; 且这里的变换操作是把变换矩阵左乘当前矩阵,
+    // 而OpenGL是把变换矩阵右乘当前矩阵.
+    //
     scale2D (sx, sy, fixedPt);   //  First transformation: Scale.
     rotate2D (pivPt, theta);     //  Second transformation: Rotate
     translate2D (tx, ty);        //  Final transformation: Translate.
 
     /*  Apply composite matrix to triangle vertices.  */
+    //
+    // P' = M' * P
+    //
     transformVerts2D (nVerts, verts);
 
     glColor3f (1.0, 0.0, 0.0);  // Set color for transformed triangle.
