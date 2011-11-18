@@ -212,19 +212,17 @@ void displayFcn (void)
         //      转成 (B) 后, 即可按数学上的推导方式去理解.
         //
 
-        // Translate.
         glTranslatef(centroidPt.x, centroidPt.y, 0.0);
+
+        // Translate.
         glTranslatef(tx, ty, 0.0);
-        glTranslatef(-centroidPt.x, -centroidPt.y, 0.0);
 
         // Rotate.
-        glTranslatef(centroidPt.x, centroidPt.y, 0.0);
         glRotatef(theta * (180 / pi), 0.0, 0.0, 1.0);
-        glTranslatef(-centroidPt.x, -centroidPt.y, 0.0);
 
         // Scale.
-        glTranslatef(centroidPt.x, centroidPt.y, 0.0);
         glScalef(sx, sy, 0.0);
+
         glTranslatef(-centroidPt.x, -centroidPt.y, 0.0);
 
         glColor3f (1.0, 0.0, 0.0);  // Set color for transformed triangle.
