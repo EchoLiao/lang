@@ -2,7 +2,7 @@
 
 GLint winWidth = 600, winHeight = 600;   //  Initial display-window size.
 
-GLfloat x0 = 100.0, y0 = 50.0, z0 = 50;  //  Viewing-coordinate origin.
+GLfloat x0 = 100.0, y0 = 50.0, z0 = -50;  //  Viewing-coordinate origin.
 GLfloat xref = 50.0, yref = 50.0, zref = 0.0;  //  Look-at point.
 GLfloat Vx = 0.0, Vy = 1.0, Vz = 0.0;          //  View up vector.
 
