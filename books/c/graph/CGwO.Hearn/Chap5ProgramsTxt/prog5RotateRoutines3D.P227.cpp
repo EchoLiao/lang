@@ -68,6 +68,12 @@ void translate3D (GLfloat tx, GLfloat ty, GLfloat tz)
     matrix4x4PreMultiply (matTransl3D, matRot);
 }
 
+/* 
+ * 3D, 绕任意轴旋转
+ *
+ *   Mr(theta) = T^-1 * R(theta) * T
+ *
+ * */
 void rotate3D (wcPt3D p1, wcPt3D p2, GLfloat radianAngle)
 {
     Matrix4x4 matQuaternionRot;
