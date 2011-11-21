@@ -11,6 +11,7 @@ LDLIBS = $(GLUT) -lGLU -lGL -lXmu -lXext -lX11 -lm
 TARGETS = \
 		  prog5CompositeTransformation2D.P203 \
 		  prog5CompositeTransformation2D.P203-2 \
+		  prog5RotateRoutines3D.P227 \
 
 
 all: $(TARGETS)
