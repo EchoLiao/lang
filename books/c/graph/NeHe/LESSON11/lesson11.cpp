@@ -175,6 +175,7 @@ void update_ver_and_tex()
     float xtstep = (1.0/((float)iw/tw)) / (float)X_NUMDIV;
     float ytstep = (1.0/((float)ih/th)) / (float)Y_NUMDIV;
 
+    // [(<<G:2>> P45 P109)]
     int ncircle = 1;     // 共须转 ncircle 圈
     // ncircle * 2 * PI * r == ow_r
     float r = ow_r / (ncircle*2.0*3.141592654);
