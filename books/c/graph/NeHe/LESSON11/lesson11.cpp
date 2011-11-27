@@ -31,6 +31,7 @@ typedef struct _RGBIMG {
 // Global Variables
 
 bool g_stop = 0;
+bool g_isopenning = true;
 
 float   g_points[X_NUMDIV * 4][5];   // The Array For The Points On The Grid Of Our "Wave"
 
@@ -176,7 +177,7 @@ void update_ver_and_tex()
     float ytstep = (1.0/((float)ih/th)) / (float)Y_NUMDIV;
 
     // [(<<G:2>> P45 P109)]
-    int ncircle = 2;     // 共须转 ncircle 圈
+    int ncircle = 4;     // 共须转 ncircle 圈
     // ncircle * 2 * PI * r == ow_r
     float r = ow_r / (ncircle*2.0*3.141592654);
     // 把柱面部分的纹理按顺时针方向贴到柱面上
@@ -189,7 +190,7 @@ void update_ver_and_tex()
     {
         for (int x = 0; x < X_NUMDIV; x++) 
         {
-            if ( g_x_curframe < x ) // 平面部分
+            if ( g_x_curframe > x ) // 平面部分
             {
                 // ([-1.x, 1.x], [-1.0, 1.0])
 
@@ -287,8 +288,18 @@ void render(void)
 
     printf("NAL XX g_x_curframe=%d ...\n", g_x_curframe);
     if ( ! g_stop )
-        if ( ++g_x_curframe > X_NUMDIV )
-            g_x_curframe = 0;
+    {
+        if ( g_isopenning )
+        {
+            if ( ++g_x_curframe >= X_NUMDIV )
+                g_isopenning = false;
+        }
+        else
+        {
+            if ( --g_x_curframe <= 0 )
+                g_isopenning = true;
+        }
+    }
     usleep(1000 * 200);
 
     // Swap The Buffers To Become Our Rendering Visible
