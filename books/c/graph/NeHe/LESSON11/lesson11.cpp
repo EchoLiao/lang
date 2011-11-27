@@ -156,7 +156,7 @@ bool init(void)
     glShadeModel(GL_SMOOTH);						   // Enable Smooth Shading
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
     glPolygonMode(GL_BACK, GL_FILL);                   // Back Face Is Solid (NEW)
-    glPolygonMode(GL_FRONT, GL_LINE);                  // Front Face Is Made Of Lines (NEW)
+    glPolygonMode(GL_FRONT, GL_FILL);                  // Front Face Is Made Of Lines (NEW)
 
     return true;
 }
@@ -184,6 +184,7 @@ void update_ver_and_tex()
     float theta = -360.0f / (X_NUMDIV / ncircle);
     // 初始化指针初始位置, 使得平面部分与柱面部分能够平滑衔接
     float rad180 = 3.141592654;
+    int xnumFramePerCircle = X_NUMDIV / ncircle;
 
     memset(g_points, 0, X_NUMDIV*4*5*sizeof(float));
     for(int y = 0; y < Y_NUMDIV; y++)
@@ -220,6 +221,9 @@ void update_ver_and_tex()
             }                    
             else // 卷轴部分
             {
+                // 超过一圈的不再贴到柱面上
+                if ( x - g_x_curframe >= xnumFramePerCircle )
+                    break;
                 float deta = (float)(x - g_x_curframe);
                 float detab = (float)(x + 1 - g_x_curframe);
                 g_points[4*x][0] = (float)sin(deta*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
