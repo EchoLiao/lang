@@ -178,7 +178,9 @@ void update_ver_and_tex()
     int ncircle = 1;     // 共须转 ncircle 圈
     // ncircle * 2 * PI * r == ow_r
     float r = ow_r / (ncircle*2.0*3.141592654);
-    float theta = 360.0f / (X_NUMDIV / ncircle);
+    // 把柱面部分的纹理按顺时针方向贴到柱面上
+    float theta = -360.0f / (X_NUMDIV / ncircle);
+    // 初始化指针初始位置, 使得平面部分与柱面部分能够平滑衔接
     float rad180 = 3.141592654;
 
     memset(g_points, 0, X_NUMDIV*4*5*sizeof(float));
@@ -216,27 +218,28 @@ void update_ver_and_tex()
             }                    
             else // 卷轴部分
             {
-                g_points[4*x][0] = (float)sin(x*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
+                float deta = (float)(x - g_x_curframe);
+                g_points[4*x][0] = (float)sin(deta*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
                 g_points[4*x][1] = y*yvstep-oh_r_half;
-                g_points[4*x][2] = (float)cos(x*theta*ang2rad+rad180)*r;
+                g_points[4*x][2] = (float)cos(deta*theta*ang2rad+rad180)*r;
                 g_points[4*x][3] = x * xtstep;
                 g_points[4*x][4] = y * ytstep;
 
-                g_points[4*x+1][0] = (float)sin(x*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
+                g_points[4*x+1][0] = (float)sin(deta*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
                 g_points[4*x+1][1] = (y+1)*yvstep-oh_r_half;
-                g_points[4*x+1][2] = (float)cos(x*theta*ang2rad+rad180)*r;
+                g_points[4*x+1][2] = (float)cos(deta*theta*ang2rad+rad180)*r;
                 g_points[4*x+1][3] = x * xtstep;
                 g_points[4*x+1][4] = (y+1) * ytstep;
 
-                g_points[4*x+2][0] = (float)sin(x*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
+                g_points[4*x+2][0] = (float)sin(deta*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
                 g_points[4*x+2][1] = (y+1)*yvstep-oh_r_half;
-                g_points[4*x+2][2] = (float)cos(x*theta*ang2rad+rad180)*r;
+                g_points[4*x+2][2] = (float)cos(deta*theta*ang2rad+rad180)*r;
                 g_points[4*x+2][3] = (x+1) * xtstep;
                 g_points[4*x+2][4] = (y+1) * ytstep;
 
-                g_points[4*x+3][0] = (float)sin(x*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
+                g_points[4*x+3][0] = (float)sin(deta*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
                 g_points[4*x+3][1] = y*yvstep-oh_r_half;
-                g_points[4*x+3][2] = (float)cos(x*theta*ang2rad+rad180)*r;
+                g_points[4*x+3][2] = (float)cos(deta*theta*ang2rad+rad180)*r;
                 g_points[4*x+3][3] = (x+1) * xtstep;
                 g_points[4*x+3][4] = y * ytstep;
             }
