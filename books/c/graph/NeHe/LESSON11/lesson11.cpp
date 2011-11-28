@@ -21,23 +21,24 @@
 #define Y_NUMDIV    1
 
 // 
-// Use `GL_QUADS' draw it!
+// Use `GL_TRIANGLE_STRIP' draw it!
 //    
-//    1            3            5            7            9
-//    -----------------------------------------------------
-//    |1          2|5          6|9         10|13        14|
-//    |            |            |            |            |
-//    |            |            |            |            |
-//    |     0      |      1     |     2      |     3      |
-//    |            |            |            |            |
-//    |            |            |            |            |
-//    |0          3|4          7|8         11|12        15|
-//    -----------------------------------------------------
-//    0            2            4            6            8
+//    1       3       5       6       9
+//    ---------------------------------
+//    |x      |x      |x      |x      |
+//    | x     | x     | x     | x     |
+//    |  x    |  x    |  x    |  x    |
+//    |   0   |   1   |   2   |   3   |
+//    |    x  |    x  |    x  |    x  |
+//    |     x |     x |     x |     x |
+//    |      x|      x|      x|      x|
+//    ---------------------------------
+//    0       2       4       6       8 
 //
-//    0,1,2...15 对应 g_points 的下标.
+//    0,1,2...3 对应 X_NUMDIV.
+//    0,1,2...9 对应 g_points 的下标.
 //
-#define NUM_VERTEXES        (X_NUMDIV * 4)
+#define NUM_VERTEXES        ((X_NUMDIV+1)*2)
 // (0,1,2) is (x,y,z), (3,4) is (s,t).
 #define NUM_PER_VERTEXE     5
 
@@ -211,66 +212,43 @@ void update_ver_and_tex()
     memset(g_points, 0, NUM_VERTEXES*NUM_PER_VERTEXE*sizeof(float));
     for(int y = 0; y < Y_NUMDIV; y++)
     {
-        for (int x = 0; x < X_NUMDIV; x++) 
+        for (int x = 0; x <= X_NUMDIV; x++) 
         {
             if ( g_x_curframe > x ) // 平面部分
             {
                 // ([-1.x, 1.x], [-1.0, 1.0])
 
-                g_points[4*x][0] = x * xvstep - ow_r_half;
-                g_points[4*x][1] = y * yvstep - oh_r_half;
-                g_points[4*x][2] = -r;
-                g_points[4*x][3] = x * xtstep;
-                g_points[4*x][4] = y * ytstep;
+                g_points[2*x][0] = x * xvstep - ow_r_half;
+                g_points[2*x][1] = y * yvstep - oh_r_half;
+                g_points[2*x][2] = -r;
+                g_points[2*x][3] = x * xtstep;
+                g_points[2*x][4] = y * ytstep;
 
-                g_points[4*x+1][0] = x * xvstep - ow_r_half;
-                g_points[4*x+1][1] = (y+1) * yvstep - oh_r_half;
-                g_points[4*x+1][2] = -r;
-                g_points[4*x+1][3] = x * xtstep;
-                g_points[4*x+1][4] = (y+1) * ytstep;
-
-                g_points[4*x+2][0] = (x+1) * xvstep - ow_r_half;
-                g_points[4*x+2][1] = (y+1) * yvstep - oh_r_half;
-                g_points[4*x+2][2] = -r;
-                g_points[4*x+2][3] = (x+1) * xtstep;
-                g_points[4*x+2][4] = (y+1) * ytstep;
-
-                g_points[4*x+3][0] = (x+1) * xvstep - ow_r_half;
-                g_points[4*x+3][1] = y * yvstep - oh_r_half;
-                g_points[4*x+3][2] = -r;
-                g_points[4*x+3][3] = (x+1) * xtstep;
-                g_points[4*x+3][4] = y * ytstep;
+                g_points[2*x+1][0] = x * xvstep - ow_r_half;
+                g_points[2*x+1][1] = (y+1) * yvstep - oh_r_half;
+                g_points[2*x+1][2] = -r;
+                g_points[2*x+1][3] = x * xtstep;
+                g_points[2*x+1][4] = (y+1) * ytstep;
             }                    
             else // 卷轴部分
             {
                 // 超过一圈的不再贴到柱面上
                 if ( x - g_x_curframe >= xnumFramePerCircle )
                     break;
+
                 float deta = (float)(x - g_x_curframe);
-                float detab = (float)(x + 1 - g_x_curframe);
-                g_points[4*x][0] = (float)sin(deta*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
-                g_points[4*x][1] = y*yvstep-oh_r_half;
-                g_points[4*x][2] = (float)cos(deta*theta*ang2rad+rad180)*r;
-                g_points[4*x][3] = x * xtstep;
-                g_points[4*x][4] = y * ytstep;
 
-                g_points[4*x+1][0] = (float)sin(deta*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
-                g_points[4*x+1][1] = (y+1)*yvstep-oh_r_half;
-                g_points[4*x+1][2] = (float)cos(deta*theta*ang2rad+rad180)*r;
-                g_points[4*x+1][3] = x * xtstep;
-                g_points[4*x+1][4] = (y+1) * ytstep;
+                g_points[2*x][0] = (float)sin(deta*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
+                g_points[2*x][1] = y*yvstep-oh_r_half;
+                g_points[2*x][2] = (float)cos(deta*theta*ang2rad+rad180)*r;
+                g_points[2*x][3] = x * xtstep;
+                g_points[2*x][4] = y * ytstep;
 
-                g_points[4*x+2][0] = (float)sin(detab*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
-                g_points[4*x+2][1] = (y+1)*yvstep-oh_r_half;
-                g_points[4*x+2][2] = (float)cos(detab*theta*ang2rad+rad180)*r;
-                g_points[4*x+2][3] = (x+1) * xtstep;
-                g_points[4*x+2][4] = (y+1) * ytstep;
-
-                g_points[4*x+3][0] = (float)sin(detab*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
-                g_points[4*x+3][1] = y*yvstep-oh_r_half;
-                g_points[4*x+3][2] = (float)cos(detab*theta*ang2rad+rad180)*r;
-                g_points[4*x+3][3] = (x+1) * xtstep;
-                g_points[4*x+3][4] = y * ytstep;
+                g_points[2*x+1][0] = (float)sin(deta*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
+                g_points[2*x+1][1] = (y+1)*yvstep-oh_r_half;
+                g_points[2*x+1][2] = (float)cos(deta*theta*ang2rad+rad180)*r;
+                g_points[2*x+1][3] = x * xtstep;
+                g_points[2*x+1][4] = (y+1) * ytstep;
             }
         }
     }
@@ -292,25 +270,17 @@ void render(void)
     update_ver_and_tex();
 
     // [(<<G:2>> P107)]
-    glBegin(GL_QUADS);
+    glBegin(GL_TRIANGLE_STRIP);
     for (y = 0; y < Y_NUMDIV; y++) {
-        for (x = 0; x < X_NUMDIV; x++) {
+        for (x = 0; x <= X_NUMDIV; x++) {
             // 从此之后的不再有顶点数据
-            if ( g_points[4*x][0] == 0.0 )
+            if ( g_points[2*x][0] == 0.0 )
                 break;
 
-            glTexCoord2f(g_points[4*x][3], g_points[4*x][4]);
-            glVertex3f(g_points[4*x][0], g_points[4*x][1], g_points[4*x][2]);
-
-            glTexCoord2f(g_points[4*x+1][3], g_points[4*x+1][4]);
-            glVertex3f(g_points[4*x+1][0], g_points[4*x+1][1], g_points[4*x+1][2]);
-
-            glTexCoord2f(g_points[4*x+2][3], g_points[4*x+2][4]);
-            glVertex3f(g_points[4*x+2][0], g_points[4*x+2][1], g_points[4*x+2][2]);
-
-            glTexCoord2f(g_points[4*x+3][3], g_points[4*x+3][4]);
-            glVertex3f(g_points[4*x+3][0], g_points[4*x+3][1], g_points[4*x+3][2]);
-
+            glTexCoord2f(g_points[2*x][3], g_points[2*x][4]);
+            glVertex3f(g_points[2*x][0], g_points[2*x][1], g_points[2*x][2]);
+            glTexCoord2f(g_points[2*x+1][3], g_points[2*x+1][4]);
+            glVertex3f(g_points[2*x+1][0], g_points[2*x+1][1], g_points[2*x+1][2]);
         }
     }
     glEnd();
