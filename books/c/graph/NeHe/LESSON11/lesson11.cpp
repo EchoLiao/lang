@@ -296,7 +296,7 @@ void render(void)
     for (y = 0; y < Y_NUMDIV; y++) {
         for (x = 0; x < X_NUMDIV; x++) {
             // 从此之后的不再有顶点数据
-            if ( g_points[4*x][0] == 0 )
+            if ( g_points[4*x][0] == 0.0 )
                 break;
 
             glTexCoord2f(g_points[4*x][3], g_points[4*x][4]);
