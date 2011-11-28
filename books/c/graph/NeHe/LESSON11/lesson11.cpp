@@ -17,7 +17,29 @@
 
 // 被细分为90个小矩形
 #define X_NUMDIV    90
+// Y_NUMDIV MUST is equal one!!
 #define Y_NUMDIV    1
+
+// 
+// Use `GL_QUADS' draw it!
+//    
+//    1            3            5            7            9
+//    -----------------------------------------------------
+//    |1          2|5          6|9         10|13        14|
+//    |            |            |            |            |
+//    |            |            |            |            |
+//    |     0      |      1     |     2      |     3      |
+//    |            |            |            |            |
+//    |            |            |            |            |
+//    |0          3|4          7|8         11|12        15|
+//    -----------------------------------------------------
+//    0            2            4            6            8
+//
+//    0,1,2...15 对应 g_points 的下标.
+//
+#define NUM_VERTEXES        (X_NUMDIV * 4)
+// (0,1,2) is (x,y,z), (3,4) is (s,t).
+#define NUM_PER_VERTEXE     5
 
 
 // A Structure For RGB Bitmaps
@@ -33,7 +55,7 @@ typedef struct _RGBIMG {
 bool g_stop = 0;
 bool g_isopenning = true;
 
-float   g_points[X_NUMDIV * 4][5];   // The Array For The Points On The Grid Of Our "Wave"
+float   g_points[NUM_VERTEXES][NUM_PER_VERTEXE];   // The Array For The Points On The Grid Of Our "Wave"
 
 bool    g_gamemode;                  // GLUT GameMode ON/OFF
 bool    g_fullscreen;                // Fullscreen Mode ON/OFF (When g_gamemode Is OFF)
@@ -186,7 +208,7 @@ void update_ver_and_tex()
     float rad180 = 3.141592654;
     int xnumFramePerCircle = X_NUMDIV / ncircle;
 
-    memset(g_points, 0, X_NUMDIV*4*5*sizeof(float));
+    memset(g_points, 0, NUM_VERTEXES*NUM_PER_VERTEXE*sizeof(float));
     for(int y = 0; y < Y_NUMDIV; y++)
     {
         for (int x = 0; x < X_NUMDIV; x++) 
@@ -273,6 +295,9 @@ void render(void)
     glBegin(GL_QUADS);
     for (y = 0; y < Y_NUMDIV; y++) {
         for (x = 0; x < X_NUMDIV; x++) {
+            // 从此之后的不再有顶点数据
+            if ( g_points[4*x][0] == 0 )
+                break;
 
             glTexCoord2f(g_points[4*x][3], g_points[4*x][4]);
             glVertex3f(g_points[4*x][0], g_points[4*x][1], g_points[4*x][2]);
