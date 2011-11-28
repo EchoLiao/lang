@@ -58,6 +58,8 @@ bool g_isopenning = true;
 
 float   g_points[NUM_VERTEXES][NUM_PER_VERTEXE];   // The Array For The Points On The Grid Of Our "Wave"
 
+int g_xnumFramePerCircle;
+
 bool    g_gamemode;                  // GLUT GameMode ON/OFF
 bool    g_fullscreen;                // Fullscreen Mode ON/OFF (When g_gamemode Is OFF)
 int     g_wiggle = 0;                // Counter Used To Control How Fast Flag Waves
@@ -207,7 +209,7 @@ void update_ver_and_tex()
     float theta = -360.0f / (X_NUMDIV / ncircle);
     // 初始化指针初始位置, 使得平面部分与柱面部分能够平滑衔接
     float rad180 = 3.141592654;
-    int xnumFramePerCircle = X_NUMDIV / ncircle;
+    g_xnumFramePerCircle = X_NUMDIV / ncircle;
 
     memset(g_points, 0, NUM_VERTEXES*NUM_PER_VERTEXE*sizeof(float));
     for(int y = 0; y < Y_NUMDIV; y++)
@@ -233,7 +235,7 @@ void update_ver_and_tex()
             else // 卷轴部分
             {
                 // 超过一圈的不再贴到柱面上
-                if ( x - g_x_curframe >= xnumFramePerCircle )
+                if ( x - g_x_curframe >= g_xnumFramePerCircle )
                     break;
 
                 float deta = (float)(x - g_x_curframe);
@@ -274,7 +276,7 @@ void render(void)
     for (y = 0; y < Y_NUMDIV; y++) {
         for (x = 0; x <= X_NUMDIV; x++) {
             // 从此之后的不再有顶点数据
-            if ( g_points[2*x][0] == 0.0 )
+            if ( x - g_x_curframe >= g_xnumFramePerCircle )
                 break;
 
             glTexCoord2f(g_points[2*x][3], g_points[2*x][4]);
