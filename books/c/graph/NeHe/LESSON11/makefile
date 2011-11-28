@@ -42,4 +42,4 @@ $(PROJ2).exe: $(OBJS2)
 
 clean:
 	$(RM) *.o
-	$(RM) $(PROJ).exe
+	$(RM) *.exe

@@ -6,6 +6,7 @@
    the program with glut32.lib, glu32.lib, opengl32.lib
    */
 
+#include <assert.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>           // Standard C/C++ Input-Output
@@ -83,7 +84,7 @@ int oh = 256;
 bool load_rgb_image(const char* file_name, int w, int h, RGBIMG* refimg)
 {
 
-#if 0
+#if 1
     GLuint   sz;    // Our Image's Data Field Length In Bytes
     FILE*    file;  // The Image's File On Disk
     long     fsize; // File Size In Bytes
@@ -146,22 +147,118 @@ bool load_rgb_image(const char* file_name, int w, int h, RGBIMG* refimg)
 #endif
 }
 
+void line_equation(float x1, float y1, float x2, float y2, float *k, float *b)
+{
+    *k = (y2 - y1) / (x2 - x1);
+    *b = (x1*y2 + x2*y1) / (x1 - x2);
+}
+
+bool create_trian_rgb_image(int win, int hin, RGBIMG *imgin,
+        int *wout, int *hout, RGBIMG *imgout)
+{
+    float w, h;
+    float Ax, Ay, Bx, By, Cx, Cy, Dx, Dy;
+    float ABk, ABb, BCk, BCb, CDk, CDb, ADk, ADb;
+    float cosTheta, tanTheta;
+    float i, j;
+
+    w = sqrtf((float)win*win + (float)hin*hin);
+    h = (float) 2.0*win*hin / (float)w;
+
+    Ax = 0.0;
+    Ay = h / 2.0;
+    Bx = sqrtf(hin*hin - (h/2.0)*(h/2.0));
+    By = h;
+    Cx = w;
+    Cy = h / 2.0;
+    Dx = sqrtf(win*win - (h/2.0)*(h/2.0));
+    Dy = 0.0;
+    line_equation(Ax, Ay, Bx, By, &ABk, &ABb);
+    line_equation(Bx, By, Cx, Cy, &BCk, &BCb);
+    line_equation(Cx, Cy, Dx, Dy, &CDk, &CDb);
+    line_equation(Ax, Ay, Dx, Dy, &ADk, &ADb);
+    cosTheta = win / w;
+    tanTheta = hin / win;
+
+    *wout = (int)w + 1;
+    *hout = (int)h + 1;
+    imgout->data = new GLubyte [*wout * *hout * 3];
+    if (imgout->data == NULL) 
+        return false;
+
+    imgout->w = *wout;
+    imgout->h = *hout;
+    memset(imgout->data, 0, *wout * *hout * 3);
+
+#if 1
+    for ( int y = 0; y < *hout; y++ )
+    {
+        for ( int x = 0; x < *wout; x++ )
+        {
+            GLubyte *pbout = imgout->data;
+            GLubyte *pbin = imgin->data;
+            if ( (float) y - ABk*x - ABb <= 0.0
+                    && (float) y - BCk*x - BCb >= 0.0
+                    && (float) y - CDk*x - CDb <= 0.0
+                    && (float) y - ADk*x - ADb >= 0.0 )
+            {
+                j = ((y-h/2.0)+x*tanTheta/cosTheta) / (1+tanTheta*tanTheta);
+                i = x/cosTheta - j*tanTheta;
+                pbin += ((int)j) * win * 3 + ((int)i) * 3;
+#if 1
+                int ipTmp = (int) ((imgin->data + win*hin*3) - pbin);
+                assert(ipTmp >= 0);
+#endif
+                pbout += y * *wout * 3 + x * 3;
+                memcpy(pbout, pbin, 3*sizeof(GLubyte));
+            }
+            else
+            {
+                memset(pbout, 0, 3*sizeof(GLubyte));
+            }
+        }
+    }
+#else
+    GLubyte *pbin = imgin->data;
+    GLubyte *pbout = imgout->data;
+    for ( int j = 0; j < hin; j++ )
+    {
+        for ( int i = 0; i < win; i++ )
+        {
+
+        }
+    }
+#endif
+
+    return true;
+
+}
+
 // Setup Our Textures. Returns true On Success, false On Fail
 bool setup_textures()
 {
-    RGBIMG img;
+    RGBIMG img, img2;
+    int w2, h2;
 
     // Create The Textures' Id List
     glGenTextures(TEXTURES_NUM, g_texid);          
     // Load The Image From A Disk File
     if (!load_rgb_image("tim_256x256.raw", 256, 256, &img)) return false;
+
+    if ( ! create_trian_rgb_image(256, 256, &img, &w2, &h2, &img2) )
+        return false;
+
     // Create Nearest Filtered Texture
     glBindTexture(GL_TEXTURE_2D, g_texid[0]);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3, img.w, img.h, 0, GL_RGB, GL_UNSIGNED_BYTE, img.data);
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, img2.w, img2.h, 0, GL_RGB, GL_UNSIGNED_BYTE, img2.data);
+    tw = iw = img2.w;
+    th = ih = img2.h;
+
     // Finished With Our Image, Free The Allocated Data
     delete img.data;
+    delete img2.data;
     return true;
 }
 
@@ -214,7 +311,7 @@ void update_ver_and_tex()
     {
         for (int x = 0; x <= X_NUMDIV; x++) 
         {
-            if ( g_x_curframe > x ) // 平面部分
+            // if ( g_x_curframe > x ) // 平面部分
             {
                 // ([-1.x, 1.x], [-1.0, 1.0])
 
@@ -230,7 +327,7 @@ void update_ver_and_tex()
                 g_points[2*x+1][3] = x * xtstep;
                 g_points[2*x+1][4] = (y+1) * ytstep;
             }                    
-            else // 卷轴部分
+            /* else // 卷轴部分
             {
                 // 超过一圈的不再贴到柱面上
                 if ( x - g_x_curframe >= xnumFramePerCircle )
@@ -249,7 +346,7 @@ void update_ver_and_tex()
                 g_points[2*x+1][2] = (float)cos(deta*theta*ang2rad+rad180)*r;
                 g_points[2*x+1][3] = x * xtstep;
                 g_points[2*x+1][4] = (y+1) * ytstep;
-            }
+            } */
         }
     }
 }
