@@ -3,6 +3,7 @@
 
 # add here the name of the project 
 PROJ = lesson11
+PROJ2 = lesson11-2
 
 # aliases
 CC = gcc
@@ -20,11 +21,15 @@ LDFLAGS = -lGLU -lGL -lXmu -lXext -lX11 -lm -lglut -L/usr/lib64 -lstdc++
 
 # add here additional object files
 OBJS = $(PROJ).o  
+OBJS2 = $(PROJ2).o  
 
-all: $(PROJ).exe
+all: $(PROJ).exe $(PROJ2).exe
 
 $(PROJ).exe: $(OBJS)
 	$(CC) $(LIBPATH) -o $@ $(OBJS) $(LDFLAGS)
+
+$(PROJ2).exe: $(OBJS2)
+	$(CC) $(LIBPATH) -o $@ $(OBJS2) $(LDFLAGS)
 
 %.o: %.c
 	$(CC) $(INCPATH) $(CFLAGS) -c $*.c
