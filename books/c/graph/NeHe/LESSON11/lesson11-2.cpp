@@ -59,6 +59,8 @@ bool g_isopenning = true;
 
 float   g_points[NUM_VERTEXES][NUM_PER_VERTEXE];   // The Array For The Points On The Grid Of Our "Wave"
 
+int g_xnumFramePerCircle;
+
 bool    g_gamemode;                  // GLUT GameMode ON/OFF
 bool    g_fullscreen;                // Fullscreen Mode ON/OFF (When g_gamemode Is OFF)
 int     g_wiggle = 0;                // Counter Used To Control How Fast Flag Waves
@@ -84,7 +86,7 @@ int oh = 256;
 bool load_rgb_image(const char* file_name, int w, int h, RGBIMG* refimg)
 {
 
-#if 1
+#if 0
     GLuint   sz;    // Our Image's Data Field Length In Bytes
     FILE*    file;  // The Image's File On Disk
     long     fsize; // File Size In Bytes
@@ -123,6 +125,7 @@ bool load_rgb_image(const char* file_name, int w, int h, RGBIMG* refimg)
     if (refimg->data == NULL) 
         return false;
 
+    memset(refimg->data, 0, w*h*3*sizeof(GLubyte));
     GLubyte *pb = refimg->data;
     for ( int y = 0; y < 256; y++ )
     {
@@ -150,7 +153,16 @@ bool load_rgb_image(const char* file_name, int w, int h, RGBIMG* refimg)
 void line_equation(float x1, float y1, float x2, float y2, float *k, float *b)
 {
     *k = (y2 - y1) / (x2 - x1);
-    *b = (x1*y2 + x2*y1) / (x1 - x2);
+    *b = (x2*y1 - x1*y2) / (x2 - x1);
+}
+
+void n2d_transf(float *xout, float *yout, float x, float y, 
+        float a, float tx, float ty)
+{
+    float sinA = sinf(a);
+    float cosA = cosf(a);
+    *xout = x*cosA - y*sinA + tx*cosA - ty*sinA;
+    *yout = x*sinA + y*cosA + tx*sinA + ty*cosA;
 }
 
 bool create_trian_rgb_image(int win, int hin, RGBIMG *imgin,
@@ -159,7 +171,7 @@ bool create_trian_rgb_image(int win, int hin, RGBIMG *imgin,
     float w, h;
     float Ax, Ay, Bx, By, Cx, Cy, Dx, Dy;
     float ABk, ABb, BCk, BCb, CDk, CDb, ADk, ADb;
-    float cosTheta, tanTheta;
+    float sinTheta, cosTheta, tanTheta;
     float i, j;
 
     w = sqrtf((float)win*win + (float)hin*hin);
@@ -177,6 +189,7 @@ bool create_trian_rgb_image(int win, int hin, RGBIMG *imgin,
     line_equation(Bx, By, Cx, Cy, &BCk, &BCb);
     line_equation(Cx, Cy, Dx, Dy, &CDk, &CDb);
     line_equation(Ax, Ay, Dx, Dy, &ADk, &ADb);
+    sinTheta = - hin / w;
     cosTheta = win / w;
     tanTheta = hin / win;
 
@@ -188,34 +201,68 @@ bool create_trian_rgb_image(int win, int hin, RGBIMG *imgin,
 
     imgout->w = *wout;
     imgout->h = *hout;
-    memset(imgout->data, 0, *wout * *hout * 3);
+    memset(imgout->data, 0, *wout * *hout * 3 * sizeof(GLubyte));
 
 #if 1
-    for ( int y = 0; y < *hout; y++ )
+    // 
+    // 变换公式: 	
+    // 
+    // 数学坐标系统 =》当前坐标系统:   
+    // X  =   MX * A11 + MY * A12 ＋ DX ; 
+    // Y  =   MX * A21 ＋ MY * A22 + DY
+    // 当前坐标系统 =》数学坐标系统:   
+    // MX  =   (X - DX) * A11  -  (Y -DY) * A12  ; 
+    // MY  =   (X - DX) * A21 -  (Y -DY) * A22 
+    //
+    // 其中: A11 = COSA  A12 = SINA  A21 = -SINA   A22 = COSA 
+    // DX,DY =  -数学坐标原点在当前坐标系统的XY
+    //
+    for ( int y = 0; y < hin; y++ )
     {
-        for ( int x = 0; x < *wout; x++ )
+        for ( int x = 0; x < win; x++ )
         {
             GLubyte *pbout = imgout->data;
             GLubyte *pbin = imgin->data;
-            if ( (float) y - ABk*x - ABb <= 0.0
-                    && (float) y - BCk*x - BCb >= 0.0
-                    && (float) y - CDk*x - CDb <= 0.0
-                    && (float) y - ADk*x - ADb >= 0.0 )
+            // if ( (float) y - ABk*x - ABb <= 0.0
+            //         && (float) y - BCk*x - BCb <= 0.0
+            //         && (float) y - CDk*x - CDb >= 0.0
+            //         && (float) y - ADk*x - ADb >= 0.0 )
             {
-                j = ((y-h/2.0)+x*tanTheta/cosTheta) / (1+tanTheta*tanTheta);
-                i = x/cosTheta - j*tanTheta;
-                pbin += ((int)j) * win * 3 + ((int)i) * 3;
-#if 1
-                int ipTmp = (int) ((imgin->data + win*hin*3) - pbin);
-                assert(ipTmp >= 0);
-#endif
-                pbout += y * *wout * 3 + x * 3;
+                n2d_transf(&i, &j, x, y, -45.0*(3.141592654/180.0), -128.0, 128.0);
+                assert(i >= -10.0);
+                assert(j >= 0.0);
+                // i = (x+0.0)*cosTheta - (y+(win/2.0))*sinTheta;
+                // j = (x+0.0)*sinTheta + (y+(win/2.0))*cosTheta;
+
+                // i = (y-h/2.0)*sinTheta + x*cosTheta;
+                // j = (y-h/2.0)*cosTheta - x*sinTheta;
+
+                // j = x*cosTheta - (y-h/2.0)*sinTheta;
+                // i = x*sinTheta + (y-h/2.0)*cosTheta;
+
+                // i = (x-0.0)*cosTheta - (y-h/2.0)*sinTheta;
+                // j = (x-0.0)*(-sinTheta) - (y-h/2.0)*cosTheta;
+                // i = x*cosTheta + y*sinTheta + 0.0;
+                // j = x*(-sinTheta) + y*cosTheta - h/2.0;
+                //
+                // j = ((x*tanTheta+(y-h/2.0))/cosTheta) / (1+tanTheta*tanTheta);
+                // i = x/cosTheta - j*tanTheta;
+                // j = ((y-h/2.0)+x*tanTheta/cosTheta) / (1+tanTheta*tanTheta);
+                // i = x/cosTheta - j*tanTheta;
+//                 pbin += ((int)j) * win * 3 + ((int)i) * 3;
+// #if 1
+//                 int ipTmp = (int) ((imgin->data + win*hin*3) - pbin);
+//                 assert(ipTmp >= 0);
+// #endif
+//                 pbout += y * *wout * 3 + x * 3;
+                pbin += y * win * 3 + x * 3;
+                pbout += ((int)j) * *wout * 3 + ((int)i) * 3;
                 memcpy(pbout, pbin, 3*sizeof(GLubyte));
             }
-            else
-            {
-                memset(pbout, 0, 3*sizeof(GLubyte));
-            }
+            // else
+            // {
+            //     memset(pbout, 0, 3*sizeof(GLubyte));
+            // }
         }
     }
 #else
@@ -231,6 +278,29 @@ bool create_trian_rgb_image(int win, int hin, RGBIMG *imgin,
 #endif
 
     return true;
+
+}
+
+void test_img(RGBIMG *img)
+{
+    // GLubyte *p = img->data;
+
+    for ( int y = img->h - 1; y >= 0; y-- )
+    {
+        GLubyte *p = img->data + y * img->w * 3;
+        for ( int x = 0; x < img->h; x++ )
+        {
+            if ( *p == 255 )
+                printf("r");
+            else if ( *(p+1) == 255 )
+                printf("g");
+            else
+                printf("0");
+
+            p += 3;
+        }
+        printf("\n");
+    }
 
 }
 
@@ -255,6 +325,8 @@ bool setup_textures()
     glTexImage2D(GL_TEXTURE_2D, 0, 3, img2.w, img2.h, 0, GL_RGB, GL_UNSIGNED_BYTE, img2.data);
     tw = iw = img2.w;
     th = ih = img2.h;
+
+    test_img(&img2);
 
     // Finished With Our Image, Free The Allocated Data
     delete img.data;
@@ -304,7 +376,7 @@ void update_ver_and_tex()
     float theta = -360.0f / (X_NUMDIV / ncircle);
     // 初始化指针初始位置, 使得平面部分与柱面部分能够平滑衔接
     float rad180 = 3.141592654;
-    int xnumFramePerCircle = X_NUMDIV / ncircle;
+    g_xnumFramePerCircle = X_NUMDIV / ncircle;
 
     memset(g_points, 0, NUM_VERTEXES*NUM_PER_VERTEXE*sizeof(float));
     for(int y = 0; y < Y_NUMDIV; y++)
@@ -330,7 +402,7 @@ void update_ver_and_tex()
             /* else // 卷轴部分
             {
                 // 超过一圈的不再贴到柱面上
-                if ( x - g_x_curframe >= xnumFramePerCircle )
+                if ( x - g_x_curframe >= g_xnumFramePerCircle )
                     break;
 
                 float deta = (float)(x - g_x_curframe);
@@ -364,6 +436,7 @@ void render(void)
 
     glBindTexture(GL_TEXTURE_2D, g_texid[0]);
 
+#if 0
     update_ver_and_tex();
 
     // [(<<G:2>> P107)]
@@ -371,8 +444,8 @@ void render(void)
     for (y = 0; y < Y_NUMDIV; y++) {
         for (x = 0; x <= X_NUMDIV; x++) {
             // 从此之后的不再有顶点数据
-            if ( g_points[2*x][0] == 0.0 )
-                break;
+            // if ( x - g_x_curframe >= g_xnumFramePerCircle )
+            //     break;
 
             glTexCoord2f(g_points[2*x][3], g_points[2*x][4]);
             glVertex3f(g_points[2*x][0], g_points[2*x][1], g_points[2*x][2]);
@@ -381,9 +454,26 @@ void render(void)
         }
     }
     glEnd();
+
+#else
+    glBegin(GL_QUADS);
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(-1.0, -1.0, 0.0);
+
+    glTexCoord2f(0.0, 1.0);
+    glVertex3f(-1.0,  1.0, 0.0);
+
+    glTexCoord2f(1.0, 1.0);
+    glVertex3f( 1.0,  1.0, 0.0);
+
+    glTexCoord2f(1.0, 0.0);
+    glVertex3f( 1.0, -1.0, 0.0);
+    glEnd();
+#endif
+
     glPopMatrix();
 
-    printf("NAL XX g_x_curframe=%d ...\n", g_x_curframe);
+    // printf("NAL XX g_x_curframe=%d ...\n", g_x_curframe);
     if ( ! g_stop )
     {
         if ( g_isopenning )
@@ -397,7 +487,7 @@ void render(void)
                 g_isopenning = true;
         }
     }
-    usleep(1000 * 200);
+    // usleep(1000 * 200);
 
     // Swap The Buffers To Become Our Rendering Visible
     glutSwapBuffers ( );
