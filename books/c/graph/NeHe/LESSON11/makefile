@@ -22,14 +22,15 @@ LDFLAGS = -lGLU -lGL -lXmu -lXext -lX11 -lm -lglut -L/usr/lib64 -lstdc++
 # add here additional object files
 OBJS = $(PROJ).o  
 OBJS2 = $(PROJ2).o  
+SHARED = naldebug.o
 
 all: $(PROJ).exe $(PROJ2).exe
 
-$(PROJ).exe: $(OBJS)
-	$(CC) $(LIBPATH) -o $@ $(OBJS) $(LDFLAGS)
+$(PROJ).exe: $(OBJS) $(SHARED)
+	$(CC) $(LIBPATH) -o $@ $(SHARED) $(OBJS) $(LDFLAGS)
 
-$(PROJ2).exe: $(OBJS2)
-	$(CC) $(LIBPATH) -o $@ $(OBJS2) $(LDFLAGS)
+$(PROJ2).exe: $(OBJS2) $(SHARED)
+	$(CC) $(LIBPATH) -o $@ $(SHARED) $(OBJS2) $(LDFLAGS)
 
 %.o: %.c
 	$(CC) $(INCPATH) $(CFLAGS) -c $*.c
@@ -40,6 +41,11 @@ $(PROJ2).exe: $(OBJS2)
 %.o: %.rc
 	$(RC) -i $*.rc -o $*.o
 
+
+naldebug.o: naldebug.cpp naldebug.h
+
+
 clean:
 	$(RM) *.o
 	$(RM) *.exe
+	$(RM) $(SHARED)

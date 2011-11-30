@@ -12,6 +12,7 @@
 #include <stdio.h>           // Standard C/C++ Input-Output
 #include <math.h>            // Math Functions
 #include <GL/glut.h>         // The GL Utility Toolkit (GLUT) Header
+#include "naldebug.h"
 
 
 #define TEXTURES_NUM 1       // We Have 1 Texture 
@@ -121,15 +122,15 @@ bool load_rgb_image(const char* file_name, int w, int h, RGBIMG* refimg)
 #else
     refimg->w = (GLuint) w;
     refimg->h = (GLuint) h;
-    refimg->data = new GLubyte [256*256*3];
+    refimg->data = new GLubyte [w*h*3];
     if (refimg->data == NULL) 
         return false;
 
     memset(refimg->data, 0, w*h*3*sizeof(GLubyte));
     GLubyte *pb = refimg->data;
-    for ( int y = 0; y < 256; y++ )
+    for ( int y = 0; y < w; y++ )
     {
-        for ( int x = 0; x < 256; x++ )
+        for ( int x = 0; x < h; x++ )
         {
             if ( x == y )
             {
@@ -285,6 +286,7 @@ void test_img(RGBIMG *img)
 {
     // GLubyte *p = img->data;
 
+#if 1
     for ( int y = img->h - 1; y >= 0; y-- )
     {
         GLubyte *p = img->data + y * img->w * 3;
@@ -294,6 +296,8 @@ void test_img(RGBIMG *img)
                 printf("r");
             else if ( *(p+1) == 255 )
                 printf("g");
+            else if ( *(p+2) == 255 )
+                printf("b");
             else
                 printf("0");
 
@@ -301,7 +305,14 @@ void test_img(RGBIMG *img)
         }
         printf("\n");
     }
+#else
 
+    // int bpp;
+    // NALReadBMPFile("nal_1.bmp", (NALBYTE**)&img->data, (long*)&img->w,
+    //         (long*)&img->h, &bpp, NALTRUE);
+    NALWriteBMPFile("nal_2.bmp", img->data, img->w, img->h, 24, NALTRUE);
+
+#endif
 }
 
 // Setup Our Textures. Returns true On Success, false On Fail
@@ -313,18 +324,18 @@ bool setup_textures()
     // Create The Textures' Id List
     glGenTextures(TEXTURES_NUM, g_texid);          
     // Load The Image From A Disk File
-    if (!load_rgb_image("tim_256x256.raw", 256, 256, &img)) return false;
+    if (!load_rgb_image("tim_256x256.raw", 64, 64, &img)) return false;
 
-    if ( ! create_trian_rgb_image(256, 256, &img, &w2, &h2, &img2) )
+    if ( ! create_trian_rgb_image(64, 64, &img, &w2, &h2, &img2) )
         return false;
 
     // Create Nearest Filtered Texture
     glBindTexture(GL_TEXTURE_2D, g_texid[0]);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, 3, img2.w, img2.h, 0, GL_RGB, GL_UNSIGNED_BYTE, img2.data);
-    tw = iw = img2.w;
-    th = ih = img2.h;
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, img.w, img.h, 0, GL_RGB, GL_UNSIGNED_BYTE, img.data);
+    tw = iw = img.w;
+    th = ih = img.h;
 
     test_img(&img2);
 
