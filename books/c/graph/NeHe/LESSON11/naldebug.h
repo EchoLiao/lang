@@ -35,8 +35,8 @@
 #endif
 
 
-typedef long				NALLONG;
-typedef unsigned long       NALDWORD;
+typedef int 				NALLONG;
+typedef unsigned int        NALDWORD;
 typedef unsigned short      NALWORD;
 typedef unsigned char       NALBYTE;
 typedef int					NALBOOL;
@@ -52,7 +52,7 @@ typedef int					NALBOOL;
 
 
 
-/* #pragma pack(1)  [>arm-linux-gcc 不支持该选项? QQQQQ<] */
+#pragma pack(1)  /* arm-linux-gcc 不支持该选项? QQQQQ */
 typedef struct
 {
     NALWORD  bfType;
@@ -61,7 +61,7 @@ typedef struct
     NALWORD  bfReserved2;
     NALDWORD bfOffBits; /* data offset */
 } NALBITMAPFILEHEADER,*NALLPBITMAPFILEHEADER;
-/* #pragma pack() */
+#pragma pack()
 
 typedef struct
 {

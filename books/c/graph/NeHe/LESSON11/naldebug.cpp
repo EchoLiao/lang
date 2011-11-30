@@ -136,12 +136,12 @@ NALBOOL WriteBMPFile(char* BMPFilename, NALBYTE *pRGBBuf, long m_nWidth,
             printf( "Can not create BMP file: %s\n", BMPFilename );
             return NALFALSE;
         }
-        printf("NAL test (%s) w1 NALBITMAPFILEHEADER: %d, NALBITMAPINFOHEADER: %d, &&&&&&&&&&&\n",
-                BMPFilename, sizeof(NALBITMAPFILEHEADER), sizeof(NALBITMAPINFOHEADER));
+        printf("NAL test %d (%s) w1 NALBITMAPFILEHEADER: %d, NALBITMAPINFOHEADER: %d, &&&&&&&&&&&\n",
+                sizeof(unsigned short), BMPFilename, sizeof(NALBITMAPFILEHEADER), sizeof(NALBITMAPINFOHEADER));
 
         bmpHeader.bfType = (NALWORD)(('M' << 8) | 'B');
         // bmpHeader.bfSize = (NALDWORD)(RGB_SIZE + sizeof(NALBITMAPFILEHEADER) + sizeof(NALBITMAPINFOHEADER));
-        bmpHeader.bfSize = (NALDWORD)(RGB_SIZE + 0x36);
+        // bmpHeader.bfSize = (NALDWORD)(RGB_SIZE + 0x36);
         bmpHeader.bfReserved1 = 0;
         bmpHeader.bfReserved2 = 0;
         bmpHeader.bfOffBits = 0x36; // sizeof(NALBITMAPFILEHEADER) + sizeof(NALBITMAPINFOHEADER);
@@ -157,8 +157,9 @@ NALBOOL WriteBMPFile(char* BMPFilename, NALBYTE *pRGBBuf, long m_nWidth,
         bmpInfo.biYPelsPerMeter = 0;
         bmpInfo.biClrUsed = 0;
         bmpInfo.biClrImportant = 0;
+        bmpHeader.bfSize = (NALDWORD)(bmpInfo.biSizeImage + 0x36); // MMMMM
 
-        if ( (count=fwrite(&bmpHeader.bfType, 1, 2, fp)) != 2 )
+        /* if ( (count=fwrite(&bmpHeader.bfType, 1, 2, fp)) != 2 )
             printf( "write BMP file header failed: count=%ld\n", count);
         if ( (count=fwrite(&bmpHeader.bfSize, 1, 4, fp)) != 4 )
             printf( "write BMP file header failed: count=%ld\n", count);
@@ -169,11 +170,11 @@ NALBOOL WriteBMPFile(char* BMPFilename, NALBYTE *pRGBBuf, long m_nWidth,
         if ( (count=fwrite(&bmpHeader.bfOffBits, 1, 4, fp)) != 4 )
             printf( "write BMP file header failed: count=%ld\n", count);
         printf("NAL header info\n");
-        /* if ( (count=fwrite(&bmpHeader, 1, sizeof(NALBITMAPFILEHEADER), fp)) != sizeof(NALBITMAPFILEHEADER)) */
-        /*    printf( "write BMP file header failed: count=%ld\n", count);                                */
+        [>if ( (count=fwrite(&bmpHeader, 1, sizeof(NALBITMAPFILEHEADER), fp)) != sizeof(NALBITMAPFILEHEADER))<]
+        [>   printf( "write BMP file header failed: count=%ld\n", count);                               <]
 
         if ( (count=fwrite(&bmpInfo, 1, sizeof(NALBITMAPINFOHEADER), fp)) != sizeof(NALBITMAPINFOHEADER))
-            printf( "Read BMP file info failed: count=%ld\n", count);
+            printf( "Read BMP file info failed: count=%ld\n", count); */
 
         if ( ! isRevert )
         {
