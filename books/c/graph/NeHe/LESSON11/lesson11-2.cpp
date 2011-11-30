@@ -284,12 +284,10 @@ bool create_trian_rgb_image(int win, int hin, RGBIMG *imgin,
 
 void test_img(RGBIMG *img)
 {
-    // GLubyte *p = img->data;
-
     for ( int y = img->h - 1; y >= 0; y-- )
     {
         GLubyte *p = img->data + y * img->w * 3;
-        for ( int x = 0; x < img->h; x++ )
+        for ( int x = 0; x < (int)img->h; x++ )
         {
             if ( *p == 255 )
                 printf("r");
@@ -302,7 +300,6 @@ void test_img(RGBIMG *img)
         }
         printf("\n");
     }
-
 }
 
 // Setup Our Textures. Returns true On Success, false On Fail
@@ -323,9 +320,15 @@ bool setup_textures()
     glBindTexture(GL_TEXTURE_2D, g_texid[0]);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
+#if 0
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, img.w, img.h, 0, GL_RGB, GL_UNSIGNED_BYTE, img.data);
+    tw = iw = img.w;
+    th = ih = img.h;
+#else
     glTexImage2D(GL_TEXTURE_2D, 0, 3, img2.w, img2.h, 0, GL_RGB, GL_UNSIGNED_BYTE, img2.data);
     tw = iw = img2.w;
     th = ih = img2.h;
+#endif
 
     test_img(&img2);
 
@@ -384,7 +387,7 @@ void update_ver_and_tex()
     {
         for (int x = 0; x <= X_NUMDIV; x++) 
         {
-            // if ( g_x_curframe > x ) // 平面部分
+            if ( g_x_curframe > x ) // 平面部分
             {
                 // ([-1.x, 1.x], [-1.0, 1.0])
 
@@ -400,7 +403,7 @@ void update_ver_and_tex()
                 g_points[2*x+1][3] = x * xtstep;
                 g_points[2*x+1][4] = (y+1) * ytstep;
             }                    
-            /* else // 卷轴部分
+            else // 卷轴部分
             {
                 // 超过一圈的不再贴到柱面上
                 if ( x - g_x_curframe >= g_xnumFramePerCircle )
@@ -419,7 +422,7 @@ void update_ver_and_tex()
                 g_points[2*x+1][2] = (float)cos(deta*theta*ang2rad+rad180)*r;
                 g_points[2*x+1][3] = x * xtstep;
                 g_points[2*x+1][4] = (y+1) * ytstep;
-            } */
+            }
         }
     }
 }
@@ -432,12 +435,13 @@ void render(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear The Screen And The Depth Buffer
     glLoadIdentity();									// Reset The View
     glTranslatef(0.0f,0.0f,-2.02f);
+    glRotatef(45.0f, 0.0f, 0.0f, 1.0f);
 
     glPushMatrix();
 
     glBindTexture(GL_TEXTURE_2D, g_texid[0]);
 
-#if 0
+#if 1
     update_ver_and_tex();
 
     // [(<<G:2>> P107)]
@@ -445,8 +449,8 @@ void render(void)
     for (y = 0; y < Y_NUMDIV; y++) {
         for (x = 0; x <= X_NUMDIV; x++) {
             // 从此之后的不再有顶点数据
-            // if ( x - g_x_curframe >= g_xnumFramePerCircle )
-            //     break;
+            if ( x - g_x_curframe >= g_xnumFramePerCircle )
+                break;
 
             glTexCoord2f(g_points[2*x][3], g_points[2*x][4]);
             glVertex3f(g_points[2*x][0], g_points[2*x][1], g_points[2*x][2]);
@@ -488,7 +492,7 @@ void render(void)
                 g_isopenning = true;
         }
     }
-    // usleep(1000 * 200);
+    usleep(1000 * 50);
 
     // Swap The Buffers To Become Our Rendering Visible
     glutSwapBuffers ( );
