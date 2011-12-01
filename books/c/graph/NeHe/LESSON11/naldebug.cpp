@@ -139,6 +139,7 @@ NALBOOL st_read_bmp_file(FILE *file, sbitData *bdata)
     st_read_bmp_header(&header, file);
     st_read_bmp_info_header(&info, file);
     assert(header.bfType == 0x4D42);
+    assert(info.biBitCount >= 8 || !"Only support 8 16 24 32 bits Format!");
 
     linepich = ((((info.biWidth*info.biBitCount)>>3)+3)>>2)<<2;
     // bmp文件格式要求行以 4 字节对齐
@@ -223,13 +224,14 @@ NALBOOL st_write_bmp_file(FILE *file, sbitData *bdata)
     st_write_bmp_header(&header, file);
     st_write_bmp_info_header(&info, file);
 
+    unsigned int srcw = bdata->w * (bdata->iBitCount >> 3);
     fseek(file, BMP_DATA_OFFSET, SEEK_SET);
     if ( ! bdata->isRevert )
     {
         sbuf = bdata->pdata;
         for ( i = 0; i < bdata->h; i++ )
         {
-            if ( fwrite(sbuf, 1, bdata->w, file) != bdata->w )
+            if ( fwrite(sbuf, 1, srcw, file) != srcw )
                 goto _WRITE_ERROR;
             if ( igap != 0 )
                 if ( fwrite(gaps, 1, igap, file) != igap )
@@ -298,6 +300,29 @@ NALBOOL WriteBMPFile(const char* fname, sbitData *bdata)
     return ret;
 }
 
+void bmp_test(sbitData *bdata)
+{
+    unsigned int x, y, bytespp, linepich;
+    NALBYTE *pb;
+
+    bytespp = bdata->iBitCount >> 3;
+    linepich = bdata->w * bytespp;
+    for ( y = 0; y < bdata->h; y++ )
+    {
+        pb = bdata->pdata + y * linepich;
+        for ( x = 0; x < bdata->w; x++ )
+        {
+            if ( *pb != 0 && *(pb+1) != 0 && *(pb+2) != 0 )
+                printf("x");
+            else
+                printf("0");
+            pb += 3;
+        }
+        printf("\n");
+    }
+
+}
+
 int main (int argc, char *argv[])
 {
     sbitData bdata;
@@ -309,6 +334,9 @@ int main (int argc, char *argv[])
         printf("NAL ReadBMPFile Error!!!\n");
         exit(1);
     }
+
+    // bmp_test(&bdata);
+
     if ( ! WriteBMPFile("sf.bmp", &bdata) )
     {
         printf("NAL WriteBMPFile Error!!!\n");
