@@ -1,5 +1,5 @@
 /*
- * =====================================================================================
+ * ===========================================================================
  *
  *       Filename:  naldebug.c
  *
@@ -15,189 +15,307 @@
  *
  *      CopyRight:  Reserve
  *
- * =====================================================================================
+ * ===========================================================================
  */
 
+#include <assert.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "naldebug.h"
 
-// =================================================================================
-NALBOOL ReadBMPFile(char* lpszName, NALBYTE **pRGBBuf, long *m_nWidth,
-        long *m_nHeight, int *iBitCount, NALBOOL isRevert)
+void st_read_byte(NALBYTE *byte, FILE *file)
 {
-    FILE *pFile=NULL;
-    NALBITMAPFILEHEADER bfh1;
-    NALBITMAPINFOHEADER bih1;
-    NALBOOL isOK = NALFALSE;
+    if ( fread(byte, 1, 1, file) != 1 )
+        printf("NAL fread Error!");
+}
+
+void st_read_word(NALWORD *word, FILE *file)
+{
+    if ( fread(word, 1, 2, file) != 2 )
+        printf("NAL fread Error!");
+}
+
+void st_read_dword(NALDWORD *dword, FILE *file)
+{
+    if ( fread(dword, 1, 4, file) != 4 )
+        printf("NAL fread Error!");
+}
+
+void st_write_byte(NALBYTE *byte, FILE *file)
+{
+    if ( fwrite(byte, 1, 1, file) != 1 )
+        printf("NAL fwrite Error!");
+}
+
+void st_write_word(NALWORD *word, FILE *file)
+{
+    if ( fwrite(word, 1, 2, file) != 2 )
+        printf("NAL fwrite Error!");
+}
+
+void st_write_dword(NALDWORD *dword, FILE *file)
+{
+    if ( fwrite(dword, 1, 4, file) != 4 )
+        printf("NAL fwrite Error!");
+}
+
+void st_read_bmp_header(sbmpHeader *head, FILE *file)
+{
+    assert(head != NULL && file != NULL);
+
+    //读文件头
+    fseek(file, BMP_HEADER_OFFSET, SEEK_SET);
+    st_read_word (&head->bfType,        file);
+    st_read_dword(&head->bfSize,        file);
+    st_read_word (&head->bfReserved1,   file);
+    st_read_word (&head->bfReserved2,   file);
+    st_read_dword(&head->bfOffBits,     file);
+}
+
+void st_read_bmp_info_header(sbmpInfoHeader *info, FILE *file)
+{
+    assert(info != NULL && file != NULL);
+
+    //读信息头
+    fseek(file, BMP_INFO_HEADER_OFFSET, SEEK_SET);
+    st_read_dword(&info->biSize,           file);
+    st_read_dword(&info->biWidth,          file);
+    st_read_dword(&info->biHeight,         file);
+    st_read_word (&info->biPlanes,         file);
+    st_read_word (&info->biBitCount,       file);
+    st_read_dword(&info->biCompression,    file);
+    st_read_dword(&info->biSizeImage,      file);
+    st_read_dword(&info->biXPelsPerMeter,  file);
+    st_read_dword(&info->biYPelsPerMeter,  file);
+    st_read_dword(&info->biClrUsed,        file);
+    st_read_dword(&info->biClrImportant,   file);
+}
+
+void st_write_bmp_header(sbmpHeader *head, FILE *file)
+{
+    assert(head != NULL && file != NULL);
+
+    fseek(file, BMP_HEADER_OFFSET, SEEK_SET);
+    st_write_word (&head->bfType,        file);
+    st_write_dword(&head->bfSize,        file);
+    st_write_word (&head->bfReserved1,   file);
+    st_write_word (&head->bfReserved2,   file);
+    st_write_dword(&head->bfOffBits,     file);
+}
+
+void st_write_bmp_info_header(sbmpInfoHeader *info, FILE *file)
+{
+    assert(info != NULL && file != NULL);
+
+    fseek(file, BMP_INFO_HEADER_OFFSET, SEEK_SET);
+    st_write_dword(&info->biSize,           file);
+    st_write_dword(&info->biWidth,          file);
+    st_write_dword(&info->biHeight,         file);
+    st_write_word (&info->biPlanes,         file);
+    st_write_word (&info->biBitCount,       file);
+    st_write_dword(&info->biCompression,    file);
+    st_write_dword(&info->biSizeImage,      file);
+    st_write_dword(&info->biXPelsPerMeter,  file);
+    st_write_dword(&info->biYPelsPerMeter,  file);
+    st_write_dword(&info->biClrUsed,        file);
+    st_write_dword(&info->biClrImportant,   file);
+}
+
+/* 
+ * You NEED release bdata->pdata by youself!
+ * */
+NALBOOL st_read_bmp_file(FILE *file, sbitData *bdata)
+{
+    assert(file != NULL && bdata != NULL);
+
+    printf("NAL test 3 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n");
+
+    unsigned int i, linepich;
+    unsigned char *dbuf;
+    sbmpHeader      header;
+    sbmpInfoHeader  info;
+
+    st_read_bmp_header(&header, file);
+    st_read_bmp_info_header(&info, file);
+    assert(header.bfType == 0x4D42);
+
+    linepich = ((((info.biWidth*info.biBitCount)>>3)+3)>>2)<<2;
+    // bmp文件格式要求行以 4 字节对齐
+    assert( linepich - ((info.biWidth*info.biBitCount)>>3) <= 3 );
+
+    if ( info.biCompression == 0 ) // Format is BI_RGB ?
+        bdata->edformat = EBMP_BGR;
+    else
+        bdata->edformat = EBMP_UNKNOWN;
+    bdata->w = linepich / (info.biBitCount>>3);
+    bdata->h = info.biHeight;   // 高度值可能是负数? QQQQQ
+    bdata->iBitCount = info.biBitCount;
+    if ( (dbuf=(unsigned char*)calloc(1, linepich * bdata->h)) == NULL )
+        goto _NO_MEMORY;
+    bdata->pdata = dbuf;
+
+    //定位到数据段
+    fseek(file, header.bfOffBits, SEEK_SET);
+
+    if ( bdata->isRevert )
+    {
+        dbuf = dbuf + (linepich * bdata->h) - linepich;
+        for ( i = 0; i < bdata->h; i++ )
+        {
+            if ( fread(dbuf, 1, linepich, file) != linepich )
+                goto _READ_ERROR;
+            dbuf -= linepich;
+        }
+    }
+    else
+    {
+        for ( i = 0; i < bdata->h; i++ )
+        {
+            if ( fread(dbuf, 1, linepich, file) != linepich )
+                goto _READ_ERROR;
+            dbuf += linepich;
+        }
+    }
+    return NALTRUE;
+
+_READ_ERROR:
+    printf("fread Error!!");
+_NO_MEMORY:
+    return NALFALSE;
+}
+
+/* 
+ * */
+NALBOOL st_write_bmp_file(FILE *file, sbitData *bdata)
+{
+    assert(file != NULL && bdata != NULL);
+
+    unsigned int i, linepich, igap;
+    unsigned char   gaps[3] = { 0 };
+    unsigned char   *sbuf;
+    sbmpHeader      header;
+    sbmpInfoHeader  info;
+
+    linepich = (((bdata->w * (bdata->iBitCount>>3))+3)>>2)<<2;
+    igap = linepich - ((bdata->w * bdata->iBitCount)>>3);
+    assert(igap <= 3);
+
+    header.bfType = 0x4D42;
+    // 目前只支持真彩图
+    header.bfSize = BMP_DATA_OFFSET + linepich * bdata->h;
+    header.bfReserved1 = 0;
+    header.bfReserved2 = 0;
+    header.bfOffBits = BMP_DATA_OFFSET;
+    
+    info.biSize = BMP_DATA_OFFSET - BMP_INFO_HEADER_OFFSET;
+    info.biWidth = linepich / (bdata->iBitCount>>3);
+    info.biHeight = bdata->h;
+    info.biPlanes = 1;
+    info.biBitCount = bdata->iBitCount;
+    info.biCompression = 0; // BI_RGB
+    info.biSizeImage = 0;
+    info.biXPelsPerMeter = 0;
+    info.biYPelsPerMeter = 0;
+    info.biClrUsed = 0;
+    info.biClrImportant = 0;
+
+    st_write_bmp_header(&header, file);
+    st_write_bmp_info_header(&info, file);
+
+    fseek(file, BMP_DATA_OFFSET, SEEK_SET);
+    if ( ! bdata->isRevert )
+    {
+        sbuf = bdata->pdata;
+        for ( i = 0; i < bdata->h; i++ )
+        {
+            if ( fwrite(sbuf, 1, bdata->w, file) != bdata->w )
+                goto _WRITE_ERROR;
+            if ( igap != 0 )
+                if ( fwrite(gaps, 1, igap, file) != igap )
+                    goto _WRITE_ERROR;
+            sbuf += linepich;
+        }
+    }
+
+    return NALTRUE;
+
+_WRITE_ERROR:
+    printf("fwrite Error!!\n");
+    return NALFALSE;
+}
+
+NALBOOL ReadBMPFile(const char* fname, sbitData *bdata)
+{
+    NALBOOL         ret;
+    FILE            *pFile=NULL;
+    sbmpHeader      header;
 
     printf("NAL %d &&&&&&&&& %s &&& %s\n", __LINE__, __func__, __FILE__);
-    pFile = fopen(lpszName, "rb");
+
+    pFile = fopen(fname, "rb");
     if ( NULL == pFile )
     {
-        printf("Cannot open BMP file '%s'\n", lpszName);
+        printf("Cannot open BMP file '%s'\n", fname);
         return NALFALSE;
     }
-    printf("NAL %d &&&&&&&&& %s &&& %s\n", __LINE__, __func__, __FILE__);
-    fread(&bfh1, 1, 2, pFile); /* read into bfh1.bfType */
-    printf("NAL %d &&&&&&&&& %s &&& %s\n", __LINE__, __func__, __FILE__);
-    switch (bfh1.bfType)
+
+    st_read_bmp_header(&header, pFile);
+
+    switch ( header.bfType )
     {
         case 0x4D42: // bmp
-            printf("NAL test 3 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n");
-            fseek(pFile,0,SEEK_SET);
-
-            unsigned char *DestBuf, *SrcLineBuf;
-            int SrcPitch, ImgHeight;
-            /* NALBITMAPFILEHEADER bfh1; */
-            int i1;
-            //读文件头
-            fread(&bfh1, 1, 2, pFile);
-            fread(&bfh1.bfSize, 1, 4, pFile);
-            fread(&bfh1.bfReserved1, 1, 2, pFile);
-            fread(&bfh1.bfReserved2, 1, 2, pFile);
-            fread(&bfh1.bfOffBits, 1, 4, pFile);
-
-            //读信息头
-            fread(&bih1, 1, 12, pFile);
-            fread(&bih1.biPlanes, 1, 2, pFile);
-            fread(&bih1.biBitCount, 1, 2, pFile);
-            fread(&bih1.biCompression, 1, 24, pFile);
-
-            ImgHeight = abs(bih1.biHeight);
-
-            *m_nWidth = bih1.biWidth;
-            *m_nHeight = bih1.biHeight;
-            *iBitCount = bih1.biBitCount;
-
-            if ( (SrcLineBuf = (unsigned char *)malloc(bih1.biWidth * (bih1.biBitCount/8))) == NULL )
-                printf("malloc ERROR!\n");
-            if ( (DestBuf = (unsigned char *)malloc(bih1.biWidth * ImgHeight * (bih1.biBitCount)/8)) == NULL )
-                printf("malloc ERROR!\n");
-            *pRGBBuf = DestBuf;
-            //定位
-            fseek(pFile,bfh1.bfOffBits, SEEK_SET);
-            //
-            SrcPitch = bih1.biBitCount * bih1.biWidth / 8;
-            if ( isRevert ) // 倒置图象
-                DestBuf = DestBuf + (bih1.biWidth * ImgHeight * (bih1.biBitCount/8)) - SrcPitch;
-            //读取指定行数据
-            fread(SrcLineBuf, 1, SrcPitch, pFile);
-            if (bih1.biHeight > 0)
-            {
-                printf("NAL test 4 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n");
-                //计算目的缓冲区指针
-                for (i1 = 0;i1 < ImgHeight; i1++)
-                {
-                    switch (bih1.biBitCount)
-                    {
-                        case 24:
-                        case 32:
-                            // printf("NAL test 5 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n");
-                            memcpy(DestBuf, SrcLineBuf, SrcPitch);
-                            if ( isRevert )
-                                DestBuf -= SrcPitch;
-                            else
-                                DestBuf += SrcPitch;
-                            break;
-                    }
-                    fread(SrcLineBuf, 1, SrcPitch, pFile);
-                }
-                isOK = NALTRUE;
-            }
-            else
-            {
-                printf("暂不支持正置图象\n");
-                isOK = NALFALSE;
-            }
-            free(SrcLineBuf);
+            ret = st_read_bmp_file(pFile, bdata);
+            break;
+        default:
+            assert(!"Unknown file Format!");
             break;
     }
 
     fclose(pFile);
 
-    return isOK;
+    return ret;
 }
 
-NALBOOL WriteBMPFile(char* BMPFilename, NALBYTE *pRGBBuf, long m_nWidth,
-        long m_nHeight, int iBitCount, NALBOOL isRevert)
+NALBOOL WriteBMPFile(const char* fname, sbitData *bdata)
 {
-    long RGB_SIZE = (m_nWidth * m_nHeight * iBitCount) >> 3;
-    // if(iBitCount == 32)
+    NALBOOL         ret;
+    FILE            *pFile=NULL;
+
+    printf("NAL %d &&&&&&&&& %s &&& %s\n", __LINE__, __func__, __FILE__);
+
+    pFile = fopen(fname, "wb");
+    if ( NULL == pFile )
     {
-        FILE *fp;
-        NALDWORD count=0;
-        NALBITMAPFILEHEADER bmpHeader;
-        NALBITMAPINFOHEADER bmpInfo;
-
-        if( (fp = fopen(BMPFilename, "wb")) == NULL )
-        {
-            printf( "Can not create BMP file: %s\n", BMPFilename );
-            return NALFALSE;
-        }
-        printf("NAL test %d (%s) w1 NALBITMAPFILEHEADER: %d, NALBITMAPINFOHEADER: %d, &&&&&&&&&&&\n",
-                sizeof(unsigned short), BMPFilename, sizeof(NALBITMAPFILEHEADER), sizeof(NALBITMAPINFOHEADER));
-
-        bmpHeader.bfType = (NALWORD)(('M' << 8) | 'B');
-        // bmpHeader.bfSize = (NALDWORD)(RGB_SIZE + sizeof(NALBITMAPFILEHEADER) + sizeof(NALBITMAPINFOHEADER));
-        // bmpHeader.bfSize = (NALDWORD)(RGB_SIZE + 0x36);
-        bmpHeader.bfReserved1 = 0;
-        bmpHeader.bfReserved2 = 0;
-        bmpHeader.bfOffBits = 0x36; // sizeof(NALBITMAPFILEHEADER) + sizeof(NALBITMAPINFOHEADER);
-
-        bmpInfo.biSize = sizeof(NALBITMAPINFOHEADER);
-        bmpInfo.biWidth = m_nWidth;
-        bmpInfo.biHeight = m_nHeight;
-        bmpInfo.biPlanes = 1;
-        bmpInfo.biBitCount = iBitCount;
-        bmpInfo.biCompression = 0 /* BI_RGB */;
-        bmpInfo.biSizeImage = (((m_nWidth*iBitCount/8+3)/4)*4) * m_nHeight;
-        bmpInfo.biXPelsPerMeter = 0;
-        bmpInfo.biYPelsPerMeter = 0;
-        bmpInfo.biClrUsed = 0;
-        bmpInfo.biClrImportant = 0;
-        bmpHeader.bfSize = (NALDWORD)(bmpInfo.biSizeImage + 0x36); // MMMMM
-
-        /* if ( (count=fwrite(&bmpHeader.bfType, 1, 2, fp)) != 2 )
-            printf( "write BMP file header failed: count=%ld\n", count);
-        if ( (count=fwrite(&bmpHeader.bfSize, 1, 4, fp)) != 4 )
-            printf( "write BMP file header failed: count=%ld\n", count);
-        if ( (count=fwrite(&bmpHeader.bfReserved1, 1, 2, fp)) != 2 )
-            printf( "write BMP file header failed: count=%ld\n", count);
-        if ( (count=fwrite(&bmpHeader.bfReserved2, 1, 2, fp)) != 2 )
-            printf( "write BMP file header failed: count=%ld\n", count);
-        if ( (count=fwrite(&bmpHeader.bfOffBits, 1, 4, fp)) != 4 )
-            printf( "write BMP file header failed: count=%ld\n", count);
-        printf("NAL header info\n");
-        [>if ( (count=fwrite(&bmpHeader, 1, sizeof(NALBITMAPFILEHEADER), fp)) != sizeof(NALBITMAPFILEHEADER))<]
-        [>   printf( "write BMP file header failed: count=%ld\n", count);                               <]
-
-        if ( (count=fwrite(&bmpInfo, 1, sizeof(NALBITMAPINFOHEADER), fp)) != sizeof(NALBITMAPINFOHEADER))
-            printf( "Read BMP file info failed: count=%ld\n", count); */
-
-        if ( ! isRevert )
-        {
-            if ( (count=fwrite(pRGBBuf, 1, RGB_SIZE, fp)) != RGB_SIZE)
-                printf( "write BMP file data failed: count=%ld\n", count);
-        }
-        else
-        {
-            // int lineBs = (m_nWidth * iBitCount) >> 3;
-            int lineBs = (((m_nWidth*iBitCount/8+3)/4)*4);
-            int i = RGB_SIZE - m_nWidth*iBitCount/8;
-            for ( ; i >= 0; i -= lineBs )
-            {
-                if ( (count=fwrite(pRGBBuf + i, 1, m_nWidth*iBitCount/8, fp)) != m_nWidth*iBitCount/8 )
-                    printf( "write BMP file data failed: count=%ld\n", count );
-            }
-        }
-
-        fclose(fp);
-        return NALTRUE;
+        printf("Cannot open BMP file '%s'\n", fname);
+        return NALFALSE;
     }
-    // else
-    //     return NALFALSE;
+
+    ret = st_write_bmp_file(pFile, bdata);
+
+    fclose(pFile);
+
+    return ret;
 }
 
+int main (int argc, char *argv[])
+{
+    sbitData bdata;
+    
+    bdata.isRevert = 0;
 
+    if ( ! ReadBMPFile("cube1.bmp", &bdata) )
+    {
+        printf("NAL ReadBMPFile Error!!!\n");
+        exit(1);
+    }
+    if ( ! WriteBMPFile("sf.bmp", &bdata) )
+    {
+        printf("NAL WriteBMPFile Error!!!\n");
+        exit(1);
+    }
+
+    free(bdata.pdata);
+
+    return 0;
+}
