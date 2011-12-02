@@ -142,10 +142,15 @@ NALBOOL st_read_bmp_file(FILE *file, sbitData *bdata)
     st_read_bmp_header(&header, file);
     st_read_bmp_info_header(&info, file);
     assert(header.bfType == 0x4D42);
-    assert(info.biBitCount >= 8 || !"Only support 8 16 24 32 bits Format!");
+    if ( info.biBitCount != 16 || info.biBitCount != 24 
+            || info.biBitCount != 32 )
+    {
+        printf("Only support 16 24 32 bits Format!");
+        return NALFALSE;
+    }
 
-    linepich = ((((info.biWidth*info.biBitCount)>>3)+3)>>2)<<2;
     // bmp文件格式要求行以 4 字节对齐
+    linepich = ((((info.biWidth*info.biBitCount)>>3)+3)>>2)<<2;
     assert( linepich - ((info.biWidth*info.biBitCount)>>3) <= 3 );
 
     if ( info.biCompression == 0 ) // Format is BI_RGB ?
@@ -343,6 +348,7 @@ void bmp_test(sbitData *bdata)
 int main (int argc, char *argv[])
 {
     sbitData bdata;
+    char     dstfile[128];
     
     bdata.isRevert = 0;
 
@@ -360,8 +366,10 @@ int main (int argc, char *argv[])
 
     // bmp_test(&bdata);
 
+    sprintf(dstfile, "%s_dst.bmp", argv[1]);
+
     // bdata.w -= 1;
-    if ( ! WriteBMPFile("sf.bmp", &bdata) )
+    if ( ! WriteBMPFile(dstfile, &bdata) )
     {
         printf("NAL WriteBMPFile Error!!!\n");
         exit(1);
