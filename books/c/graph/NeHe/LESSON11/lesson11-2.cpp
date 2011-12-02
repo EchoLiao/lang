@@ -12,6 +12,7 @@
 #include <stdio.h>           // Standard C/C++ Input-Output
 #include <math.h>            // Math Functions
 #include <GL/glut.h>         // The GL Utility Toolkit (GLUT) Header
+#include "bmprw.h"
 
 
 #define TEXTURES_NUM 1       // We Have 1 Texture 
@@ -284,6 +285,7 @@ bool create_trian_rgb_image(int win, int hin, RGBIMG *imgin,
 
 void test_img(RGBIMG *img)
 {
+#if 0
     for ( int y = img->h - 1; y >= 0; y-- )
     {
         GLubyte *p = img->data + y * img->w * 3;
@@ -300,6 +302,9 @@ void test_img(RGBIMG *img)
         }
         printf("\n");
     }
+#else
+    // NALWriteBMPFile("nal-1.bmp", img->data, img->w, img->h, 24, NALTRUE);
+#endif
 }
 
 // Setup Our Textures. Returns true On Success, false On Fail

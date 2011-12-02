@@ -1,7 +1,7 @@
 /*
  * =====================================================================================
  *
- *       Filename:  naldebug.h
+ *       Filename:
  *
  *    Description:
  *
@@ -20,8 +20,8 @@
  */
 
 
-#ifndef _NALDEBUG_H
-#define _NALDEBUG_H
+#ifndef _BMPRW_H
+#define _BMPRW_H
 
 
 #define NALDEBUG
@@ -107,4 +107,4 @@ typedef struct
 NALBOOL ReadBMPFile(const char* fname, sbitData *bdata);
 NALBOOL WriteBMPFile(const char* fname, sbitData *bdata);
 
-#endif // _NALDEBUG_H
+#endif // _BMPRW_H
