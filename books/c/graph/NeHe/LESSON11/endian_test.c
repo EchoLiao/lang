@@ -34,14 +34,14 @@ static union {
 
 void endian_test(void)
 {
-    printf("ENDIAN sizeof(int*)         = %d\n", sizeof(int*));
-    printf("ENDIAN sizeof(char)         = %d\n", sizeof(char));
-    printf("ENDIAN sizeof(short)        = %d\n", sizeof(short));
-    printf("ENDIAN sizeof(int)          = %d\n", sizeof(int));
-    printf("ENDIAN sizeof(long)         = %d\n", sizeof(long));
-    printf("ENDIAN sizeof(long long)    = %d\n", sizeof(long long));
-    printf("ENDIAN sizeof(float)        = %d\n", sizeof(float));
-    printf("ENDIAN sizeof(double)       = %d\n", sizeof(double));
+    printf("ENDIAN sizeof(int*)         = %ld\n", sizeof(int*));
+    printf("ENDIAN sizeof(char)         = %ld\n", sizeof(char));
+    printf("ENDIAN sizeof(short)        = %ld\n", sizeof(short));
+    printf("ENDIAN sizeof(int)          = %ld\n", sizeof(int));
+    printf("ENDIAN sizeof(long)         = %ld\n", sizeof(long));
+    printf("ENDIAN sizeof(long long)    = %ld\n", sizeof(long long));
+    printf("ENDIAN sizeof(float)        = %ld\n", sizeof(float));
+    printf("ENDIAN sizeof(double)       = %ld\n", sizeof(double));
     printf("\n");
 
     union
@@ -64,7 +64,7 @@ void endian_test(void)
         else
             printf("ENDIAN: unknown\n");
     } else
-        printf("ENDIAN sizeof(short) = %d\n", sizeof(short));
+        printf("ENDIAN sizeof(short) = %ld\n", sizeof(short));
     printf("\n");
 
     // long long lli = 0x33;
@@ -75,8 +75,15 @@ void endian_test(void)
     if ( un.c[0] == 2 && un.c[1] == 1 )
     {
         printf("Assert test:");
-        assert(*l1 == 0x00000000);
-        assert(*l2 == 0x00000033);
+        if ( sizeof(long) == 4 )
+        {
+            assert(*l1 == 0x00000000);
+            assert(*l2 == 0x00000033);
+        }
+        else // 8 bits
+        {
+            assert(*l1 == 0x0000003300000000);
+        }
         printf("\tTrue!\n\n");
     }
     printf("DBP NUM lli is(%%llx) 0x%llx \n", lli);
