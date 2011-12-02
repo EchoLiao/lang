@@ -18,11 +18,14 @@
  * ===========================================================================
  */
 
+// #define NDEBUG
 #include <assert.h>
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "naldebug.h"
+
 
 void st_read_byte(NALBYTE *byte, FILE *file)
 {
@@ -149,7 +152,7 @@ NALBOOL st_read_bmp_file(FILE *file, sbitData *bdata)
         bdata->edformat = EBMP_BGR;
     else
         bdata->edformat = EBMP_UNKNOWN;
-    bdata->w = linepich / (info.biBitCount>>3);
+    bdata->w = linepich / (info.biBitCount>>3); // MUST: info.biHeight >= 8
     bdata->h = info.biHeight;   // 高度值可能是负数? QQQQQ
     bdata->iBitCount = info.biBitCount;
     if ( (dbuf=(unsigned char*)calloc(1, linepich * bdata->h)) == NULL )
@@ -226,7 +229,20 @@ NALBOOL st_write_bmp_file(FILE *file, sbitData *bdata)
 
     unsigned int srcw = bdata->w * (bdata->iBitCount >> 3);
     fseek(file, BMP_DATA_OFFSET, SEEK_SET);
-    if ( ! bdata->isRevert )
+    if ( bdata->isRevert )
+    {
+        sbuf = bdata->pdata + linepich * (bdata->h - 1);
+        for ( i = 0; i < bdata->h; i++ )
+        {
+            if ( fwrite(sbuf, 1, srcw, file) != srcw )
+                goto _WRITE_ERROR;
+            if ( igap != 0 )
+                if ( fwrite(gaps, 1, igap, file) != igap )
+                    goto _WRITE_ERROR;
+            sbuf -= linepich;
+        }
+    }
+    else 
     {
         sbuf = bdata->pdata;
         for ( i = 0; i < bdata->h; i++ )
@@ -249,8 +265,8 @@ _WRITE_ERROR:
 
 NALBOOL ReadBMPFile(const char* fname, sbitData *bdata)
 {
-    NALBOOL         ret;
-    FILE            *pFile=NULL;
+    NALBOOL         ret = NALFALSE;
+    FILE            *pFile = NULL;
     sbmpHeader      header;
 
     printf("NAL %d &&&&&&&&& %s &&& %s\n", __LINE__, __func__, __FILE__);
@@ -323,13 +339,20 @@ void bmp_test(sbitData *bdata)
 
 }
 
+#if 1
 int main (int argc, char *argv[])
 {
     sbitData bdata;
     
     bdata.isRevert = 0;
 
-    if ( ! ReadBMPFile("cube1.bmp", &bdata) )
+    if ( argv[1] == NULL )
+    {
+        printf("Usage: %s bmpfile\n", argv[0]);
+        exit(1);
+    }
+
+    if ( ! ReadBMPFile(argv[1], &bdata) )
     {
         printf("NAL ReadBMPFile Error!!!\n");
         exit(1);
@@ -337,6 +360,7 @@ int main (int argc, char *argv[])
 
     // bmp_test(&bdata);
 
+    // bdata.w -= 1;
     if ( ! WriteBMPFile("sf.bmp", &bdata) )
     {
         printf("NAL WriteBMPFile Error!!!\n");
@@ -347,3 +371,4 @@ int main (int argc, char *argv[])
 
     return 0;
 }
+#endif
