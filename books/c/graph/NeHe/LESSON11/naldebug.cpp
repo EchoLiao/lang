@@ -142,10 +142,10 @@ NALBOOL st_read_bmp_file(FILE *file, sbitData *bdata)
     st_read_bmp_header(&header, file);
     st_read_bmp_info_header(&info, file);
     assert(header.bfType == 0x4D42);
-    if ( info.biBitCount != 16 || info.biBitCount != 24 
-            || info.biBitCount != 32 )
+    if ( info.biBitCount != 16 && info.biBitCount != 24 
+            && info.biBitCount != 32 )
     {
-        printf("Only support 16 24 32 bits Format!");
+        printf("Only support 16 24 32 bits Format!\n");
         return NALFALSE;
     }
 
@@ -350,7 +350,7 @@ int main (int argc, char *argv[])
     sbitData bdata;
     char     dstfile[128];
     
-    bdata.isRevert = 0;
+    bdata.isRevert = 1;
 
     if ( argv[1] == NULL )
     {
