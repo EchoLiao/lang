@@ -84,7 +84,7 @@ typedef struct
 #pragma pack()
 
 
-enum eDateFormat
+enum eDataFormat
 {
     EBMP_UNKNOWN = 0,
     EBMP_RGB,
@@ -96,7 +96,7 @@ enum eDateFormat
 
 typedef struct
 {
-    eDateFormat edformat;
+    eDataFormat edformat;
     NALINT      w;          // in pixels
     NALINT      h;          // in pixels
     NALINT      iBitCount;  // in bits

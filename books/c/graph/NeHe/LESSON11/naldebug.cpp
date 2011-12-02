@@ -125,6 +125,60 @@ void st_write_bmp_info_header(sbmpInfoHeader *info, FILE *file)
     st_write_dword(&info->biClrImportant,   file);
 }
 
+void st_set_bitmap_format(sbmpInfoHeader *info, sbitData *bdata)
+{
+    if ( info->biCompression == 0 ) // Format is BI_RGB ?
+    {
+        if ( info->biBitCount == 24 )
+            bdata->edformat = EBMP_BGR;
+        else if ( info->biBitCount == 32 )
+            bdata->edformat = EBMP_BGRA;
+        else
+            bdata->edformat = EBMP_UNKNOWN;
+    }
+    else
+    {
+        bdata->edformat = EBMP_UNKNOWN;
+    }
+}
+
+NALBOOL st_format_transform(unsigned char *buf, int blen, 
+        int bpp, enum eDataFormat dft)
+{
+    int i, pixelsize, w;
+    unsigned char t, *p;
+
+    if ( bpp != 24 && bpp != 32 )
+        return NALTRUE;
+
+    if ( dft == EBMP_BGR || dft == EBMP_BGRA )
+        return NALTRUE;
+
+    pixelsize = (bpp >> 3);
+    w = blen / pixelsize;
+
+    // bmp文件颜色分量的存储顺序是: BGR 或 BGRA
+    // RGB  ==> BGR 
+    // RGBA ==> BGRA
+    if ( dft == EBMP_RGB || dft == EBMP_RGBA )
+    {
+        p = buf;
+        for ( i = 0; i < w; i++ )
+        {
+            // assert(*p == 255);
+            t = *p;
+            *p = *(p+2);
+            *(p+2) = t;
+            p += pixelsize;
+        }
+        return NALTRUE;
+    }
+
+    printf("Unknown Format!\n");
+
+    return NALFALSE;
+}
+
 /* 
  * You NEED release bdata->pdata by youself!
  * */
@@ -153,10 +207,7 @@ NALBOOL st_read_bmp_file(FILE *file, sbitData *bdata)
     linepich = ((((info.biWidth*info.biBitCount)>>3)+3)>>2)<<2;
     assert( linepich - ((info.biWidth*info.biBitCount)>>3) <= 3 );
 
-    if ( info.biCompression == 0 ) // Format is BI_RGB ?
-        bdata->edformat = EBMP_BGR;
-    else
-        bdata->edformat = EBMP_UNKNOWN;
+    st_set_bitmap_format(&info, bdata);
     bdata->w = linepich / (info.biBitCount>>3); // MUST: info.biHeight >= 8
     bdata->h = info.biHeight;   // 高度值可能是负数? QQQQQ
     bdata->iBitCount = info.biBitCount;
@@ -200,14 +251,15 @@ NALBOOL st_write_bmp_file(FILE *file, sbitData *bdata)
 {
     assert(file != NULL && bdata != NULL);
 
-    unsigned int i, linepich, igap;
+    unsigned int i, srcw, linepich, igap;
     unsigned char   gaps[3] = { 0 };
-    unsigned char   *sbuf;
+    unsigned char   *sbuf, *ssbuf;
     sbmpHeader      header;
     sbmpInfoHeader  info;
 
-    linepich = (((bdata->w * (bdata->iBitCount>>3))+3)>>2)<<2;
-    igap = linepich - ((bdata->w * bdata->iBitCount)>>3);
+    srcw = bdata->w * (bdata->iBitCount >> 3);
+    linepich = ((srcw+3)>>2)<<2;
+    igap = linepich - srcw;
     assert(igap <= 3);
 
     header.bfType = 0x4D42;
@@ -232,14 +284,18 @@ NALBOOL st_write_bmp_file(FILE *file, sbitData *bdata)
     st_write_bmp_header(&header, file);
     st_write_bmp_info_header(&info, file);
 
-    unsigned int srcw = bdata->w * (bdata->iBitCount >> 3);
+    if ( (ssbuf=(unsigned char*)calloc(1, linepich)) == NULL )
+        goto _NO_MEMORY;
     fseek(file, BMP_DATA_OFFSET, SEEK_SET);
     if ( bdata->isRevert )
     {
         sbuf = bdata->pdata + linepich * (bdata->h - 1);
         for ( i = 0; i < bdata->h; i++ )
         {
-            if ( fwrite(sbuf, 1, srcw, file) != srcw )
+            memcpy(ssbuf, sbuf, linepich);
+            st_format_transform(ssbuf, linepich, bdata->iBitCount,
+                    bdata->edformat);
+            if ( fwrite(ssbuf, 1, srcw, file) != srcw )
                 goto _WRITE_ERROR;
             if ( igap != 0 )
                 if ( fwrite(gaps, 1, igap, file) != igap )
@@ -252,7 +308,10 @@ NALBOOL st_write_bmp_file(FILE *file, sbitData *bdata)
         sbuf = bdata->pdata;
         for ( i = 0; i < bdata->h; i++ )
         {
-            if ( fwrite(sbuf, 1, srcw, file) != srcw )
+            memcpy(ssbuf, sbuf, linepich);
+            st_format_transform(ssbuf, linepich, bdata->iBitCount,
+                    bdata->edformat);
+            if ( fwrite(ssbuf, 1, srcw, file) != srcw )
                 goto _WRITE_ERROR;
             if ( igap != 0 )
                 if ( fwrite(gaps, 1, igap, file) != igap )
@@ -261,10 +320,13 @@ NALBOOL st_write_bmp_file(FILE *file, sbitData *bdata)
         }
     }
 
+    free(ssbuf);
     return NALTRUE;
 
 _WRITE_ERROR:
+    free(ssbuf);
     printf("fwrite Error!!\n");
+_NO_MEMORY:
     return NALFALSE;
 }
 
@@ -327,13 +389,15 @@ void bmp_test(sbitData *bdata)
     NALBYTE *pb;
 
     bytespp = bdata->iBitCount >> 3;
-    linepich = bdata->w * bytespp;
+    linepich = (((bdata->w * bytespp) + 3)>>2)<<2;
+#if 0
     for ( y = 0; y < bdata->h; y++ )
     {
         pb = bdata->pdata + y * linepich;
         for ( x = 0; x < bdata->w; x++ )
         {
-            if ( *pb != 0 && *(pb+1) != 0 && *(pb+2) != 0 )
+            // if ( *pb != 0 && *(pb+1) != 0 && *(pb+2) != 0 )
+            if ( *pb != 255 )
                 printf("x");
             else
                 printf("0");
@@ -341,7 +405,23 @@ void bmp_test(sbitData *bdata)
         }
         printf("\n");
     }
+#else
+    for ( y = 0; y < bdata->h; y++ )
+    {
+        pb = bdata->pdata + y * linepich;
+        for ( x = 0; x < bdata->w; x++ )
+        {
+            *pb = 0xFF;
+            *(pb+1) = 0x0;
+            if ( bytespp == 3 || bytespp == 4 )
+                *(pb+2) = 0x0;
+            if ( bytespp == 4 )
+                *(pb+3) = 0xFF;
 
+            pb += bytespp;
+        }
+    }
+#endif
 }
 
 #if 1
@@ -403,11 +483,14 @@ int main (int argc, char *argv[])
         exit(1);
     }
 
-    // bmp_test(&bdata);
+    printf("NAL && %d\n", bdata.edformat);
+
+#if 1 // For test
+    bmp_test(&bdata);
+    bdata.edformat = EBMP_RGB;
+#endif
 
     sprintf(dstfile, "%s_dst.bmp", argv[1]);
-
-    // bdata.w -= 1;
     if ( ! WriteBMPFile(dstfile, &bdata) )
     {
         printf("NAL WriteBMPFile Error!!!\n");
