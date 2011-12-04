@@ -330,9 +330,27 @@ bool setup_textures()
     tw = iw = img.w;
     th = ih = img.h;
 #else
+#if 0
     glTexImage2D(GL_TEXTURE_2D, 0, 3, img2.w, img2.h, 0, GL_RGB, GL_UNSIGNED_BYTE, img2.data);
     tw = iw = img2.w;
     th = ih = img2.h;
+#else
+    sbitData *bmpw, *bmpr;
+
+    bmpw = bmpCreateObjForWrite(EBMP_RGB, 0, img2.w, img2.h, 24, img2.data);
+    assert( bmpWrite("nal-1.bmp", bmpw) );
+
+    bmpr = bmpCreateObjForRead(EBMP_RGB, 0);
+    assert( bmpRead("nal-1.bmp", bmpr) );
+
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, bmpr->w, bmpr->h, 0, GL_RGB, GL_UNSIGNED_BYTE, bmpr->pdata);
+    tw = iw = bmpr->w;
+    th = ih = bmpr->h;
+
+    bmpDestroyObjForWrite(&bmpw);
+    bmpDestroyObjForRead(&bmpr);
+
+#endif
 #endif
 
     test_img(&img2);
