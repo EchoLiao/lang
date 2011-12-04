@@ -104,7 +104,14 @@ typedef struct
     NALBYTE     *pdata;
 } sbitData;
 
-NALBOOL ReadBMPFile(const char* fname, sbitData *bdata);
-NALBOOL WriteBMPFile(const char* fname, sbitData *bdata);
+
+sbitData* bmpCreateObjForRead(eDataFormat edf, NALBOOL isRevert);
+NALBOOL bmpRead(const char* fname, sbitData *bdata);
+NALBOOL bmpDestroyObjForRead(sbitData **bdata);
+
+sbitData* bmpCreateObjForWrite(eDataFormat edf, NALBOOL isRevert, 
+        NALINT w, NALINT h, NALINT bpp, NALBYTE *pd);
+NALBOOL bmpWrite(const char* fname, sbitData *bdata);
+NALBOOL bmpDestroyObjForWrite(sbitData **bdata);
 
 #endif // _BMPRW_H

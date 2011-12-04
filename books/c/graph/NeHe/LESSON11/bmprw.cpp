@@ -165,7 +165,6 @@ NALBOOL st_format_transform(unsigned char *buf, int blen,
         p = buf;
         for ( i = 0; i < w; i++ )
         {
-            // assert(*p == 255);
             t = *p;
             *p = *(p+2);
             *(p+2) = t;
@@ -179,14 +178,10 @@ NALBOOL st_format_transform(unsigned char *buf, int blen,
     return NALFALSE;
 }
 
-/* 
- * You NEED release bdata->pdata by youself!
- * */
 NALBOOL st_read_bmp_file(FILE *file, sbitData *bdata)
 {
     assert(file != NULL && bdata != NULL);
-
-    printf("NAL test 3 &&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&\n");
+    assert(bdata->pdata == NULL);
 
     unsigned int i, linepich;
     unsigned char *dbuf;
@@ -199,7 +194,7 @@ NALBOOL st_read_bmp_file(FILE *file, sbitData *bdata)
     if ( info.biBitCount != 16 && info.biBitCount != 24 
             && info.biBitCount != 32 )
     {
-        printf("Only support 16 24 32 bits Format!\n");
+        printf("Only support 16 24 32 bits Format for read!\n");
         return NALFALSE;
     }
 
@@ -207,7 +202,6 @@ NALBOOL st_read_bmp_file(FILE *file, sbitData *bdata)
     linepich = ((((info.biWidth*info.biBitCount)>>3)+3)>>2)<<2;
     assert( linepich - ((info.biWidth*info.biBitCount)>>3) <= 3 );
 
-    st_set_bitmap_format(&info, bdata);
     bdata->w = linepich / (info.biBitCount>>3); // MUST: info.biHeight >= 8
     bdata->h = info.biHeight;   // 高度值可能是负数? QQQQQ
     bdata->iBitCount = info.biBitCount;
@@ -225,6 +219,8 @@ NALBOOL st_read_bmp_file(FILE *file, sbitData *bdata)
         {
             if ( fread(dbuf, 1, linepich, file) != linepich )
                 goto _READ_ERROR;
+            st_format_transform(dbuf, linepich, bdata->iBitCount,
+                    bdata->edformat);
             dbuf -= linepich;
         }
     }
@@ -234,12 +230,16 @@ NALBOOL st_read_bmp_file(FILE *file, sbitData *bdata)
         {
             if ( fread(dbuf, 1, linepich, file) != linepich )
                 goto _READ_ERROR;
+            st_format_transform(dbuf, linepich, bdata->iBitCount,
+                    bdata->edformat);
             dbuf += linepich;
         }
     }
     return NALTRUE;
 
 _READ_ERROR:
+    free(dbuf);
+    dbuf = NULL;
     printf("fread Error!!");
 _NO_MEMORY:
     return NALFALSE;
@@ -250,6 +250,7 @@ _NO_MEMORY:
 NALBOOL st_write_bmp_file(FILE *file, sbitData *bdata)
 {
     assert(file != NULL && bdata != NULL);
+    assert(bdata->pdata != NULL);
 
     unsigned int i, srcw, linepich, igap;
     unsigned char   gaps[3] = { 0 };
@@ -330,13 +331,14 @@ _NO_MEMORY:
     return NALFALSE;
 }
 
-NALBOOL ReadBMPFile(const char* fname, sbitData *bdata)
+NALBOOL bmpRead(const char* fname, sbitData *bdata)
 {
+    assert(fname != NULL && bdata != NULL);
+    assert(bdata->pdata == NULL);
+
     NALBOOL         ret = NALFALSE;
     FILE            *pFile = NULL;
     sbmpHeader      header;
-
-    printf("NAL %d &&&&&&&&& %s &&& %s\n", __LINE__, __func__, __FILE__);
 
     pFile = fopen(fname, "rb");
     if ( NULL == pFile )
@@ -362,12 +364,13 @@ NALBOOL ReadBMPFile(const char* fname, sbitData *bdata)
     return ret;
 }
 
-NALBOOL WriteBMPFile(const char* fname, sbitData *bdata)
+NALBOOL bmpWrite(const char* fname, sbitData *bdata)
 {
+    assert(fname != NULL && bdata != NULL);
+    assert(bdata->pdata != NULL);
+
     NALBOOL         ret;
     FILE            *pFile=NULL;
-
-    printf("NAL %d &&&&&&&&& %s &&& %s\n", __LINE__, __func__, __FILE__);
 
     pFile = fopen(fname, "wb");
     if ( NULL == pFile )
@@ -384,3 +387,58 @@ NALBOOL WriteBMPFile(const char* fname, sbitData *bdata)
 }
 
 
+sbitData* bmpCreateObjForRead(eDataFormat edf, NALBOOL isRevert)
+{
+    sbitData *pbd;
+
+    if ( (pbd=(sbitData *)calloc(1, sizeof(sbitData))) == NULL )
+        return NULL;
+
+    pbd->edformat = edf;
+    pbd->isRevert = isRevert;
+
+    return pbd;
+}
+
+NALBOOL bmpDestroyObjForRead(sbitData **bdata)
+{
+    assert(bdata != NULL && *bdata != NULL && (*bdata)->pdata != NULL);
+
+    free((*bdata)->pdata);
+    (*bdata)->pdata = NULL;
+
+    free(*bdata);
+    *bdata = NULL;
+
+    return NALTRUE;
+}
+
+sbitData* bmpCreateObjForWrite(eDataFormat edf, NALBOOL isRevert, 
+        NALINT w, NALINT h, NALINT bpp, NALBYTE *pd)
+{
+    assert(pd != NULL);
+
+    sbitData *pbd;
+
+    if ( (pbd=(sbitData *)calloc(1, sizeof(sbitData))) == NULL )
+        return NULL;
+
+    pbd->edformat = edf;
+    pbd->isRevert = isRevert;
+    pbd->w = w;
+    pbd->h = h;
+    pbd->iBitCount = bpp;
+    pbd->pdata = pd;
+
+    return pbd;
+}
+
+NALBOOL bmpDestroyObjForWrite(sbitData **bdata)
+{
+    assert(bdata != NULL && *bdata != NULL && (*bdata)->pdata != NULL);
+
+    free(*bdata);
+    *bdata = NULL;
+
+    return NALTRUE;
+}
