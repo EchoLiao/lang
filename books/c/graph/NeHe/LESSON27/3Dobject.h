@@ -10,11 +10,17 @@ struct sPoint{
 };
 
 // plane equation
+// 平面方程为: ax + by + cz + d = 0
 struct sPlaneEq{
 	float a, b, c, d;
 };
 
 // structure describing an object's face
+// * 3个整形索引指定了模型中三角形的三个顶点
+// * 第二个变量指定了三角形面的法线
+// * 平面方程描述了三角所在的平面
+// * 临近的3个顶点索引, 指定了与这个三角形相邻的三个顶点     QQQQQ
+// * 最后一个变量指定这个三角形是否投出阴影 
 struct sPlane{
 	unsigned int p[3];
 	sPoint normals[3];
@@ -24,6 +30,7 @@ struct sPlane{
 };
 
 // object structure
+// 用下面的结构描述一个产生阴影的物体
 struct glObject{
 	GLuint nPlanes, nPoints;
 	sPoint points[100];
@@ -38,19 +45,23 @@ inline int ReadObject(const char *st, glObject *o){
   file = fopen(st, "r");
   if (!file) return 0;
   //points
+  // 读取顶点
   fscanf(file, "%d", &(o->nPoints));
   for (i=1;i<=o->nPoints;i++){
     fscanf(file, "%f", &(o->points[i].x));
     fscanf(file, "%f", &(o->points[i].y));
     fscanf(file, "%f", &(o->points[i].z));
   }
+
   //planes
+  // 读取三角形面
   fscanf(file, "%d", &(o->nPlanes));
   for (i=0;i<o->nPlanes;i++){
     fscanf(file, "%d", &(o->planes[i].p[0]));
     fscanf(file, "%d", &(o->planes[i].p[1]));
     fscanf(file, "%d", &(o->planes[i].p[2]));
 
+    // 读取每个顶点的法线
     fscanf(file, "%f", &(o->planes[i].normals[0].x));
     fscanf(file, "%f", &(o->planes[i].normals[0].y));
     fscanf(file, "%f", &(o->planes[i].normals[0].z));
@@ -66,6 +77,7 @@ inline int ReadObject(const char *st, glObject *o){
 
 // connectivity procedure - based on Gamasutra's article
 // hard to explain here
+// 查找每个面的相邻的顶点
 inline void SetConnectivity(glObject *o){
 	unsigned int p1i, p2i, p1j, p2j;
 	unsigned int P1i, P2i, P1j, P2j;

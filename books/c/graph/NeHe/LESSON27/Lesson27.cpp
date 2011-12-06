@@ -74,7 +74,7 @@ GLvoid ResizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize Th
 
 int InitGLObjects()										// Initialize Objects
 {
-  if (!ReadObject("Data/Object2.txt", &obj))			// Read Object2 Into obj
+  if (!ReadObject("Data/Object.txt", &obj))			// Read Object2 Into obj
     {
       return 0;									// If Failed Return False
     }
