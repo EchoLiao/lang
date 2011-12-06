@@ -21,8 +21,11 @@
 #include <assert.h>
 #include <stdio.h>
 
+// #define X86_64   1
+
+
 /*
-// 加一种测试大小端的方法
+// 另一种测试大小端的方法
 static union {
     char c[4];
     unsigned int l;
@@ -34,6 +37,7 @@ static union {
 
 void endian_test(void)
 {
+#ifdef X86_64
     printf("ENDIAN sizeof(int*)         = %ld\n", sizeof(int*));
     printf("ENDIAN sizeof(char)         = %ld\n", sizeof(char));
     printf("ENDIAN sizeof(short)        = %ld\n", sizeof(short));
@@ -43,6 +47,17 @@ void endian_test(void)
     printf("ENDIAN sizeof(float)        = %ld\n", sizeof(float));
     printf("ENDIAN sizeof(double)       = %ld\n", sizeof(double));
     printf("\n");
+#else
+    printf("ENDIAN sizeof(int*)         = %d\n", sizeof(int*));
+    printf("ENDIAN sizeof(char)         = %d\n", sizeof(char));
+    printf("ENDIAN sizeof(short)        = %d\n", sizeof(short));
+    printf("ENDIAN sizeof(int)          = %d\n", sizeof(int));
+    printf("ENDIAN sizeof(long)         = %d\n", sizeof(long));
+    printf("ENDIAN sizeof(long long)    = %d\n", sizeof(long long));
+    printf("ENDIAN sizeof(float)        = %d\n", sizeof(float));
+    printf("ENDIAN sizeof(double)       = %d\n", sizeof(double));
+    printf("\n");
+#endif
 
     union
     {
@@ -63,8 +78,15 @@ void endian_test(void)
             printf("ENDIAN: little-endian\n");
         else
             printf("ENDIAN: unknown\n");
-    } else
+    }
+    else
+    {
+#ifdef X86_64
         printf("ENDIAN sizeof(short) = %ld\n", sizeof(short));
+#else
+        printf("ENDIAN sizeof(short) = %d\n", sizeof(short));
+#endif
+    }
     printf("\n");
 
     // long long lli = 0x33;
@@ -77,11 +99,13 @@ void endian_test(void)
         printf("Assert test:");
         if ( sizeof(long) == 4 )
         {
+            printf("(x86_32)");
             assert(*l1 == 0x00000000);
             assert(*l2 == 0x00000033);
         }
         else // 8 bits
         {
+            printf("(x86_64)");
             assert(*l1 == 0x0000003300000000);
         }
         printf("\tTrue!\n\n");
