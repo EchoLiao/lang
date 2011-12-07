@@ -246,6 +246,10 @@ void render(void)
 
     glPushMatrix();
     glEnable(GL_TEXTURE_2D);
+    // 纹理单元与当前的片段颜色混合的算法由 glTexEnvi() 指定!
+    // glTexEnvi() 默认使用的是 GL_MODULATE .
+    // 即混合算法是: R(dst) = R(src) * R(tex) ...
+    glColor3f(1.0, 1.0, 1.0);
     glBindTexture(GL_TEXTURE_2D, g_texid[0]);
     update_ver_and_tex();
     // [(<<G:2>> P107)]
