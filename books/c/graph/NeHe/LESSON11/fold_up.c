@@ -243,8 +243,8 @@ void render(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear The Screen And The Depth Buffer
     glLoadIdentity();									// Reset The View
 
-    glTranslatef(0.0f,0.0f,-2.0f);
     glPushMatrix();
+    glTranslatef(0.0f,0.0f,-2.0f);
     glEnable(GL_TEXTURE_2D);
     // 纹理单元与当前的片段颜色混合的算法由 glTexEnvi() 指定!
     // glTexEnvi() 默认使用的是 GL_MODULATE .
