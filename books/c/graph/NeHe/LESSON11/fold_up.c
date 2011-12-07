@@ -360,13 +360,44 @@ void special_keys(int a_keys, int x, int y)
     }
 }
 
+/* 
+ * 实现 gluUnProject() 的功能!
+ * [(man gluUnProject)]
+ * http://pyopengl.sourceforge.net/documentation/manual-3.0/gluUnProject.xhtml
+ *
+ *   | objX |              | (2*(winX-view[0]))/view[2] - 1 |
+ *   | objY | =  INV(PM) * | (2*(winY-view[1]))/view[3] - 1 |
+ *   | objZ |              |    2*winZ - 1                  |
+ *   |  W   |              |        1                       |
+ *
+ */
+int MygluUnProjectf(float winX, float winY, float winZ,
+        const float *model, const float *proj, const GLint *view,
+        float* objX, float* objY, float* objZ)
+{
+    M3DMatrix44f PM, Inv;
+    M3DVector4f  V, R;
+
+    m3dLoadVector4(V, (2.0*(winX-view[0])/view[2])-1.0,
+                      (2.0*(winY-view[1])/view[3])-1.0,
+                      (2.0*winZ)-1.0,
+                      1.0 );
+    m3dMatrixMultiply44(PM, proj, model);
+    if ( ! m3dInvertMatrix44(Inv, PM) )
+        return 0;
+    m3dMatrix44fMultiplyVector4f(R, Inv, V);
+
+    *objX = R[0] / R[3];
+    *objY = R[1] / R[3];
+    *objZ = R[2] / R[3];
+
+    return 1;
+}
+
 void ProcessSelection(int xPos, int yPos, float *worx, float *wory, float *worz)
 {
 	int viewport[4];
-	double modelMatrix[16];
-	double projMatrix[16];
-	double nx, ny, nz;
-	double fx, fy, fz;
+	double nx, ny, nz, fx, fy, fz;
 
     // save Current matrix
     glMatrixMode(GL_PROJECTION);
@@ -377,6 +408,8 @@ void ProcessSelection(int xPos, int yPos, float *worx, float *wory, float *worz)
 	glGetIntegerv(GL_VIEWPORT, viewport);
     resetup_matrix(viewport[2], viewport[3]);
 
+#if 0
+	double modelMatrix[16], projMatrix[16];
 	glGetDoublev(GL_MODELVIEW_MATRIX, modelMatrix); // 获取视图矩阵
 	glGetDoublev(GL_PROJECTION_MATRIX, projMatrix); // 获取投影矩阵
     // 求出两点, 用于确定一条向量
@@ -384,6 +417,18 @@ void ProcessSelection(int xPos, int yPos, float *worx, float *wory, float *worz)
             modelMatrix, projMatrix, viewport, &nx, &ny, &nz);
 	gluUnProject((double)xPos, (double)(viewport[3] - yPos), 1.0,
             modelMatrix, projMatrix, viewport, &fx, &fy, &fz);
+#else
+	float nxf, nyf, nzf, fxf, fyf, fzf;
+	float modelMatrixf[16], projMatrixf[16];
+	glGetFloatv(GL_MODELVIEW_MATRIX, modelMatrixf); // 获取视图矩阵
+	glGetFloatv(GL_PROJECTION_MATRIX, projMatrixf); // 获取投影矩阵
+	MygluUnProjectf((float)xPos, (float)(viewport[3] - yPos), 0.0,
+            modelMatrixf, projMatrixf, viewport, &nxf, &nyf, &nzf);
+	MygluUnProjectf((float)xPos, (float)(viewport[3] - yPos), 1.0,
+            modelMatrixf, projMatrixf, viewport, &fxf, &fyf, &fzf);
+    nx = nxf; ny = nyf; nz = nzf;
+    fx = fxf; fy = fyf; fz = fzf;
+#endif
     printf("nx=%f ny=%f nz=%f,  fx=%f fy=%f fz=%f\n", nx, ny, nz, fx, fy, fz);
 
     M3DPlane4f p;
