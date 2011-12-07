@@ -61,7 +61,7 @@ typedef struct _RGBIMG {
 bool g_stop = 0;
 bool g_isopenning = true;
 
-float   g_points[NUM_VERTEXES][NUM_PER_VERTEXE];   // The Array For The Points On The Grid Of Our "Wave"
+float   g_points[(14+1)*2][NUM_PER_VERTEXE];   // The Array For The Points On The Grid Of Our "Wave"
 
 int g_xnumFramePerCircle;
 
@@ -85,6 +85,22 @@ int ow = 342;
 int oh = 256;
 
 float worldx, worldy, worldz;
+
+typedef struct tagFoldUpObj
+{
+    float ow;
+    float oh;
+    float sw;
+    float sh;
+    float iw;
+    float ih;
+    float tw;
+    float th;
+    int   numDiv;
+    int   curAngPosID;
+} sFoldUpObj;
+
+sFoldUpObj g_foldup;
 
 
 // Loads A RGB Raw Image From A Disk File And Updates Our Image Reference
@@ -161,11 +177,23 @@ bool init(void)
     glPolygonMode(GL_FRONT, GL_FILL);                  // Front Face Is Made Of Lines (NEW)
     glPointSize(6);
 
+    g_foldup.ow = 342 * 2;
+    g_foldup.oh = 256;
+    g_foldup.sw = 342;
+    g_foldup.sh = 256;
+    g_foldup.iw = 256;
+    g_foldup.ih = 256;
+    g_foldup.tw = 256;
+    g_foldup.th = 256;
+    g_foldup.numDiv = 14;
+    g_foldup.curAngPosID = 6;
+
     return true;
 }
 
 void update_ver_and_tex()
 {
+#if 0
     // ([0.0, 2*ow/oh], [0.0, 2.0])
     // ([0.0, 2.2x], [0.0, 2.0])
     float ow_r = 2.0 * (float) ow / oh;
@@ -233,6 +261,59 @@ void update_ver_and_tex()
             }
         }
     }
+#else
+    // ([0.0, 2*ow/oh], [0.0, 2.0])
+    // ([0.0, 2.2x], [0.0, 2.0])
+    float ow_r = 2.0 * (float) g_foldup.ow / g_foldup.oh;
+    float oh_r = 2.0 * (float) g_foldup.oh / g_foldup.oh;
+    float sw_r = 2.0 * (float) g_foldup.sw / g_foldup.sh;
+    float sh_r = 2.0 * (float) g_foldup.sh / g_foldup.sh;
+
+    float ow_r_half = ow_r / 2.0;
+    float oh_r_half = oh_r / 2.0;
+
+    float xvstep = ow_r / g_foldup.numDiv;
+    float yvstep = oh_r / 1.0;
+    float xtstep = (1.0/(g_foldup.iw/g_foldup.tw)) / (float)g_foldup.numDiv;
+    float ytstep = (1.0/(g_foldup.iw/g_foldup.tw)) / 1.0;
+
+    float b = ow_r / g_foldup.numDiv;
+    float a = (sw_r - 2.0*ow_r/g_foldup.numDiv) / (g_foldup.numDiv - 2);
+    float c = sqrtf(b*b - a*a);
+    float d = yvstep;
+
+    // if ( g_foldup.curAngPosID % 2 == 1 )
+    //     zstart = 0.0;
+    // else
+    //     zstart = -c;
+
+    int x, y;
+    for ( y = 0; y < 1; y++ )
+    {
+        for ( x = 0; x <= g_foldup.numDiv; x++ )
+        {
+            g_points[2*x][0] = x * a - ow_r_half;
+            g_points[2*x][1] = y * d - oh_r_half;
+            if ( (g_foldup.curAngPosID % 2 == 1 && x % 2 == 0)
+                    || (g_foldup.curAngPosID % 2 == 0 && x % 2 == 1) )
+                g_points[2*x][2] = 0.0;
+            else
+                g_points[2*x][2] = -c;
+            g_points[2*x][3] = x * xtstep;
+            g_points[2*x][4] = y * ytstep;
+
+            g_points[2*x+1][0] = x * a - ow_r_half;
+            g_points[2*x+1][1] = (y+1) * d - oh_r_half;
+            if ( (g_foldup.curAngPosID % 2 == 1 && x % 2 == 0)
+                    || (g_foldup.curAngPosID % 2 == 0 && x % 2 == 1) )
+                g_points[2*x][2] = 0.0;
+            else
+                g_points[2*x][2] = -c;
+            g_points[2*x+1][3] = x * xtstep;
+            g_points[2*x+1][4] = (y+1) * ytstep;
+        }
+    }
+#endif
 }
 
 // Our Rendering Is Done Here
@@ -281,8 +362,8 @@ void render(void)
         glVertex3f(worldx + 0.1, worldy + 0.1, worldz);
         glVertex3f(worldx - 0.1, worldy + 0.1, worldz);
     glEnd();
-#if 0
-    printf("NAL XX g_x_curframe=%d ...\n", g_x_curframe);
+#if 1
+    // printf("NAL XX g_x_curframe=%d ...\n", g_x_curframe);
     if ( ! g_stop )
     {
         if ( g_isopenning )
