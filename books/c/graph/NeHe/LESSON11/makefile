@@ -6,6 +6,7 @@ PROJ = lesson11
 PROJ2 = lesson11-2
 ENDIAN = endian_test
 BMPRW = bmprw_test
+FOLD_UP = fold_up
 
 # aliases
 CC = gcc
@@ -27,8 +28,12 @@ OBJS2 = $(PROJ2).o
 ENDIAN_OBJ = $(ENDIAN).o  
 BMPRW_OBJ = $(BMPRW).o  
 SHARED = bmprw.o
+FOLD_UP_OBJ = $(FOLD_UP).o
 
-all: $(PROJ).exe $(PROJ2).exe $(ENDIAN).exe $(BMPRW).exe
+all: $(PROJ).exe $(PROJ2).exe $(ENDIAN).exe $(BMPRW).exe $(FOLD_UP).exe
+
+$(FOLD_UP).exe: $(FOLD_UP_OBJ) $(SHARED) M3D_math3d.o M3D_plane.o
+	$(CC) $(LIBPATH) -o $@ $^ $(LDFLAGS)
 
 $(PROJ).exe: $(OBJS) $(SHARED)
 	$(CC) $(LIBPATH) -o $@ $(SHARED) $(OBJS) $(LDFLAGS)
