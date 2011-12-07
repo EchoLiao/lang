@@ -48,6 +48,17 @@ float m3dGetDistanceSquared(const M3DVector3f u, const M3DVector3f v)
     return (x + y + z);
 }
 
+// V(product) = M(a) * V(b)
+void m3dMatrix44fMultiplyVector4f(M3DVector4f product, const M3DMatrix44f a, const M3DVector4f b)
+{
+#define A(row,col)  a[(col<<2)+row]
+    product[0] = A(0,0) * b[0] + A(0,1) * b[1] + A(0,2) * b[2] + A(0,3) * b[3];
+    product[1] = A(1,0) * b[0] + A(1,1) * b[1] + A(1,2) * b[2] + A(1,3) * b[3];
+    product[2] = A(2,0) * b[0] + A(2,1) * b[1] + A(2,2) * b[2] + A(2,3) * b[3];
+    product[3] = A(3,0) * b[0] + A(3,1) * b[1] + A(3,2) * b[2] + A(3,3) * b[3];
+#undef A
+}
+
 #define A(row,col)  a[(col<<2)+row]
 #define B(row,col)  b[(col<<2)+row]
 #define P(row,col)  product[(col<<2)+row]

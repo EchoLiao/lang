@@ -312,5 +312,7 @@ void m3dMakePlanarShadowMatrix(M3DMatrix44f proj, const M3DVector4f planeEq, con
 float m3dClosestPointOnRay(M3DVector3f vPointOnRay, const M3DVector3f vRayOrigin, const M3DVector3f vUnitRayDir,
         const M3DVector3f vPointInSpace);
 
+void m3dMatrix44fMultiplyVector4f(M3DVector4f product, const M3DMatrix44f a, const M3DVector4f b);
+
 #endif
 
