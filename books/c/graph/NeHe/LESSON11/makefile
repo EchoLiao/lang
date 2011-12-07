@@ -32,8 +32,8 @@ FOLD_UP_OBJ = $(FOLD_UP).o
 
 all: $(PROJ).exe $(PROJ2).exe $(ENDIAN).exe $(BMPRW).exe $(FOLD_UP).exe
 
-$(FOLD_UP).exe: $(FOLD_UP_OBJ) $(SHARED)
-	$(CC) $(LIBPATH) -o $@ $(SHARED) $(FOLD_UP_OBJ) $(LDFLAGS)
+$(FOLD_UP).exe: $(FOLD_UP_OBJ) $(SHARED) M3D_math3d.o M3D_plane.o
+	$(CC) $(LIBPATH) -o $@ $^ $(LDFLAGS)
 
 $(PROJ).exe: $(OBJS) $(SHARED)
 	$(CC) $(LIBPATH) -o $@ $(SHARED) $(OBJS) $(LDFLAGS)

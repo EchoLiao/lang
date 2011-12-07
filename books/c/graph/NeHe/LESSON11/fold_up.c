@@ -11,6 +11,8 @@
 #include <stdio.h>           // Standard C/C++ Input-Output
 #include <math.h>            // Math Functions
 #include <GL/glut.h>         // The GL Utility Toolkit (GLUT) Header
+#include "M3D_math3d.h"
+#include "M3D_plane.h"
 
 typedef int bool;
 #define true    1
@@ -81,6 +83,9 @@ int ih = 256;
 // 对象大小
 int ow = 342;
 int oh = 256;
+
+float worldx, worldy, worldz;
+
 
 // Loads A RGB Raw Image From A Disk File And Updates Our Image Reference
 // Returns true On Success, False On Fail.
@@ -154,6 +159,7 @@ bool init(void)
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
     glPolygonMode(GL_BACK, GL_FILL);                   // Back Face Is Solid (NEW)
     glPolygonMode(GL_FRONT, GL_FILL);                  // Front Face Is Made Of Lines (NEW)
+    glPointSize(6);
 
     return true;
 }
@@ -236,14 +242,12 @@ void render(void)
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear The Screen And The Depth Buffer
     glLoadIdentity();									// Reset The View
-    glTranslatef(0.0f,0.0f,-2.02f);
+    glTranslatef(0.0f,0.0f,-2.0f);
 
     glPushMatrix();
-
+    glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, g_texid[0]);
-
     update_ver_and_tex();
-
     // [(<<G:2>> P107)]
     glBegin(GL_TRIANGLE_STRIP);
     for (y = 0; y < Y_NUMDIV; y++) {
@@ -261,7 +265,12 @@ void render(void)
     glEnd();
     glPopMatrix();
 
-#if 0
+    glDisable(GL_TEXTURE_2D);
+    glColor3f(1.0, 0.0, 0.0);
+    glBegin(GL_POINTS);
+        glVertex3f(worldx, worldy, worldz);
+    glEnd();
+#if 1
     printf("NAL XX g_x_curframe=%d ...\n", g_x_curframe);
     if ( ! g_stop )
     {
@@ -292,7 +301,7 @@ void reshape(int w, int h)
     // Calculate The Aspect Ratio And Set The Clipping Volume
     if (h == 0) h = 1;
 
-    glFrustum(-(float)w/h/2.0, (float)w/h/2.0, -0.5, 0.5, 1.0, 100);
+    glFrustum(-(float)w/h/2.0, (float)w/h/2.0, -0.5, 0.5, 1.0, 100.0);
     glMatrixMode(GL_MODELVIEW);      // Select The Modelview Matrix
 
     glLoadIdentity(); // Reset The Modelview Matrix
@@ -328,6 +337,66 @@ void special_keys(int a_keys, int x, int y)
     }
 }
 
+void ProcessSelection(int xPos, int yPos, float *worx, float *wory, float *worz)
+{
+	int viewport[4];
+	double modelMatrix[16];
+	double projMatrix[16];
+	double nx, ny, nz;
+	double fx, fy, fz;
+
+	glGetIntegerv(GL_VIEWPORT, viewport);
+	glGetDoublev(GL_MODELVIEW_MATRIX, modelMatrix); // 获取视图矩阵
+	glGetDoublev(GL_PROJECTION_MATRIX, projMatrix); // 获取投影矩阵
+    // 求出两点, 用于确定一条向量
+	gluUnProject((double)xPos, (double)(viewport[3] - yPos), 0.0,
+            modelMatrix, projMatrix, viewport, &nx, &ny, &nz);
+	gluUnProject((double)xPos, (double)(viewport[3] - yPos), 1.0,
+            modelMatrix, projMatrix, viewport, &fx, &fy, &fz);
+    printf("nx=%f ny=%f nz=%f,  fx=%f fy=%f fz=%f\n", nx, ny, nz, fx, fy, fz);
+
+    M3DPlane4f p;
+    M3DVector3f dir;
+// #if 0
+    M3DVector3f N;
+    m3dLoadVector3(dir, fx-nx, fy-ny, fz-nz);
+    m3dLoadVector3(N, 0.0, 0.0, 1.0);
+    m3dLoadPlanev(p, N, 1.0);
+    double pndotrd = p[0]*dir[0] + p[1]*dir[1] + p[2]*dir[2];
+	double point_len = -(p[0]*nx + p[1]*ny + p[2]*nz + p[3]) / pndotrd;
+
+	*worx =  nx + (point_len * dir[0]);
+	*wory =  ny + (point_len * dir[1]);
+	*worz =  nz + (point_len * dir[2]);
+    printf("1w (%f, %f, %f)\n", *worx, *wory, *worz);
+// #else
+    M3DVector3f wor, rayPos;
+    m3dLoadVector3(rayPos, nx, ny, nz);
+    m3dRayIntersection(p, wor, rayPos, dir);
+	*worx =  wor[0];
+	*wory =  wor[1];
+	*worz =  wor[2];
+    printf("2w (%f, %f, %f)\n", wor[0], wor[1], wor[2]);
+// #endif
+}
+
+///////////////////////////////////////////////////////////
+// Process the mouse click
+void MouseCallback(int button, int state, int x, int y)
+{
+    float wx, wy, wz;
+    if(button == GLUT_LEFT_BUTTON && state == GLUT_DOWN)
+    {
+        ProcessSelection(x, y, &wx, &wy, &wz);
+        printf("3w (%f, %f, %f)\n", wx, wy, wz);
+        worldx = wx;
+        worldy = wy;
+        worldz = wz;
+        glutPostRedisplay();
+    }
+}
+
+
 // Main Function For Bringing It All Together.
 int main(int argc, char** argv)
 {
@@ -342,6 +411,7 @@ int main(int argc, char** argv)
     glutReshapeFunc(reshape);                    // Register The Reshape Handler
     glutKeyboardFunc(keyboard);                  // Register The Keyboard Handler
     glutSpecialFunc(special_keys);               // Register Special Keys Handler
+	glutMouseFunc(MouseCallback);
     glutIdleFunc(render);                        // We Do Rendering In Idle Time
     glutMainLoop();                              // Go To GLUT Main Loop
     return 0;
