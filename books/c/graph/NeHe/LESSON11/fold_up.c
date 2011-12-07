@@ -242,8 +242,8 @@ void render(void)
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear The Screen And The Depth Buffer
     glLoadIdentity();									// Reset The View
-    glTranslatef(0.0f,0.0f,-2.0f);
 
+    glTranslatef(0.0f,0.0f,-2.0f);
     glPushMatrix();
     glEnable(GL_TEXTURE_2D);
     // 纹理单元与当前的片段颜色混合的算法由 glTexEnvi() 指定!
@@ -274,7 +274,14 @@ void render(void)
     glBegin(GL_POINTS);
         glVertex3f(worldx, worldy, worldz);
     glEnd();
-#if 1
+
+    glBegin(GL_LINE_LOOP);
+        glVertex3f(worldx - 0.1, worldy - 0.1, worldz);
+        glVertex3f(worldx + 0.1, worldy - 0.1, worldz);
+        glVertex3f(worldx + 0.1, worldy + 0.1, worldz);
+        glVertex3f(worldx - 0.1, worldy + 0.1, worldz);
+    glEnd();
+#if 0
     printf("NAL XX g_x_curframe=%d ...\n", g_x_curframe);
     if ( ! g_stop )
     {
@@ -290,10 +297,22 @@ void render(void)
         }
     }
 #endif
-    usleep(1000 * 200);
+    // usleep(1000 * 200);
 
     // Swap The Buffers To Become Our Rendering Visible
     glutSwapBuffers ( );
+}
+
+void resetup_matrix(int w, int h)
+{
+    float asp = (float)w / (float)h;
+
+    glMatrixMode(GL_PROJECTION);     // Select The Projection Matrix
+    glLoadIdentity();                // Reset The Projection Matrix
+
+    glFrustum(-asp/2.0, asp/2.0, -0.5, 0.5, 1.0, 100.0);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
 }
 
 // Our Reshaping Handler (Required Even In Fullscreen-Only Modes)
@@ -349,7 +368,15 @@ void ProcessSelection(int xPos, int yPos, float *worx, float *wory, float *worz)
 	double nx, ny, nz;
 	double fx, fy, fz;
 
+    // save Current matrix
+    glMatrixMode(GL_PROJECTION);
+    glPushMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPushMatrix();
+
 	glGetIntegerv(GL_VIEWPORT, viewport);
+    resetup_matrix(viewport[2], viewport[3]);
+
 	glGetDoublev(GL_MODELVIEW_MATRIX, modelMatrix); // 获取视图矩阵
 	glGetDoublev(GL_PROJECTION_MATRIX, projMatrix); // 获取投影矩阵
     // 求出两点, 用于确定一条向量
@@ -360,12 +387,11 @@ void ProcessSelection(int xPos, int yPos, float *worx, float *wory, float *worz)
     printf("nx=%f ny=%f nz=%f,  fx=%f fy=%f fz=%f\n", nx, ny, nz, fx, fy, fz);
 
     M3DPlane4f p;
-    M3DVector3f dir;
-// #if 0
-    M3DVector3f N;
+    M3DVector3f N, dir;
     m3dLoadVector3(dir, fx-nx, fy-ny, fz-nz);
     m3dLoadVector3(N, 0.0, 0.0, 1.0);
-    m3dLoadPlanev(p, N, 1.0);
+    m3dLoadPlanev(p, N, -(-2.0));
+// #if 0
     double pndotrd = p[0]*dir[0] + p[1]*dir[1] + p[2]*dir[2];
 	double point_len = -(p[0]*nx + p[1]*ny + p[2]*nz + p[3]) / pndotrd;
 
@@ -382,6 +408,12 @@ void ProcessSelection(int xPos, int yPos, float *worx, float *wory, float *worz)
 	*worz =  wor[2];
     printf("2w (%f, %f, %f)\n", wor[0], wor[1], wor[2]);
 // #endif
+
+    // restore to prev matrix
+    glMatrixMode(GL_PROJECTION);
+    glPopMatrix();
+    glMatrixMode(GL_MODELVIEW);
+    glPopMatrix();
 }
 
 ///////////////////////////////////////////////////////////
