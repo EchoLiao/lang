@@ -28,7 +28,7 @@
 /* The number of our GLUT window */
 int window; 
 
-int font=(int)(GLUT_BITMAP_HELVETICA_10);    // For printing bitmap fonts
+void *font=(void*)(GLUT_BITMAP_HELVETICA_10);    // For printing bitmap fonts
 char s[30];                                // Tmp variable for storing the display strings  
 int time,timeprev=0;											 // For calculating elapsed time
 bool fullScreen=false;										 // toggle for fullscreen mode
@@ -85,9 +85,9 @@ void InitGL(int Width, int Height)	        // We call this right after our OpenG
 }
 
 /* Function for displaying bitmap fonts on the screen */
-void glPrint(float x, float y, void *font,char *string) {
+void glPrint(float x, float y, void *font,const char *string) {
 
-	char *c;
+	const char *c;
 	glRasterPos2f(x, y);
 	for (c=string; *c != '\0'; c++) {
 		glutBitmapCharacter(font, *c);
