@@ -1,11 +1,4 @@
-/*
-   NeHe (nehe.gamedev.net) OpenGL tutorial series
-   GLUT port.in 2001 by milix (milix_gr@hotmail.com)
-   Most comments are from the original tutorials found in NeHe.
-   For VC++ users, create a Win32 Console project and link 
-   the program with glut32.lib, glu32.lib, opengl32.lib
-   */
-
+#include <assert.h>
 #include <string.h>
 #include <unistd.h>
 #include <stdio.h>           // Standard C/C++ Input-Output
@@ -14,38 +7,18 @@
 #include "M3D_math3d.h"
 #include "M3D_plane.h"
 
+void update_ver_and_tex();
+
+
 typedef int bool;
 #define true    1
 #define false   0
 
 #define TEXTURES_NUM 1       // We Have 1 Texture 
 
-// 被细分为90个小矩形
-#define X_NUMDIV    90
-// Y_NUMDIV MUST is equal one!!
-#define Y_NUMDIV    1
-
-// 
-// Use `GL_TRIANGLE_STRIP' draw it!
-//    
-//    1       3       5       6       9
-//    ---------------------------------
-//    |x      |x      |x      |x      |
-//    | x     | x     | x     | x     |
-//    |  x    |  x    |  x    |  x    |
-//    |   0   |   1   |   2   |   3   |
-//    |    x  |    x  |    x  |    x  |
-//    |     x |     x |     x |     x |
-//    |      x|      x|      x|      x|
-//    ---------------------------------
-//    0       2       4       6       8 
-//
-//    0,1,2...3 对应 X_NUMDIV.
-//    0,1,2...9 对应 g_points 的下标.
-//
-#define NUM_VERTEXES        ((X_NUMDIV+1)*2)
 // (0,1,2) is (x,y,z), (3,4) is (s,t).
 #define NUM_PER_VERTEXE     5
+
 
 
 // A Structure For RGB Bitmaps
@@ -58,43 +31,28 @@ typedef struct _RGBIMG {
 
 // Global Variables
 
-bool g_stop = 0;
-bool g_isopenning = true;
-
+bool    g_stop = 0;
 float   g_points[(14+1)*2][NUM_PER_VERTEXE];   // The Array For The Points On The Grid Of Our "Wave"
-
-int g_xnumFramePerCircle;
-
 bool    g_fullscreen;                // Fullscreen Mode ON/OFF (When g_gamemode Is OFF)
-int     g_wiggle = 0;                // Counter Used To Control How Fast Flag Waves
 GLuint	g_texid[TEXTURES_NUM];       // Our Textures' Id List 
-int     g_x_curframe = 0;
 
-const float ang2rad = 2.0*3.141592654/360.0;
-
-// 所申请的纹理大小
-int tw = 256;
-int th = 256;
-
-// 图像大小
-int iw = 256;
-int ih = 256;
-
-// 对象大小
-int ow = 342;
-int oh = 256;
+int     windowW;
+int     windowH;
+int     viewW;
+int     viewH;
 
 float worldx, worldy, worldz;
 
 typedef struct tagFoldUpObj
 {
-    float ow;
+
+    float ow; // 对象大小
     float oh;
-    float sw;
-    float sh;
-    float iw;
+    float vw; // 视口大小
+    float vh;
+    float iw; // 图像大小
     float ih;
-    float tw;
+    float tw; // 所申请的纹理大小
     float th;
     int   numDiv;
     int   curAngPosID;
@@ -103,12 +61,44 @@ typedef struct tagFoldUpObj
 sFoldUpObj g_foldup;
 
 
+
 // Loads A RGB Raw Image From A Disk File And Updates Our Image Reference
 // Returns true On Success, False On Fail.
 bool load_rgb_image(const char* file_name, int w, int h, RGBIMG* refimg)
 {
 
-#if 0
+#if 1
+    GLuint   sz;    // Our Image's Data Field Length In Bytes
+    FILE*    file;  // The Image's File On Disk
+    long     fsize; // File Size In Bytes
+    GLubyte* p;     // Helper Pointer
+
+    // Update The Image's Fields
+    refimg->w = (GLuint) w;
+    refimg->h = (GLuint) h;
+    // 所加载的是24位的位图; 使每一行都以4字节对齐, 以加载读取速度.
+    sz = (((3*refimg->w+3)>>2)<<2)*refimg->h;
+    refimg->data = (GLubyte*)malloc(256*256*3);
+    if (refimg->data == NULL) return false;
+
+    // Open The File And Read The Pixels
+    file = fopen(file_name , "rb");
+    if (!file) return false;
+    fseek(file, 0L, SEEK_END);
+    fsize = ftell(file);
+    if (fsize != (long)sz) {
+        fclose(file);
+        return false;
+    }
+    fseek(file, 0L, SEEK_SET);
+    p = refimg->data;
+    while (fsize > 0) {
+        fread(p, 1, 1, file);
+        p++;
+        fsize--;
+    }
+    fclose(file); 
+    return true;
 #else
     refimg->w = (GLuint) w;
     refimg->h = (GLuint) h;
@@ -160,6 +150,24 @@ bool setup_textures()
     return true;
 }
 
+void st_foldup_init()
+{
+    g_foldup.ow = 342 * 4;
+    g_foldup.oh = 256 * 2;
+    g_foldup.vw = viewW;
+    g_foldup.vh = viewH;
+    g_foldup.iw = 256;
+    g_foldup.ih = 256;
+    g_foldup.tw = 256;
+    g_foldup.th = 256;
+    g_foldup.numDiv = 14;
+    g_foldup.curAngPosID = 7;
+
+    assert(g_foldup.ow > g_foldup.vw);
+
+    update_ver_and_tex();
+}
+
 // Our GL Specific Initializations. Returns true On Success, false On Fail.
 bool init(void)
 {
@@ -177,143 +185,95 @@ bool init(void)
     glPolygonMode(GL_FRONT, GL_FILL);                  // Front Face Is Made Of Lines (NEW)
     glPointSize(6);
 
-    g_foldup.ow = 342 * 2;
-    g_foldup.oh = 256;
-    g_foldup.sw = 342;
-    g_foldup.sh = 256;
-    g_foldup.iw = 256;
-    g_foldup.ih = 256;
-    g_foldup.tw = 256;
-    g_foldup.th = 256;
-    g_foldup.numDiv = 14;
-    g_foldup.curAngPosID = 6;
+    st_foldup_init();
 
     return true;
 }
 
 void update_ver_and_tex()
 {
-#if 0
     // ([0.0, 2*ow/oh], [0.0, 2.0])
     // ([0.0, 2.2x], [0.0, 2.0])
-    float ow_r = 2.0 * (float) ow / oh;
-    float oh_r = 2.0 * (float) oh / oh;
+    float ow = 2.0 * (float) g_foldup.ow / g_foldup.oh;
+    float oh = 2.0 * (float) g_foldup.oh / g_foldup.oh;
+    float sw = 2.0 * (float) g_foldup.vw / g_foldup.vh;
+    float sh = 2.0 * (float) g_foldup.vh / g_foldup.vh;
 
-    float ow_r_half = ow_r / 2.0;
-    float oh_r_half = oh_r / 2.0;
+    float sw_half = sw / 2.0;
+    float sh_half = sh / 2.0;
 
-    float xvstep = ow_r / (float)X_NUMDIV;
-    float yvstep = oh_r / (float)Y_NUMDIV;
-    float xtstep = (1.0/((float)iw/tw)) / (float)X_NUMDIV;
-    float ytstep = (1.0/((float)ih/th)) / (float)Y_NUMDIV;
+    float yvstep = oh / 1.0;
+    float xtstep = (g_foldup.iw/g_foldup.tw) / (float)g_foldup.numDiv;
+    float ytstep = (g_foldup.iw/g_foldup.tw) / 1.0;
 
-    // [(<<G:2>> P45 P109)]
-    int ncircle = 4;     // 共须转 ncircle 圈
-    // ncircle * 2 * PI * r == ow_r
-    float r = ow_r / (ncircle*2.0*3.141592654);
-    // 把柱面部分的纹理按顺时针方向贴到柱面上
-    float theta = -360.0f / (X_NUMDIV / ncircle);
-    // 初始化指针初始位置, 使得平面部分与柱面部分能够平滑衔接
-    float rad180 = 3.141592654;
-    g_xnumFramePerCircle = X_NUMDIV / ncircle;
-
-    memset(g_points, 0, NUM_VERTEXES*NUM_PER_VERTEXE*sizeof(float));
-    int x, y;
-    for(y = 0; y < Y_NUMDIV; y++)
-    {
-        for (x = 0; x <= X_NUMDIV; x++) 
-        {
-            if ( g_x_curframe > x ) // 平面部分
-            {
-                // ([-1.x, 1.x], [-1.0, 1.0])
-
-                g_points[2*x][0] = x * xvstep - ow_r_half;
-                g_points[2*x][1] = y * yvstep - oh_r_half;
-                g_points[2*x][2] = -r;
-                g_points[2*x][3] = x * xtstep;
-                g_points[2*x][4] = y * ytstep;
-
-                g_points[2*x+1][0] = x * xvstep - ow_r_half;
-                g_points[2*x+1][1] = (y+1) * yvstep - oh_r_half;
-                g_points[2*x+1][2] = -r;
-                g_points[2*x+1][3] = x * xtstep;
-                g_points[2*x+1][4] = (y+1) * ytstep;
-            }                    
-            else // 卷轴部分
-            {
-                // 超过一圈的不再贴到柱面上
-                if ( x - g_x_curframe >= g_xnumFramePerCircle )
-                    break;
-
-                float deta = (float)(x - g_x_curframe);
-
-                g_points[2*x][0] = (float)sin(deta*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
-                g_points[2*x][1] = y*yvstep-oh_r_half;
-                g_points[2*x][2] = (float)cos(deta*theta*ang2rad+rad180)*r;
-                g_points[2*x][3] = x * xtstep;
-                g_points[2*x][4] = y * ytstep;
-
-                g_points[2*x+1][0] = (float)sin(deta*theta*ang2rad+rad180)*r - ow_r_half + g_x_curframe*xvstep;
-                g_points[2*x+1][1] = (y+1)*yvstep-oh_r_half;
-                g_points[2*x+1][2] = (float)cos(deta*theta*ang2rad+rad180)*r;
-                g_points[2*x+1][3] = x * xtstep;
-                g_points[2*x+1][4] = (y+1) * ytstep;
-            }
-        }
-    }
+#if 1
+    float b = ow / g_foldup.numDiv;
+    float a = (sw - 2.0*ow/g_foldup.numDiv) / (g_foldup.numDiv - 2);
 #else
-    // ([0.0, 2*ow/oh], [0.0, 2.0])
-    // ([0.0, 2.2x], [0.0, 2.0])
-    float ow_r = 2.0 * (float) g_foldup.ow / g_foldup.oh;
-    float oh_r = 2.0 * (float) g_foldup.oh / g_foldup.oh;
-    float sw_r = 2.0 * (float) g_foldup.sw / g_foldup.sh;
-    float sh_r = 2.0 * (float) g_foldup.sh / g_foldup.sh;
-
-    float ow_r_half = ow_r / 2.0;
-    float oh_r_half = oh_r / 2.0;
-
-    float xvstep = ow_r / g_foldup.numDiv;
-    float yvstep = oh_r / 1.0;
-    float xtstep = (1.0/(g_foldup.iw/g_foldup.tw)) / (float)g_foldup.numDiv;
-    float ytstep = (1.0/(g_foldup.iw/g_foldup.tw)) / 1.0;
-
-    float b = ow_r / g_foldup.numDiv;
-    float a = (sw_r - 2.0*ow_r/g_foldup.numDiv) / (g_foldup.numDiv - 2);
+    float b = ow / (float)g_foldup.numDiv;
+    float a = sw / (float)g_foldup.numDiv;
+#endif
     float c = sqrtf(b*b - a*a);
     float d = yvstep;
+    int   curid = g_foldup.curAngPosID;
 
-    // if ( g_foldup.curAngPosID % 2 == 1 )
-    //     zstart = 0.0;
-    // else
-    //     zstart = -c;
 
     int x, y;
+    float detaX;
     for ( y = 0; y < 1; y++ )
     {
         for ( x = 0; x <= g_foldup.numDiv; x++ )
         {
-            g_points[2*x][0] = x * a - ow_r_half;
-            g_points[2*x][1] = y * d - oh_r_half;
-            if ( (g_foldup.curAngPosID % 2 == 1 && x % 2 == 0)
-                    || (g_foldup.curAngPosID % 2 == 0 && x % 2 == 1) )
+#if 1
+            if ( x <= curid - 1 )
+                detaX = a * x;
+            else if ( x >= curid + 2 )
+                detaX = a * (x - 2) + 2 * b;
+            else
+                detaX = a*(curid-1) + b*(x-curid+1);
+            // BOTTOM
+            g_points[2*x][0] = detaX - sw_half;
+            g_points[2*x][1] = y * d - sh_half;
+            if ( (curid % 2 == 1 && x % 2 == 0)
+                    || (curid % 2 == 0 && x % 2 == 1) )
                 g_points[2*x][2] = 0.0;
             else
                 g_points[2*x][2] = -c;
+            if ( x >= curid - 1 && x <= curid + 1 )
+                g_points[2*x][2] = 0.0;
+#else
+            g_points[2*x][0] = x * a - sw_half;
+            g_points[2*x][1] = y * d - sh_half;
+            if ( x % 2 == 0 )
+                g_points[2*x][2] = -c;
+            else
+                g_points[2*x][2] = 0.0;
+#endif
             g_points[2*x][3] = x * xtstep;
             g_points[2*x][4] = y * ytstep;
 
-            g_points[2*x+1][0] = x * a - ow_r_half;
-            g_points[2*x+1][1] = (y+1) * d - oh_r_half;
-            if ( (g_foldup.curAngPosID % 2 == 1 && x % 2 == 0)
-                    || (g_foldup.curAngPosID % 2 == 0 && x % 2 == 1) )
-                g_points[2*x][2] = 0.0;
+
+            // TOP
+#if 1
+            g_points[2*x+1][0] = detaX - sw_half;
+            g_points[2*x+1][1] = (y+1) * d - sh_half;
+            if ( (curid % 2 == 1 && x % 2 == 0)
+                    || (curid % 2 == 0 && x % 2 == 1) )
+                g_points[2*x+1][2] = 0.0;
             else
-                g_points[2*x][2] = -c;
+                g_points[2*x+1][2] = -c;
+            if ( x >= curid - 1 && x <= curid + 1 )
+                g_points[2*x+1][2] = 0.0;
+#else
+            if ( x % 2 == 0 )
+                g_points[2*x+1][2] = -c;
+            else
+                g_points[2*x+1][2] = 0.0;
+#endif
             g_points[2*x+1][3] = x * xtstep;
             g_points[2*x+1][4] = (y+1) * ytstep;
         }
     }
-#endif
 }
 
 // Our Rendering Is Done Here
@@ -321,34 +281,37 @@ void render(void)
 {
     int x, y;
 
+    update_ver_and_tex();
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear The Screen And The Depth Buffer
     glLoadIdentity();									// Reset The View
 
-    glPushMatrix();
-    glTranslatef(0.0f,0.0f,-2.0f);
-    glEnable(GL_TEXTURE_2D);
-    // 纹理单元与当前的片段颜色混合的算法由 glTexEnvi() 指定!
-    // glTexEnvi() 默认使用的是 GL_MODULATE .
-    // 即混合算法是: R(dst) = R(src) * R(tex) ...
-    glColor3f(1.0, 1.0, 1.0);
-    glBindTexture(GL_TEXTURE_2D, g_texid[0]);
-    update_ver_and_tex();
-    // [(<<G:2>> P107)]
-    glBegin(GL_TRIANGLE_STRIP);
-    for (y = 0; y < Y_NUMDIV; y++) {
-        for (x = 0; x <= X_NUMDIV; x++) {
-            // 从此之后的不再有顶点数据
-            if ( x - g_x_curframe >= g_xnumFramePerCircle )
-                break;
+    glPushMatrix(); {
+        glTranslatef(0.0f,0.0f,-2.0f);
 
-            glTexCoord2f(g_points[2*x][3], g_points[2*x][4]);
-            glVertex3f(g_points[2*x][0], g_points[2*x][1], g_points[2*x][2]);
-            glTexCoord2f(g_points[2*x+1][3], g_points[2*x+1][4]);
-            glVertex3f(g_points[2*x+1][0], g_points[2*x+1][1], g_points[2*x+1][2]);
+        glEnable(GL_TEXTURE_2D);
+
+        // 纹理单元与当前的片段颜色混合的算法由 glTexEnvi() 指定!
+        // glTexEnvi() 默认使用的是 GL_MODULATE .
+        // 即混合算法是: R(dst) = R(src) * R(tex) ...
+        glColor3f(1.0, 1.0, 1.0);
+        glBindTexture(GL_TEXTURE_2D, g_texid[0]);
+
+        glBegin(GL_TRIANGLE_STRIP);
+        // printf("NAL 1X curAngPosID=%d\n", g_foldup.curAngPosID);
+        for ( y = 0; y < 1; y++ )
+        {
+            for ( x = 0; x <= g_foldup.numDiv; x++ )
+            {
+                glTexCoord2f(g_points[2*x][3], g_points[2*x][4]);
+                glVertex3f(g_points[2*x][0], g_points[2*x][1], g_points[2*x][2]);
+
+                glTexCoord2f(g_points[2*x+1][3], g_points[2*x+1][4]);
+                glVertex3f(g_points[2*x+1][0], g_points[2*x+1][1], g_points[2*x+1][2]);
+            }
         }
-    }
-    glEnd();
-    glPopMatrix();
+        glEnd();
+    } glPopMatrix();
 
     glDisable(GL_TEXTURE_2D);
     glColor3f(1.0, 0.0, 0.0);
@@ -362,30 +325,19 @@ void render(void)
         glVertex3f(worldx + 0.1, worldy + 0.1, worldz);
         glVertex3f(worldx - 0.1, worldy + 0.1, worldz);
     glEnd();
-#if 1
-    // printf("NAL XX g_x_curframe=%d ...\n", g_x_curframe);
-    if ( ! g_stop )
-    {
-        if ( g_isopenning )
-        {
-            if ( ++g_x_curframe >= X_NUMDIV )
-                g_isopenning = false;
-        }
-        else
-        {
-            if ( --g_x_curframe <= 0 )
-                g_isopenning = true;
-        }
-    }
-#endif
-    // usleep(1000 * 200);
 
-    // Swap The Buffers To Become Our Rendering Visible
+    if ( ++g_foldup.curAngPosID >= 14 )
+        g_foldup.curAngPosID = 1;
+    usleep(1000 * 300);
+
     glutSwapBuffers ( );
 }
 
 void resetup_matrix(int w, int h)
 {
+    if (h == 0) 
+        h = 1;
+
     float asp = (float)w / (float)h;
 
     glMatrixMode(GL_PROJECTION);     // Select The Projection Matrix
@@ -399,16 +351,12 @@ void resetup_matrix(int w, int h)
 // Our Reshaping Handler (Required Even In Fullscreen-Only Modes)
 void reshape(int w, int h)
 {
+    viewW = windowW = w;
+    viewH = windowH = h;
+
     glViewport(0, 0, w, h);
-    glMatrixMode(GL_PROJECTION);     // Select The Projection Matrix
-    glLoadIdentity();                // Reset The Projection Matrix
-    // Calculate The Aspect Ratio And Set The Clipping Volume
-    if (h == 0) h = 1;
 
-    glFrustum(-(float)w/h/2.0, (float)w/h/2.0, -0.5, 0.5, 1.0, 100.0);
-    glMatrixMode(GL_MODELVIEW);      // Select The Modelview Matrix
-
-    glLoadIdentity(); // Reset The Modelview Matrix
+    resetup_matrix(w, h);
 }
 
 // Our Keyboard Handler (Normal Keys)
@@ -517,7 +465,7 @@ void ProcessSelection(int xPos, int yPos, float *worx, float *wory, float *worz)
     m3dLoadVector3(dir, fx-nx, fy-ny, fz-nz);
     m3dLoadVector3(N, 0.0, 0.0, 1.0);
     m3dLoadPlanev(p, N, -(-2.0));
-// #if 0
+#if 0
     double pndotrd = p[0]*dir[0] + p[1]*dir[1] + p[2]*dir[2];
 	double point_len = -(p[0]*nx + p[1]*ny + p[2]*nz + p[3]) / pndotrd;
 
@@ -525,7 +473,7 @@ void ProcessSelection(int xPos, int yPos, float *worx, float *wory, float *worz)
 	*wory =  ny + (point_len * dir[1]);
 	*worz =  nz + (point_len * dir[2]);
     printf("1w (%f, %f, %f)\n", *worx, *wory, *worz);
-// #else
+#else
     M3DVector3f wor, rayPos;
     m3dLoadVector3(rayPos, nx, ny, nz);
     m3dRayIntersection(p, wor, rayPos, dir);
@@ -533,7 +481,7 @@ void ProcessSelection(int xPos, int yPos, float *worx, float *wory, float *worz)
 	*wory =  wor[1];
 	*worz =  wor[2];
     printf("2w (%f, %f, %f)\n", wor[0], wor[1], wor[2]);
-// #endif
+#endif
 
     // restore to prev matrix
     glMatrixMode(GL_PROJECTION);
@@ -562,9 +510,12 @@ void MouseCallback(int button, int state, int x, int y)
 // Main Function For Bringing It All Together.
 int main(int argc, char** argv)
 {
+    viewW = windowW = 342 * 2;
+    viewH = windowH = 256 * 2;
+
     glutInit(&argc, argv);                           // GLUT Initializtion
     glutInitDisplayMode(GLUT_DEPTH | GLUT_RGBA | GLUT_DOUBLE); // (CHANGED)
-    glutInitWindowSize(342*2, 256*2);                // Window Size If We Start In Windowed Mode
+    glutInitWindowSize(windowW, windowH);                // Window Size If We Start In Windowed Mode
     glutCreateWindow("NeHe's OpenGL Framework"); // Window Title 
     if (!init()) {                                   // Our Initialization
         return -1;
