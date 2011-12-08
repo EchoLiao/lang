@@ -198,8 +198,8 @@ void update_ver_and_tex()
 
     float xvstep = ow_r / (float)X_NUMDIV;
     float yvstep = oh_r / (float)Y_NUMDIV;
-    float xtstep = (1.0/((float)iw/tw)) / (float)X_NUMDIV;
-    float ytstep = (1.0/((float)ih/th)) / (float)Y_NUMDIV;
+    float xtstep = ((float)iw/tw) / (float)X_NUMDIV;
+    float ytstep = ((float)ih/th) / (float)Y_NUMDIV;
 
     // [(<<G:2>> P45 P109)]
     int ncircle = 4;     // 共须转 ncircle 圈
