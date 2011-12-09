@@ -4,6 +4,12 @@
 
   Prepared by Erkin Tunca for http://nehe.gamedev.net
 
+
+  力, 速度, 加速度, 位移之间的关系公式:
+    V = V0 + a*t
+    S = V0 + (a*t*t)/2 = S0 + V * detat
+    F = m * a
+
 **************************************************************************/
 
 #include <math.h>
@@ -144,6 +150,10 @@ public:
 	  At an instance in time, several sources of force might affect the mass. The vector sum 
 	  of these forces make up the net force applied to the mass at the instance.
 	*/
+    /* 
+     * 在某一时刻, 更新物体所受到的力的方向和大小.
+     *
+     * */
 	void applyForce(Vector3D force)
 	{
 		this->force += force;					// The external force is added to the force of the mass
@@ -152,6 +162,10 @@ public:
 	/*
 	  void init() method sets the force values to zero
 	*/
+    /* 
+     * 把物体所受到的力的方向和大小重置为零.
+     *
+     * */
 	void init()
 	{
 		force.x = 0;
@@ -166,11 +180,23 @@ public:
 	  simple. It is suitable for most of physical simulations that we know in common 
 	  computer and video games.
 	*/
+    /* 
+     * 经过时间片(dt)后, 更新在力的作用下(force)物体的速度(vel)(包括方向和大
+     * 小), 和位置(pos).
+     *
+     * 在没有力的作用下, 若物体的初始状态是运动的, 则物体做永远的匀速直线运动;
+     * 若物体的初始状态是静止的, 则物体将永远静止.
+     *
+     * */
 	void simulate(float dt)
 	{
+        //      V = V0 + a * detat
+        //      F = m * a
+        //  ==> V = V0 + (F / m) * detat
 		vel += (force / m) * dt;				// Change in velocity is added to the velocity.
 												// The change is proportinal with the acceleration (force / m) and change in time
 
+        // S = S0 + V * detat
 		pos += vel * dt;						// Change in position is added to the position.
 												// Change in position is velocity times the change in time
 	}
@@ -188,11 +214,17 @@ public:
 	{
 		this->numOfMasses = numOfMasses;
 		
+        // Mess *A[3]; 指针数组!
 		masses = new Mass*[numOfMasses];			// Create an array of pointers
 
 		for (int a = 0; a < numOfMasses; ++a)		// We will step to every pointer in the array
 			masses[a] = new Mass(m);				// Create a Mass as a pointer and put it in the array
 	}
+
+    ~Simulation()
+    {
+        release();
+    }
 
 	virtual void release()							// delete the masses created
 	{
@@ -250,8 +282,8 @@ class ConstantVelocity : public Simulation
 public:
 	ConstantVelocity() : Simulation(1, 1.0f)				//Constructor firstly constructs its super class with 1 mass and 1 kg
 	{
-		masses[0]->pos = Vector3D(0.0f, 0.0f, 0.0f);		//a mass was created and we set its position to the origin
-		masses[0]->vel = Vector3D(1.0f, 0.0f, 0.0f);		//we set the mass's velocity to (1.0f, 0.0f, 0.0f)
+		masses[0]->pos = Vector3D(0.0f, 8.0f, 0.0f);		//a mass was created and we set its position to the origin
+		masses[0]->vel = Vector3D(5.0f, 0.0f, 0.0f);		//we set the mass's velocity to (1.0f, 0.0f, 0.0f)
 	}
 
 };
@@ -267,19 +299,25 @@ public:
 class MotionUnderGravitation : public Simulation
 {
 public:
+    // 引力加速度的方向和大小
 	Vector3D gravitation;													//the gravitational acceleration
 
 	MotionUnderGravitation(Vector3D gravitation) : Simulation(1, 1.0f)		//Constructor firstly constructs its super class with 1 mass and 1 kg
 	{																		//Vector3D gravitation, is the gravitational acceleration
 		this->gravitation = gravitation;									//set this class's gravitation
-		masses[0]->pos = Vector3D(-10.0f, 0.0f, 0.0f);						//set the position of the mass
+		masses[0]->pos = Vector3D(-0.0f, 0.0f, 0.0f);						//set the position of the mass
 		masses[0]->vel = Vector3D(10.0f, 15.0f, 0.0f);						//set the velocity of the mass
 	}
 
 	virtual void solve()													//gravitational force will be applied therefore we need a "solve" method.
 	{
-		for (int a = 0; a < numOfMasses; ++a)								//we will apply force to all masses (actually we have 1 mass, but we can extend it in the future)
-			masses[a]->applyForce(gravitation * masses[a]->m);				//gravitational force is as F = m * g. (mass times the gravitational acceleration)
+        //
+        // 力和加速度的关系:
+        //    F = m * a
+        //  其中, m为物体的质量(masses[.]->m), a为加速度(gravitation).
+        //
+		for (int a = 0; a < numOfMasses; ++a)
+			masses[a]->applyForce(gravitation * masses[a]->m);
 	}
 	
 };
@@ -290,27 +328,53 @@ public:
   This point is refered as the connectionPos and the spring has a springConstant value to represent its 
   stiffness.
 */
+
+/* 
+ *      简谐运动(或简谐振动,谐振)既是最基本也是最简单的一种机械振动. 当某物体进行
+ *  简谐运动时, 物体所受的力跟位移成正比, 并且力总是指向平衡位置. 
+ *
+ *      如果用F表示物体受到的回复力, 用x表示小球对于平衡位置的位移, 根据胡克定律,
+ *  F和x成正比, 它们之间的关系可用下式来表示: 
+ *
+ *      F = − kx
+ *
+ *  式中的k是回复力与位移成正比的比例系数, 不能与弹簧的劲度系数混淆; 负号的意
+ *  思是: 回复力的方向总跟物体位移的方向相反. 
+ *
+ **/
 class MassConnectedWithSpring : public Simulation
 {
 public:
+    // 回复力与位移成正比的比例系数
 	float springConstant;													//more the springConstant, stiffer the spring force
+    // 平衡位置
 	Vector3D connectionPos;													//the arbitrary constant point that the mass is connected
 
 	MassConnectedWithSpring(float springConstant) : Simulation(1, 1.0f)		//Constructor firstly constructs its super class with 1 mass and 1 kg
 	{
 		this->springConstant = springConstant;								//set the springConstant
 
-		//connectionPos = Vector3D(0.0f, -5.0f, 0.0f);						//set the connectionPos
-		connectionPos = Vector3D(0.0f, -5.5f, 0.0f);							// modified by laks to make the spring visible
+		connectionPos = Vector3D(0.0f, 10.0f, 0.0f);							// modified by laks to make the spring visible
 
 		masses[0]->pos = connectionPos + Vector3D(10.0f, 0.0f, 0.0f);		//set the position of the mass 10 meters to the right side of the connectionPos
 		masses[0]->vel = Vector3D(0.0f, 0.0f, 0.0f);						//set the velocity of the mass to zero
+	}
+
+	MassConnectedWithSpring(float springConstant, Vector3D connPos,
+            Vector3D origPos) : Simulation(1, 1.0f)
+	{
+		this->springConstant = springConstant;
+
+		connectionPos = connPos;
+		masses[0]->pos = origPos;
+		masses[0]->vel = Vector3D(0.0f, 0.0f, 0.0f);
 	}
 
 	virtual void solve()													//the spring force will be applied
 	{
 		for (int a = 0; a < numOfMasses; ++a)								//we will apply force to all masses (actually we have 1 mass, but we can extend it in the future)
 		{
+            // F = -k * x
 			Vector3D springVector = masses[a]->pos - connectionPos;			//find a vector from the position of the mass to the connectionPos
 			masses[a]->applyForce(-springVector * springConstant);			//apply the force according to the famous spring force formulation
 		}
