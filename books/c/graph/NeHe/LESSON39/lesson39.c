@@ -28,7 +28,7 @@
 /* The number of our GLUT window */
 int window; 
 
-void *font=(void*)(GLUT_BITMAP_HELVETICA_10);    // For printing bitmap fonts
+void *font=(void*)(GLUT_BITMAP_HELVETICA_18);    // For printing bitmap fonts
 char s[30];                                // Tmp variable for storing the display strings  
 int time,timeprev=0;											 // For calculating elapsed time
 bool fullScreen=false;										 // toggle for fullscreen mode
@@ -58,8 +58,10 @@ it simulates. All masses in this container are pulled towards the connectionPos 
 with a constant of stiffness. This constant is set by the constructor and for now it is 2.0 
 (see below).
 */
+/* MassConnectedWithSpring* massConnectedWithSpring = 
+	new MassConnectedWithSpring(8.0f); */
 MassConnectedWithSpring* massConnectedWithSpring = 
-	new MassConnectedWithSpring(2.0f);
+    new MassConnectedWithSpring(8.0f, Vector3D(0.0, 0.0, 0.0), Vector3D(-3.0, 9.0, 0.0));
 
 float slowMotionRatio = 10.0f;									// slowMotionRatio Is A Value To Slow Down The Simulation, Relative To Real World Time
 float timeElapsed = 0;													// Elapsed Time In The Simulation (Not Equal To Real World's Time Unless slowMotionRatio Is 1
@@ -79,7 +81,7 @@ void InitGL(int Width, int Height)	        // We call this right after our OpenG
 
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();													// Reset The Projection Matrix
-  gluPerspective(45.0f,(GLfloat)Width/(GLfloat)Height,0.1f,100.0f);	// Calculate The Aspect Ratio Of The Window
+  gluPerspective(45.0f,(GLfloat)Width/(GLfloat)Height,0.1f,1000.0f);	// Calculate The Aspect Ratio Of The Window
 
   glMatrixMode(GL_MODELVIEW);
 }
@@ -120,7 +122,7 @@ void ReSizeGLScene(int Width, int Height)
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
 
-  gluPerspective(45.0f,(GLfloat)Width/(GLfloat)Height,0.1f,100.0f);
+  gluPerspective(45.0f,(GLfloat)Width/(GLfloat)Height,0.1f,1000.0f);
   glMatrixMode(GL_MODELVIEW);
 }
 
@@ -155,6 +157,7 @@ void DrawGLScene()
 	if (numOfIterations != 0)													// Avoid Division By Zero
 		dt = dt / numOfIterations;											// dt Should Be Updated According To numOfIterations
 
+    // 计算经过时间片(dt)后, 物体的新位置, 新运行方向等.
 	for (int a = 0; a < numOfIterations; ++a)					// We Need To Iterate Simulations "numOfIterations" Times
 	{
 		constantVelocity->operate(dt);									// Iterate constantVelocity Simulation By dt Seconds
@@ -164,7 +167,7 @@ void DrawGLScene()
 
 	// Position Camera 40 Meters Up In Z-Direction.
 	// Set The Up Vector In Y-Direction So That +X Directs To Right And +Y Directs To Up On The Window.
-	gluLookAt(0, 0, 40, 0, 0, 0, 0, 1, 0);						
+	gluLookAt(0, 0, 200, 0, 0, 0, 0, 1, 0);						
 
 	glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);		// Clear Screen And Depth Buffer
 

@@ -33,7 +33,7 @@ lesson%.tar.gz :
 #
 # 1. compile the thing.  uses the variables defined above.
 # 
-lesson%.exe : lesson%.o
+lesson%.exe : lesson%.o Physics1.h
 	$(CC) $(CFLAGS) -o $@ $(LIBDIR) $< $(LIBRARIES)  
 
 lesson%.o : lesson%.cpp
