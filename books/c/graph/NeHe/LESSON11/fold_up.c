@@ -41,6 +41,7 @@ int     windowH;
 int     viewW;
 int     viewH;
 
+float g_Ztran = -3.0f;
 float worldx, worldy, worldz;
 
 typedef struct tagFoldUpObj
@@ -67,7 +68,7 @@ sFoldUpObj g_foldup;
 bool load_rgb_image(const char* file_name, int w, int h, RGBIMG* refimg)
 {
 
-#if 1
+#if 0
     GLuint   sz;    // Our Image's Data Field Length In Bytes
     FILE*    file;  // The Image's File On Disk
     long     fsize; // File Size In Bytes
@@ -152,8 +153,8 @@ bool setup_textures()
 
 void st_foldup_init()
 {
-    g_foldup.ow = 342 * 4;
-    g_foldup.oh = 256 * 2;
+    g_foldup.ow = 256 * 14;
+    g_foldup.oh = 256;
     g_foldup.vw = viewW;
     g_foldup.vh = viewH;
     g_foldup.iw = 256;
@@ -161,7 +162,7 @@ void st_foldup_init()
     g_foldup.tw = 256;
     g_foldup.th = 256;
     g_foldup.numDiv = 14;
-    g_foldup.curAngPosID = 7;
+    g_foldup.curAngPosID = 9;
 
     assert(g_foldup.ow > g_foldup.vw);
 
@@ -181,7 +182,7 @@ bool init(void)
     glEnable(GL_DEPTH_TEST);						   // Enables Depth Testing
     glShadeModel(GL_SMOOTH);						   // Enable Smooth Shading
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-    glPolygonMode(GL_BACK, GL_FILL);                   // Back Face Is Solid (NEW)
+    glPolygonMode(GL_BACK, GL_LINE);                   // Back Face Is Solid (NEW)
     glPolygonMode(GL_FRONT, GL_FILL);                  // Front Face Is Made Of Lines (NEW)
     glPointSize(6);
 
@@ -249,8 +250,18 @@ void update_ver_and_tex()
             else
                 g_points[2*x][2] = 0.0;
 #endif
-            g_points[2*x][3] = x * xtstep;
-            g_points[2*x][4] = y * ytstep;
+            // g_points[2*x][3] = x * xtstep;
+            // g_points[2*x][4] = y * ytstep;
+            if ( x % 2 == 0 )
+            {
+                g_points[2*x][3] = 0.0;
+                g_points[2*x][4] = 0.0;
+            }
+            else
+            {
+                g_points[2*x][3] = 1.0;
+                g_points[2*x][4] = 0.0;
+            }
 
 
             // TOP
@@ -270,8 +281,19 @@ void update_ver_and_tex()
             else
                 g_points[2*x+1][2] = 0.0;
 #endif
-            g_points[2*x+1][3] = x * xtstep;
-            g_points[2*x+1][4] = (y+1) * ytstep;
+            // g_points[2*x+1][3] = x * xtstep;
+            // g_points[2*x+1][4] = (y+1) * ytstep;
+            if ( x % 2 == 0 )
+            {
+                g_points[2*x+1][3] = 0.0;
+                g_points[2*x+1][4] = 1.0;
+            }
+            else
+            {
+                g_points[2*x+1][3] = 1.0;
+                g_points[2*x+1][4] = 1.0;
+            }
+
         }
     }
 }
@@ -287,7 +309,7 @@ void render(void)
     glLoadIdentity();									// Reset The View
 
     glPushMatrix(); {
-        glTranslatef(0.0f,0.0f,-2.0f);
+        glTranslatef(0.0f,0.0f,g_Ztran);
 
         glEnable(GL_TEXTURE_2D);
 
@@ -326,9 +348,9 @@ void render(void)
         glVertex3f(worldx - 0.1, worldy + 0.1, worldz);
     glEnd();
 
-    if ( ++g_foldup.curAngPosID >= 14 )
-        g_foldup.curAngPosID = 1;
-    usleep(1000 * 300);
+    // if ( ++g_foldup.curAngPosID >= 14 )
+    //     g_foldup.curAngPosID = 1;
+    // usleep(1000 * 300);
 
     glutSwapBuffers ( );
 }
@@ -464,7 +486,7 @@ void ProcessSelection(int xPos, int yPos, float *worx, float *wory, float *worz)
     M3DVector3f N, dir;
     m3dLoadVector3(dir, fx-nx, fy-ny, fz-nz);
     m3dLoadVector3(N, 0.0, 0.0, 1.0);
-    m3dLoadPlanev(p, N, -(-2.0));
+    m3dLoadPlanev(p, N, -g_Ztran);
 #if 0
     double pndotrd = p[0]*dir[0] + p[1]*dir[1] + p[2]*dir[2];
 	double point_len = -(p[0]*nx + p[1]*ny + p[2]*nz + p[3]) / pndotrd;
@@ -490,6 +512,28 @@ void ProcessSelection(int xPos, int yPos, float *worx, float *wory, float *worz)
     glPopMatrix();
 }
 
+
+void st_foldup_process_button_down(float wx, float wy, float wz)
+{
+    int i, j;
+    float x, y;
+
+    for ( j = 0; j < 1; j++ )
+    {
+        for ( i = 0; i <= g_foldup.numDiv; i++ )
+        {
+            x = g_points[2*i][0];
+            y = g_points[2*i][1];
+            if ( x >= wx - 0.05 && x <= wx + 0.05 )
+            {
+                g_foldup.curAngPosID = i;
+                glutPostRedisplay();
+                break;
+            }
+        }
+    }
+}
+
 ///////////////////////////////////////////////////////////
 // Process the mouse click
 void MouseCallback(int button, int state, int x, int y)
@@ -502,6 +546,7 @@ void MouseCallback(int button, int state, int x, int y)
         worldx = wx;
         worldy = wy;
         worldz = wz;
+        st_foldup_process_button_down(wx, wy, wz);
         glutPostRedisplay();
     }
 }
@@ -510,7 +555,7 @@ void MouseCallback(int button, int state, int x, int y)
 // Main Function For Bringing It All Together.
 int main(int argc, char** argv)
 {
-    viewW = windowW = 342 * 2;
+    viewW = windowW = 256 * 5;
     viewH = windowH = 256 * 2;
 
     glutInit(&argc, argv);                           // GLUT Initializtion
