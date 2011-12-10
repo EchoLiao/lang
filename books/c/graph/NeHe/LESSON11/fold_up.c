@@ -209,9 +209,7 @@ void st_foldup_update_frame()
         return;
 
     float ow = 2.0 * (float) g_foldup.ow / g_foldup.oh;
-    float oh = 2.0 * (float) g_foldup.oh / g_foldup.oh;
     float sw = 2.0 * (float) g_foldup.vw / g_foldup.vh;
-    float sh = 2.0 * (float) g_foldup.vh / g_foldup.vh;
     float b = ow / g_foldup.numDiv;
     float a = (sw - 2.0*b) / (g_foldup.numDiv - 2);
     float c = sqrtf(b*b - a*a);
@@ -300,14 +298,10 @@ void update_ver_and_tex()
     float sw_half = sw / 2.0;
     float sh_half = sh / 2.0;
 
-    float yvstep = oh / 1.0;
-    float xtstep = (g_foldup.iw/g_foldup.tw) / (float)g_foldup.numDiv;
-    float ytstep = (g_foldup.iw/g_foldup.tw) / 1.0;
-
     float b = ow / g_foldup.numDiv;
-    float a = (sw - 2.0*ow/g_foldup.numDiv) / (g_foldup.numDiv - 2);
+    float a = (sw - 2.0*b) / (g_foldup.numDiv - 2);
     float c = sqrtf(b*b - a*a);
-    float d = yvstep;
+    float d = oh / 1; // (oh / numDivInYdir)
     int   curid = g_foldup.lastAngPosID;
 
     int x, y;
