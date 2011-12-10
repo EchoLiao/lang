@@ -168,7 +168,7 @@ void st_foldup_init()
     g_foldup.numDiv = 14;
     g_foldup.curAngPosID = 13;
     g_foldup.lastAngPosID = g_foldup.curAngPosID;
-    g_foldup.numFrame = 16;
+    g_foldup.numFrame = 32;
     g_foldup.curFrame = 0;
     g_foldup.isNewClick = 0;
 
@@ -256,6 +256,34 @@ void st_foldup_update_frame()
                 {
                 }
             }
+            else
+            {
+                if ( x <= lastid - 1 )
+                {
+                }
+                else if ( x == lastid )
+                {
+                    g_points[2*x][0] -= s1;
+                    g_points[2*x][2] -= e;
+                    g_points[2*x+1][0] -= s1;
+                    g_points[2*x+1][2] -= e;
+                }
+                else if ( x >= lastid + 1 && x <= curid - 1 )
+                {
+                    g_points[2*x][0] -= s2;
+                    g_points[2*x+1][0] -= s2;
+                }
+                else if ( x == curid )
+                {
+                    g_points[2*x][0] -= s1;
+                    g_points[2*x][2] += g;
+                    g_points[2*x+1][0] -= s1;
+                    g_points[2*x+1][2] += g;
+                }
+                else
+                {
+                }
+            }
         }
     }
 }
@@ -329,10 +357,11 @@ void render(void)
     int x, y;
     printf("^^^^^ render ^^^^^^^^^\n");
 
-    if ( g_foldup.isNewClick )
+    if ( g_foldup.isNewClick && g_foldup.curAngPosID != g_foldup.lastAngPosID )
     {
         update_ver_and_tex();
         st_foldup_update_frame();
+        printf("^^^^^ update ^^^^^^^^^\n");
     }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear The Screen And The Depth Buffer
