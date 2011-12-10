@@ -162,9 +162,10 @@ void st_foldup_init()
     g_foldup.tw = 256;
     g_foldup.th = 256;
     g_foldup.numDiv = 14;
-    g_foldup.curAngPosID = 9;
+    g_foldup.curAngPosID = 5;
 
     assert(g_foldup.ow > g_foldup.vw);
+    assert(g_foldup.numDiv % 2 == 0);
 
     update_ver_and_tex();
 }
@@ -209,17 +210,11 @@ void update_ver_and_tex()
     float xtstep = (g_foldup.iw/g_foldup.tw) / (float)g_foldup.numDiv;
     float ytstep = (g_foldup.iw/g_foldup.tw) / 1.0;
 
-#if 1
     float b = ow / g_foldup.numDiv;
     float a = (sw - 2.0*ow/g_foldup.numDiv) / (g_foldup.numDiv - 2);
-#else
-    float b = ow / (float)g_foldup.numDiv;
-    float a = sw / (float)g_foldup.numDiv;
-#endif
     float c = sqrtf(b*b - a*a);
     float d = yvstep;
     int   curid = g_foldup.curAngPosID;
-
 
     int x, y;
     float detaX;
@@ -227,52 +222,35 @@ void update_ver_and_tex()
     {
         for ( x = 0; x <= g_foldup.numDiv; x++ )
         {
-#if 1
             if ( x <= curid - 1 )
                 detaX = a * x;
             else if ( x >= curid + 2 )
                 detaX = a * (x - 2) + 2 * b;
             else
                 detaX = a*(curid-1) + b*(x-curid+1);
+
             // BOTTOM
             g_points[2*x][0] = detaX - sw_half;
             g_points[2*x][1] = y * d - sh_half;
-            if ( (curid % 2 == 1 && x % 2 == 0)
-                    || (curid % 2 == 0 && x % 2 == 1) )
+            if ( x % 2 == 0 ) 
                 g_points[2*x][2] = 0.0;
             else
                 g_points[2*x][2] = -c;
             if ( x >= curid - 1 && x <= curid + 1 )
                 g_points[2*x][2] = 0.0;
-#else
-            g_points[2*x][0] = x * a - sw_half;
-            g_points[2*x][1] = y * d - sh_half;
-            if ( x % 2 == 0 )
-                g_points[2*x][2] = -c;
-            else
-                g_points[2*x][2] = 0.0;
-#endif
             g_points[2*x][3] = 1.0 * x;
             g_points[2*x][4] = 0.0;
 
 
             // TOP
-#if 1
             g_points[2*x+1][0] = detaX - sw_half;
             g_points[2*x+1][1] = (y+1) * d - sh_half;
-            if ( (curid % 2 == 1 && x % 2 == 0)
-                    || (curid % 2 == 0 && x % 2 == 1) )
+            if ( x % 2 == 0 ) 
                 g_points[2*x+1][2] = 0.0;
             else
                 g_points[2*x+1][2] = -c;
             if ( x >= curid - 1 && x <= curid + 1 )
                 g_points[2*x+1][2] = 0.0;
-#else
-            if ( x % 2 == 0 )
-                g_points[2*x+1][2] = -c;
-            else
-                g_points[2*x+1][2] = 0.0;
-#endif
             g_points[2*x+1][3] = 1.0 * x;
             g_points[2*x+1][4] = 1.0;
         }
@@ -501,11 +479,11 @@ void st_foldup_process_button_down(float wx, float wy, float wz)
 
     for ( j = 0; j < 1; j++ )
     {
-        for ( i = 0; i <= g_foldup.numDiv; i++ )
+        for ( i = 1; i <= g_foldup.numDiv - 1; i += 2 )
         {
             x = g_points[2*i][0];
             y = g_points[2*i][1];
-            if ( x >= wx - 0.05 && x <= wx + 0.05 )
+            if ( x >= wx - 0.09 && x <= wx + 0.09 )
             {
                 g_foldup.curAngPosID = i;
                 glutPostRedisplay();
