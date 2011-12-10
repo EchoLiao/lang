@@ -68,7 +68,7 @@ sFoldUpObj g_foldup;
 bool load_rgb_image(const char* file_name, int w, int h, RGBIMG* refimg)
 {
 
-#if 0
+#if 1
     GLuint   sz;    // Our Image's Data Field Length In Bytes
     FILE*    file;  // The Image's File On Disk
     long     fsize; // File Size In Bytes
@@ -182,7 +182,7 @@ bool init(void)
     glEnable(GL_DEPTH_TEST);						   // Enables Depth Testing
     glShadeModel(GL_SMOOTH);						   // Enable Smooth Shading
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-    glPolygonMode(GL_BACK, GL_LINE);                   // Back Face Is Solid (NEW)
+    glPolygonMode(GL_BACK, GL_FILL);                   // Back Face Is Solid (NEW)
     glPolygonMode(GL_FRONT, GL_FILL);                  // Front Face Is Made Of Lines (NEW)
     glPointSize(6);
 
@@ -250,18 +250,8 @@ void update_ver_and_tex()
             else
                 g_points[2*x][2] = 0.0;
 #endif
-            // g_points[2*x][3] = x * xtstep;
-            // g_points[2*x][4] = y * ytstep;
-            if ( x % 2 == 0 )
-            {
-                g_points[2*x][3] = 0.0;
-                g_points[2*x][4] = 0.0;
-            }
-            else
-            {
-                g_points[2*x][3] = 1.0;
-                g_points[2*x][4] = 0.0;
-            }
+            g_points[2*x][3] = 1.0 * x;
+            g_points[2*x][4] = 0.0;
 
 
             // TOP
@@ -281,19 +271,8 @@ void update_ver_and_tex()
             else
                 g_points[2*x+1][2] = 0.0;
 #endif
-            // g_points[2*x+1][3] = x * xtstep;
-            // g_points[2*x+1][4] = (y+1) * ytstep;
-            if ( x % 2 == 0 )
-            {
-                g_points[2*x+1][3] = 0.0;
-                g_points[2*x+1][4] = 1.0;
-            }
-            else
-            {
-                g_points[2*x+1][3] = 1.0;
-                g_points[2*x+1][4] = 1.0;
-            }
-
+            g_points[2*x+1][3] = 1.0 * x;
+            g_points[2*x+1][4] = 1.0;
         }
     }
 }
