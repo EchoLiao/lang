@@ -181,9 +181,11 @@ bool init(void)
     glDepthFunc(GL_LEQUAL);							   // The Type Of Depth Testing To Do
     glEnable(GL_DEPTH_TEST);						   // Enables Depth Testing
     glShadeModel(GL_SMOOTH);						   // Enable Smooth Shading
+
+   glFrontFace(GL_CW); // 顶点顺序是顺时针方向的表面是正面
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-    glPolygonMode(GL_BACK, GL_FILL);                   // Back Face Is Solid (NEW)
-    glPolygonMode(GL_FRONT, GL_FILL);                  // Front Face Is Made Of Lines (NEW)
+    glPolygonMode(GL_FRONT, GL_LINE);
+    glPolygonMode(GL_BACK, GL_FILL);
     glPointSize(6);
 
     st_foldup_init();
