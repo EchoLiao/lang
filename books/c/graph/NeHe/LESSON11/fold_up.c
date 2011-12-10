@@ -57,6 +57,10 @@ typedef struct tagFoldUpObj
     float th;
     int   numDiv;
     int   curAngPosID;
+    int   lastAngPosID;
+    int   numFrame;
+    int   curFrame;
+    int   isNewClick;
 } sFoldUpObj;
 
 sFoldUpObj g_foldup;
@@ -162,10 +166,15 @@ void st_foldup_init()
     g_foldup.tw = 256;
     g_foldup.th = 256;
     g_foldup.numDiv = 14;
-    g_foldup.curAngPosID = 5;
+    g_foldup.curAngPosID = 13;
+    g_foldup.lastAngPosID = g_foldup.curAngPosID;
+    g_foldup.numFrame = 16;
+    g_foldup.curFrame = 0;
+    g_foldup.isNewClick = 0;
 
     assert(g_foldup.ow > g_foldup.vw);
     assert(g_foldup.numDiv % 2 == 0);
+    assert(g_foldup.numFrame > 1);
 
     update_ver_and_tex();
 }
@@ -185,13 +194,70 @@ bool init(void)
 
    glFrontFace(GL_CW); // 顶点顺序是顺时针方向的表面是正面
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-    glPolygonMode(GL_FRONT, GL_LINE);
+    glPolygonMode(GL_FRONT, GL_FILL);
     glPolygonMode(GL_BACK, GL_FILL);
     glPointSize(6);
 
     st_foldup_init();
 
     return true;
+}
+
+void st_foldup_update_frame()
+{
+    if ( g_foldup.curAngPosID == g_foldup.lastAngPosID )
+        return;
+
+    float ow = 2.0 * (float) g_foldup.ow / g_foldup.oh;
+    float oh = 2.0 * (float) g_foldup.oh / g_foldup.oh;
+    float sw = 2.0 * (float) g_foldup.vw / g_foldup.vh;
+    float sh = 2.0 * (float) g_foldup.vh / g_foldup.vh;
+    float b = ow / g_foldup.numDiv;
+    float a = (sw - 2.0*b) / (g_foldup.numDiv - 2);
+    float c = sqrtf(b*b - a*a);
+
+    float e = (g_foldup.curFrame + 1) * (c / g_foldup.numFrame);
+    float s1 = sqrtf(b*b - (c-e)*(c-e)) - a;
+    float s2 = 2.0 * s1;
+    float g = sqrtf(b*b - (b-s1)*(b-s1));
+
+    int curid = g_foldup.curAngPosID;
+    int lastid = g_foldup.lastAngPosID;
+    int x, y;
+    for ( y = 0; y < 1; y++ )
+    {
+        for ( x = 0; x <= g_foldup.numDiv; x++ )
+        {
+            if ( curid < lastid )
+            {
+                if ( x <= curid - 1 )
+                {
+                }
+                else if ( x == curid )
+                {
+                    g_points[2*x][0] += s1;
+                    g_points[2*x][2] += e;
+                    g_points[2*x+1][0] += s1;
+                    g_points[2*x+1][2] += e;
+                }
+                else if ( x >= curid + 1 && x <= lastid - 1 )
+                {
+                    g_points[2*x][0] += s2;
+                    g_points[2*x+1][0] += s2;
+                }
+                else if ( x == lastid )
+                {
+                    g_points[2*x][0] += s1;
+                    g_points[2*x][2] -= g;
+                    g_points[2*x+1][0] += s1;
+                    g_points[2*x+1][2] -= g;
+                }
+                else
+                {
+                }
+            }
+        }
+    }
 }
 
 void update_ver_and_tex()
@@ -214,7 +280,7 @@ void update_ver_and_tex()
     float a = (sw - 2.0*ow/g_foldup.numDiv) / (g_foldup.numDiv - 2);
     float c = sqrtf(b*b - a*a);
     float d = yvstep;
-    int   curid = g_foldup.curAngPosID;
+    int   curid = g_foldup.lastAngPosID;
 
     int x, y;
     float detaX;
@@ -261,8 +327,13 @@ void update_ver_and_tex()
 void render(void)   
 {
     int x, y;
+    printf("^^^^^ render ^^^^^^^^^\n");
 
-    update_ver_and_tex();
+    if ( g_foldup.isNewClick )
+    {
+        update_ver_and_tex();
+        st_foldup_update_frame();
+    }
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear The Screen And The Depth Buffer
     glLoadIdentity();									// Reset The View
@@ -307,9 +378,16 @@ void render(void)
         glVertex3f(worldx - 0.1, worldy + 0.1, worldz);
     glEnd();
 
-    // if ( ++g_foldup.curAngPosID >= 14 )
-    //     g_foldup.curAngPosID = 1;
-    // usleep(1000 * 300);
+    if ( ++g_foldup.curFrame >= g_foldup.numFrame )
+    {
+        g_foldup.isNewClick = 0;
+    }
+    else
+    {
+        glutPostRedisplay();
+    }
+
+    usleep(1000 * 1);
 
     glutSwapBuffers ( );
 }
@@ -485,7 +563,11 @@ void st_foldup_process_button_down(float wx, float wy, float wz)
             y = g_points[2*i][1];
             if ( x >= wx - 0.09 && x <= wx + 0.09 )
             {
+                g_foldup.isNewClick = 1;
+                g_foldup.lastAngPosID = g_foldup.curAngPosID;
                 g_foldup.curAngPosID = i;
+                g_foldup.curFrame = 0;
+                printf("******** HIT ******** i = %d\n", i);
                 glutPostRedisplay();
                 break;
             }
@@ -506,7 +588,7 @@ void MouseCallback(int button, int state, int x, int y)
         worldy = wy;
         worldz = wz;
         st_foldup_process_button_down(wx, wy, wz);
-        glutPostRedisplay();
+        // glutPostRedisplay();
     }
 }
 
@@ -529,7 +611,7 @@ int main(int argc, char** argv)
     glutKeyboardFunc(keyboard);                  // Register The Keyboard Handler
     glutSpecialFunc(special_keys);               // Register Special Keys Handler
 	glutMouseFunc(MouseCallback);
-    glutIdleFunc(render);                        // We Do Rendering In Idle Time
+    // glutIdleFunc(render);                        // We Do Rendering In Idle Time
     glutMainLoop();                              // Go To GLUT Main Loop
     return 0;
 }
