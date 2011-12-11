@@ -16,6 +16,8 @@ typedef int bool;
 
 #define TEXTURES_NUM 1       // We Have 1 Texture 
 
+#define NUM_DIV             14
+
 // (0,1,2) is (x,y,z), (3,4) is (s,t).
 #define NUM_PER_VERTEXE     5
 
@@ -32,7 +34,7 @@ typedef struct _RGBIMG {
 // Global Variables
 
 bool    g_stop = 0;
-float   g_points[(14+1)*2][NUM_PER_VERTEXE];   // The Array For The Points On The Grid Of Our "Wave"
+float   (*g_points)[NUM_PER_VERTEXE];
 bool    g_fullscreen;                // Fullscreen Mode ON/OFF (When g_gamemode Is OFF)
 GLuint	g_texid[TEXTURES_NUM];       // Our Textures' Id List 
 
@@ -155,9 +157,18 @@ bool setup_textures()
     return true;
 }
 
-void st_foldup_init()
+int st_foldup_init()
 {
-    g_foldup.ow = 256 * 14;
+    g_points = (float (*)[NUM_PER_VERTEXE]) calloc( (NUM_DIV+1)*2,
+                NUM_PER_VERTEXE * sizeof(float) );
+    if ( g_points == NULL )
+    {
+        fprintf(stderr, "calloc Error!\n");
+        return 0;
+    }
+
+    // g_foldup.ow = 256 * 14;
+    g_foldup.ow = 256 * NUM_DIV;
     g_foldup.oh = 256;
     g_foldup.vw = viewW;
     g_foldup.vh = viewH;
@@ -165,7 +176,7 @@ void st_foldup_init()
     g_foldup.ih = 256;
     g_foldup.tw = 256;
     g_foldup.th = 256;
-    g_foldup.numDiv = 14;
+    g_foldup.numDiv = NUM_DIV;
     g_foldup.curAngPosID = 13;
     g_foldup.lastAngPosID = g_foldup.curAngPosID;
     g_foldup.numFrame = 32;
@@ -180,6 +191,8 @@ void st_foldup_init()
             g_foldup.curAngPosID <= g_foldup.numDiv - 1);
 
     update_ver_and_tex();
+
+    return 1;
 }
 
 // Our GL Specific Initializations. Returns true On Success, false On Fail.
@@ -201,7 +214,8 @@ bool init(void)
     glPolygonMode(GL_BACK, GL_FILL);
     glPointSize(6);
 
-    st_foldup_init();
+    if ( ! st_foldup_init() )
+        return false;
 
     return true;
 }
