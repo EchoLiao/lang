@@ -175,6 +175,9 @@ void st_foldup_init()
     assert(g_foldup.ow > g_foldup.vw);
     assert(g_foldup.numDiv % 2 == 0);
     assert(g_foldup.numFrame > 1);
+    assert(g_foldup.curAngPosID % 2 == 1 );
+    assert(g_foldup.curAngPosID >= 1 &&
+            g_foldup.curAngPosID <= g_foldup.numDiv - 1);
 
     update_ver_and_tex();
 }
