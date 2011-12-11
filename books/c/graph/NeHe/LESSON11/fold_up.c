@@ -203,6 +203,9 @@ bool init(void)
     return true;
 }
 
+/* 
+   [(<<G:2>> P111)]
+*/
 void st_foldup_update_frame()
 {
     if ( g_foldup.curAngPosID == g_foldup.lastAngPosID )
@@ -286,6 +289,9 @@ void st_foldup_update_frame()
     }
 }
 
+/* 
+   [(<<G:2>> P111)]
+*/
 void update_ver_and_tex()
 {
     // ([0.0, 2*ow/oh], [0.0, 2.0])
@@ -409,6 +415,9 @@ void render(void)
     {
         glutPostRedisplay();
     }
+
+    if (glGetError() != GL_NO_ERROR)
+        fprintf(stderr, "GL Error!\n");
 
     usleep(1000 * 1);
 
