@@ -612,6 +612,9 @@ void st_foldup_process_button_down(float wx, float wy, float wz)
             y = g_points[2*i][1];
             if ( x >= wx - 0.09 && x <= wx + 0.09 )
             {
+                if ( g_foldup.curAngPosID == i )
+                    return;
+
                 g_foldup.isNewClick = 1;
                 g_foldup.lastAngPosID = g_foldup.curAngPosID;
                 g_foldup.curAngPosID = i;
