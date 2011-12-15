@@ -72,38 +72,52 @@ inline int ReadObject(const char *st, glObject *o){
 
 // connectivity procedure - based on Gamasutra's article
 // hard to explain here
-// 查找每个面的相邻的顶点
+// 查找每个面的相邻的面
 inline void SetConnectivity(glObject *o){
 	unsigned int p1i, p2i, p1j, p2j;
 	unsigned int P1i, P2i, P1j, P2j;
 	unsigned int i,j,ki,kj;
 
-	for(i=0;i<o->nPlanes-1;i++)
-		for(j=i+1;j<o->nPlanes;j++)
-			for(ki=0;ki<3;ki++)
-				if(!o->planes[i].neigh[ki]){
-					for(kj=0;kj<3;kj++){
+    assert(o->nPlanes >= 2);
+
+	for(i=0;i<o->nPlanes-1;i++) { // 对于模型中的每一个面A
+		for(j=i+1;j<o->nPlanes;j++) { // 对于除了面A的其它的面B
+			for(ki=0;ki<3;ki++) { // 对于面A的每一个顶点
+				if(!o->planes[i].neigh[ki]) { // 如果面A的这一邻面还没被找到过
+					for(kj=0;kj<3;kj++) { // 对于面B的每一个顶点
 						p1i=ki;
-						p1j=kj;
 						p2i=(ki+1)%3;
+						p1j=kj;
 						p2j=(kj+1)%3;
 
+                        // 面A的边(p1i, p2i)
 						p1i=o->planes[i].p[p1i];
 						p2i=o->planes[i].p[p2i];
+                        // 面B的边(p1j, p2j)
 						p1j=o->planes[j].p[p1j];
 						p2j=o->planes[j].p[p2j];
 
+                        // 如果面A的边(p1i, p2i)和面B的边(p1j, p2j)为同一条边,
+                        // 则下面公式的 P1i=P1j, 且P2i=P2j .
 						P1i=((p1i+p2i)-abs(p1i-p2i))/2;
 						P2i=((p1i+p2i)+abs(p1i-p2i))/2;
 						P1j=((p1j+p2j)-abs(p1j-p2j))/2;
 						P2j=((p1j+p2j)+abs(p1j-p2j))/2;
 
 						if((P1i==P1j) && (P2i==P2j)){  //they are neighbours
-							o->planes[i].neigh[ki] = j+1;	  
-							o->planes[j].neigh[kj] = i+1;	  
+                            // 面i的邻面为面j, 面j的邻面为面i. 在这里设置时把
+                            // 索引加一的原因是为了对 neigh 进行两用:
+                            //     1) 用作标识面是否邻面, 0表示没有, 非0表示有;
+                            //     2) 用作标识面的邻面的索引(保存的值为邻面索引加一,
+                            //        在使用到时, 须减一).
+							o->planes[i].neigh[ki] = j+1;
+							o->planes[j].neigh[kj] = i+1;
 						}
 					}
 				}
+            }
+        }
+    }
 }
 
 void m3dNormalizeVector(struct sPoint *u)
