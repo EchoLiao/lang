@@ -26,7 +26,7 @@ glObject	obj;										// Object
 GLfloat		xrot=0, xspeed=0;							// X Rotation & X Speed
 GLfloat		yrot=0, yspeed=0;							// Y Rotation & Y Speed
 
-float LightPos[] = { 0.0f, 5.0f,-4.0f, 1.0f};			// Light Position
+float LightPos[] = { -5.0f, 4.0f, -3.5f, 1.0f};			// Light Position
 float LightAmb[] = { 0.2f, 0.2f, 0.2f, 1.0f};			// Ambient Light Values
 float LightDif[] = { 0.6f, 0.6f, 0.6f, 1.0f};			// Diffuse Light Values
 float LightSpc[] = {-0.2f, -0.2f, -0.2f, 1.0f};			// Specular Light Values
@@ -74,7 +74,7 @@ GLvoid ResizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize Th
 
 int InitGLObjects()										// Initialize Objects
 {
-  if (!ReadObject("Data/Object.txt", &obj))			// Read Object2 Into obj
+  if (!ReadObject("Data/SimpleObject.txt", &obj))			// Read Object2 Into obj
     {
       return 0;									// If Failed Return False
     }
@@ -91,7 +91,6 @@ int InitGL()										// All Setup For OpenGL Goes Here
 {
   if (!InitGLObjects()) return 0;					// Function For Initializing Our Object(s)
   glShadeModel(GL_SMOOTH);							// Enable Smooth Shading
-  glClearColor(0.0f, 0.0f, 0.0f, 0.5f);				// Black Background
   glClearDepth(1.0f);									// Depth Buffer Setup
   glClearStencil(0);									// Stencil Buffer Setup
   glEnable(GL_DEPTH_TEST);							// Enables Depth Testing
@@ -110,6 +109,7 @@ int InitGL()										// All Setup For OpenGL Goes Here
   glMaterialfv(GL_FRONT, GL_SPECULAR, MatSpc);		// Set Material Specular
   glMaterialfv(GL_FRONT, GL_SHININESS, MatShn);		// Set Material Shininess
 
+  glFrontFace(GL_CCW);
   glCullFace(GL_BACK);								// Set Culling Face To Back Face
   glEnable(GL_CULL_FACE);								// Enable Culling
   glClearColor(0.1f, 1.0f, 0.5f, 1.0f);				// Set Clear Color (Greenish Color)
