@@ -1,6 +1,7 @@
 #ifndef _3DOBJECT_H
 #define _3DOBJECT_H
 
+#include <assert.h>
 #include <iostream>
 #include <cmath>
 
@@ -17,13 +18,14 @@ struct sPlaneEq{
 
 // structure describing an object's face
 // * 3个整形索引指定了模型中三角形的三个顶点
-// * 第二个变量指定了三角形面的法线
-// * 平面方程描述了三角所在的平面
-// * 临近的3个顶点索引, 指定了与这个三角形相邻的三个顶点     QQQQQ
-// * 最后一个变量指定这个三角形是否投出阴影 
+// * 临近的3个三角形面片的索引
+//     1) 用作标识面是否邻面, 0表示没有, 非0表示有;
+//     2) 用作标识面的邻面的索引(保存的值为邻面索引加一,
+//        在使用到时, 须减一).
+// * 平面方程描述了三角形面片所在的平面(显然也可以知道平面的法线)
+// * 最后一个变量指定这个三角形面片是否投出阴影
 struct sPlane{
 	unsigned int p[3];
-	sPoint normals[3];
 	unsigned int neigh[3];
 	sPlaneEq PlaneEq;
 	bool visible;
@@ -44,33 +46,26 @@ inline int ReadObject(const char *st, glObject *o){
 
   file = fopen(st, "r");
   if (!file) return 0;
+
   //points
   // 读取顶点
   fscanf(file, "%d", &(o->nPoints));
   for (i=1;i<=o->nPoints;i++){
+    // 注意: Data/*.txt 的面的索引是从1开始计数, 所以i初始化为1.
+    // 顶点数据在该程序中都是通过 o->planes 进行索引的!
     fscanf(file, "%f", &(o->points[i].x));
     fscanf(file, "%f", &(o->points[i].y));
     fscanf(file, "%f", &(o->points[i].z));
   }
 
   //planes
-  // 读取三角形面
+  // 读取三角形面个数
   fscanf(file, "%d", &(o->nPlanes));
   for (i=0;i<o->nPlanes;i++){
+    // 读取三角形面的顶点索引(三点确定一个面)
     fscanf(file, "%d", &(o->planes[i].p[0]));
     fscanf(file, "%d", &(o->planes[i].p[1]));
     fscanf(file, "%d", &(o->planes[i].p[2]));
-
-    // 读取每个顶点的法线
-    fscanf(file, "%f", &(o->planes[i].normals[0].x));
-    fscanf(file, "%f", &(o->planes[i].normals[0].y));
-    fscanf(file, "%f", &(o->planes[i].normals[0].z));
-    fscanf(file, "%f", &(o->planes[i].normals[1].x));
-    fscanf(file, "%f", &(o->planes[i].normals[1].y));
-    fscanf(file, "%f", &(o->planes[i].normals[1].z));
-    fscanf(file, "%f", &(o->planes[i].normals[2].x));
-    fscanf(file, "%f", &(o->planes[i].normals[2].y));
-    fscanf(file, "%f", &(o->planes[i].normals[2].z));
   }
   return 1;
 }
@@ -111,22 +106,46 @@ inline void SetConnectivity(glObject *o){
 				}
 }
 
+void m3dNormalizeVector(struct sPoint *u)
+{
+    float len = u->x * u->x + u->y * u->y + u->z * u->z;
+    assert(len != 0.0);
+    u->x /= len;
+    u->y /= len;
+    u->z /= len;
+}
+
+
+void m3dCrossProduct(struct sPoint *result, const struct sPoint *u,
+        const struct sPoint *v)
+{
+    result->x =  u->y * v->z - v->y * u->z;
+    result->y = -u->x * v->z + v->x * u->z;
+    result->z =  u->x * v->y - v->x * u->y;
+}
+
 // function for computing a plane equation given 3 points
 inline void CalcPlane(glObject o, sPlane *plane){
-	sPoint v[4];
-	int i;
+    // [(<<计算机图形学几何工具算法详解>> P492)]
+    sPoint v1, v2, v3;
+    // v1 = p1 - p0, v2 = p2 - p0
+    v1.x = o.points[plane->p[1]].x - o.points[plane->p[0]].x;
+    v1.y = o.points[plane->p[1]].y - o.points[plane->p[0]].y;
+    v1.z = o.points[plane->p[1]].z - o.points[plane->p[0]].z;
+    v2.x = o.points[plane->p[2]].x - o.points[plane->p[0]].x;
+    v2.y = o.points[plane->p[2]].y - o.points[plane->p[0]].y;
+    v2.z = o.points[plane->p[2]].z - o.points[plane->p[0]].z;
 
-	for (i=0;i<3;i++){
-		v[i+1].x = o.points[plane->p[i]].x;
-		v[i+1].y = o.points[plane->p[i]].y;
-		v[i+1].z = o.points[plane->p[i]].z;
-	}
-	plane->PlaneEq.a = v[1].y*(v[2].z-v[3].z) + v[2].y*(v[3].z-v[1].z) + v[3].y*(v[1].z-v[2].z);
-	plane->PlaneEq.b = v[1].z*(v[2].x-v[3].x) + v[2].z*(v[3].x-v[1].x) + v[3].z*(v[1].x-v[2].x);
-	plane->PlaneEq.c = v[1].x*(v[2].y-v[3].y) + v[2].x*(v[3].y-v[1].y) + v[3].x*(v[1].y-v[2].y);
-	plane->PlaneEq.d =-( v[1].x*(v[2].y*v[3].z - v[3].y*v[2].z) +
-					  v[2].x*(v[3].y*v[1].z - v[1].y*v[3].z) +
-					  v[3].x*(v[1].y*v[2].z - v[2].y*v[1].z) );
+    // cross = v1 x v2
+    m3dCrossProduct(&v3, &v1, &v2);
+    m3dNormalizeVector(&v3);
+    plane->PlaneEq.a = v3.x;
+    plane->PlaneEq.b = v3.y;
+    plane->PlaneEq.c = v3.z;
+    // d = -(n * p0)
+    plane->PlaneEq.d = -( v3.x * o.points[plane->p[0]].x
+                        + v3.y * o.points[plane->p[0]].y
+                        + v3.z * o.points[plane->p[0]].z );
 }
 
 // procedure for drawing the object - very simple
@@ -136,9 +155,9 @@ void DrawGLObject(glObject o){
 	glBegin(GL_TRIANGLES);
 	for (i=0; i<o.nPlanes; i++){
 		for (j=0; j<3; j++){
-			glNormal3f(o.planes[i].normals[j].x,
-					o.planes[i].normals[j].y,
-					o.planes[i].normals[j].z);
+            glNormal3f(o.planes[i].PlaneEq.a,
+                    o.planes[i].PlaneEq.b,
+                    o.planes[i].PlaneEq.c);
 			glVertex3f(o.points[o.planes[i].p[j]].x,
 					o.points[o.planes[i].p[j]].y,
 					o.points[o.planes[i].p[j]].z);
