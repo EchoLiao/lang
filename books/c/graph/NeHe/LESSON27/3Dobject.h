@@ -180,7 +180,11 @@ void DrawGLObject(glObject o){
 	glEnd();
 }
 
-void  CastShadow(glObject *o, float *lp){
+// Shadow Volume(阴影锥)技术详解
+// http://www.yakergong.net/blog/archives/23
+// 用"阴影锥"算法渲染阴影(请保证场景在阴影之前被渲染)
+void  CastShadow(glObject *o, float *lp)
+{
 	unsigned int	i, j, k, jj;
 	unsigned int	p1, p2;
 	sPoint			v1, v2;
@@ -193,39 +197,73 @@ void  CastShadow(glObject *o, float *lp){
 				o->planes[i].PlaneEq.b*lp[1]+
 				o->planes[i].PlaneEq.c*lp[2]+
 				o->planes[i].PlaneEq.d*lp[3];
+        /* 前提, 顶点是以逆时针顺序指定的. 若side>0, 则在点lp处能够看到的面是
+         * 正面; 若side<0, 则为背面; 若side=0, 则lp在面上. */
 		if (side >0) o->planes[i].visible = 1;
 				else o->planes[i].visible = 0;
 	}
 
+    /*
+     * rt-notes/linux/computor/grath/opengl/note/pipe-line.txt
+     * http://fly.cc.fer.hr/~unreal/theredbook/appendixa.html
+     *
+     * OpenGL Pipe Line:
+     *   culling test >> scissoring >> alpha test >> stencil test >>
+     *   depth-buffer test >> dithering >> blending
+     *
+     *      其中, culling test 是发生是顶点着色时期, 而其它的都是发生在片段着
+     *      色时期.
+     *
+     * */
+
  	glDisable(GL_LIGHTING);
+    // 画阴影锥体和阴影时不能改变原有的深度值, 否则阴影锥体产生新的深度值,
+    // 会影响到后续的阴影锥体和阴影的判断.
+    // 使深度缓冲区不可写, 但深度测试还是开启着的.
 	glDepthMask(GL_FALSE);
 	glDepthFunc(GL_LEQUAL);
-
 	glEnable(GL_STENCIL_TEST);
+    // 对于阴影锥体我们并不希望它在屏幕上显示
 	glColorMask(0, 0, 0, 0);
+
+    // 程序初始化时需要设置: glCullFace(GL_BACK), glEnable(GL_CULL_FACE) .
+    // 程序初始化时设置蒙板清除值为0: glClearStencil(0) ,
+    // 在渲染场景前执行 glClear(GL_STENCIL_BUFFER_BIT) 以把蒙板缓冲区清零.
+
+
+    // 首先, 我们需要找出和画出阴影锥, 所以把蒙板测试函数设置为: "所有的片元都
+    // 能通过蒙板测试(GL_ALWAYS)".
 	glStencilFunc(GL_ALWAYS, 1, 0xffffffff);
 
-	// first pass, stencil operation decreases stencil value
+    // 设置顶点顺序为逆时针的面为正面, 所以当渲染阴影锥体的各个面时, 只有靠近
+    // 视点这一侧的面会被渲染, 离视点较远的那一侧, 只能看到背面, 已被剔除.
 	glFrontFace(GL_CCW);
+    // 渲染靠近视点这一侧的面时, 对应蒙板值加一. <A1>
 	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
-	for (i=0; i<o->nPlanes;i++){
-		if (o->planes[i].visible)
-			for (j=0;j<3;j++){
+    // 找出"silhouette edge"
+	for (i=0; i<o->nPlanes;i++){ // 对于模型中的每一个面A
+		if (o->planes[i].visible) // 在光源处观察, 如果面A可见(正面)
+			for (j=0;j<3;j++){ // 对于面A的每一个顶点
 				k = o->planes[i].neigh[j];
+                // 如果面A的该边(p1,p2)不存在邻面; 或邻面不可见, 则该边是
+                // "silhouette edge" 的边.
 				if ((!k) || (!o->planes[k-1].visible)){
 					// here we have an edge, we must draw a polygon
 					p1 = o->planes[i].p[j];
 					jj = (j+1)%3;
 					p2 = o->planes[i].p[jj];
 
+                    // 用面A的该条边和足够远处的与此边相平行的边去截"从光源到
+                    // 面A的该边的端点的两条射线", 把得到的四边形作为阴影锥体
+                    // 的一个面.
 					//calculate the length of the vector
-					v1.x = (o->points[p1].x - lp[0])*100;
-					v1.y = (o->points[p1].y - lp[1])*100;
-					v1.z = (o->points[p1].z - lp[2])*100;
+					v1.x = (o->points[p1].x - lp[0])*200;
+					v1.y = (o->points[p1].y - lp[1])*200;
+					v1.z = (o->points[p1].z - lp[2])*200;
 
-					v2.x = (o->points[p2].x - lp[0])*100;
-					v2.y = (o->points[p2].y - lp[1])*100;
-					v2.z = (o->points[p2].z - lp[2])*100;
+					v2.x = (o->points[p2].x - lp[0])*200;
+					v2.y = (o->points[p2].y - lp[1])*200;
+					v2.z = (o->points[p2].z - lp[2])*200;
 					
 					//draw the polygon
 					glBegin(GL_TRIANGLE_STRIP);
@@ -247,8 +285,10 @@ void  CastShadow(glObject *o, float *lp){
 			}
 	}
 
-	// second pass, stencil operation increases stencil value
+    // 设置顶点顺序为顺时针的面为正面, 所以当渲染阴影锥体的各个面时, 只有远离
+    // 视点那一侧的面会被渲染, 离视点较近的这一侧, 只能看到背面, 已被剔除.
 	glFrontFace(GL_CW);
+    // 渲染远离视点那一侧的面时, 对应蒙板值减一. <A2>
 	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
 	for (i=0; i<o->nPlanes;i++){
 		if (o->planes[i].visible)
@@ -289,6 +329,7 @@ void  CastShadow(glObject *o, float *lp){
 			}
 	}
 
+	// 设置回顶点顺序为逆时针的面为正面.
 	glFrontFace(GL_CCW);
 	glColorMask(1, 1, 1, 1);
 
@@ -296,6 +337,8 @@ void  CastShadow(glObject *o, float *lp){
 	glColor4f(0.0f, 0.0f, 0.0f, 0.4f);
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // 经过<A1>和<A2>两次渲染后, 蒙板缓冲区中不为0的像素区域即是阴影区域.
+    // 所以, ...
 	glStencilFunc(GL_NOTEQUAL, 0, 0xffffffff);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 	glPushMatrix();
