@@ -7,7 +7,7 @@ all: Lesson27.o
 	g++ -o $(EXEC) Lesson27.o $(INCDIRS) $(LIBDIRS) $(LIBS)
 
 Lesson27.o : Lesson27.cpp 3Dobject.h
-	g++ -c Lesson27.cpp
+	g++ -Wall -g -c Lesson27.cpp
 
 run: all
 	./$(EXEC)
