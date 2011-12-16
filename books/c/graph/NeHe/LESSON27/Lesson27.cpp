@@ -66,7 +66,10 @@ GLvoid ResizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize Th
   glLoadIdentity();									// Reset The Projection Matrix
 
   // Calculate The Aspect Ratio Of The Window
-  gluPerspective(45.0f,(GLfloat)width/(GLfloat)height,0.001f,100.0f);
+  // 函数gluPerspective的参数near会影响阴影,>0.1f时,阴影会消失;太小时,阴影质量不是很好.
+  // http://www.cnblogs.com/gin_dl/archive/2009/08/25/1553636.html
+  // http://www.gamedev.net/page/resources/_/technical/graphics-programming-and-theory/the-theory-of-stencil-shadow-volumes-r1873
+  gluPerspective(45.0f,(GLfloat)width/(GLfloat)height,0.1,100.0f);
 
   glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
   glLoadIdentity();									// Reset The Modelview Matrix
@@ -74,7 +77,7 @@ GLvoid ResizeGLScene(GLsizei width, GLsizei height)		// Resize And Initialize Th
 
 int InitGLObjects()										// Initialize Objects
 {
-  if (!ReadObject("Data/SimpleObject.txt", &obj))			// Read Object2 Into obj
+  if (!ReadObject("Data/Object2.txt", &obj))			// Read Object2 Into obj
     {
       return 0;									// If Failed Return False
     }
