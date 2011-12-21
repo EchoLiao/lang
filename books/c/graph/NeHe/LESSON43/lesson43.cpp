@@ -100,7 +100,7 @@ void handleKeyPress( SDL_keysym *keysym )
 }
 
 /* general OpenGL initialization function */
-int initGL( GLvoid )
+int initGL( )
 {
 
     /* Enable smooth shading */
@@ -127,7 +127,7 @@ int initGL( GLvoid )
 }
 
 /* Here goes our drawing code */
-int drawGLScene( GLvoid )
+int drawGLScene( )
 {
  	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
 	glLoadIdentity();					// Reset The Current Modelview Matrix

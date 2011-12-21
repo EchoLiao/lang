@@ -1,7 +1,7 @@
 CC = gcc -Wall -ansi
 SOURCE = lesson43.cpp FreeType.cpp
 FREETYPE_INCLUDE = /usr/include/freetype2
-FLAGS = -lGL -lGLU -lfreetype `sdl-config --cflags --libs`
+FLAGS = -lGL -lGLU -lfreetype `sdl-config --cflags --libs` -L/usr/lib64 -lstdc++ -lm
 BINARY = freetype
 
 all:
@@ -9,5 +9,5 @@ all:
 
 clean:
 	@echo Cleaning up...
-	@rm $(BINARY)
+	@rm -f $(BINARY)
 	@echo Done.
