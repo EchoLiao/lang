@@ -224,7 +224,11 @@ void  CastShadow(glObject *o, float *lp)
 	glDepthFunc(GL_LEQUAL);
 	glEnable(GL_STENCIL_TEST);
     // 对于阴影锥体我们并不希望它在屏幕上显示
+#if 1
 	glColorMask(0, 0, 0, 0);
+#else
+	glColorMask(1, 0, 0, 0);
+#endif
 
     // 程序初始化时需要设置: glCullFace(GL_BACK), glEnable(GL_CULL_FACE) .
     // 程序初始化时设置蒙板清除值为0: glClearStencil(0) ,
@@ -264,7 +268,7 @@ void  CastShadow(glObject *o, float *lp)
 					v2.x = (o->points[p2].x - lp[0])*200;
 					v2.y = (o->points[p2].y - lp[1])*200;
 					v2.z = (o->points[p2].z - lp[2])*200;
-					
+#if 1
 					//draw the polygon
 					glBegin(GL_TRIANGLE_STRIP);
 						glVertex3f(o->points[p1].x,
@@ -280,6 +284,16 @@ void  CastShadow(glObject *o, float *lp)
 						glVertex3f(o->points[p2].x + v2.x,
 									o->points[p2].y + v2.y,
 									o->points[p2].z + v2.z);
+#else
+					glBegin(GL_TRIANGLES);
+						glVertex3f(lp[0], lp[1], lp[2]);
+						glVertex3f(o->points[p1].x + v1.x,
+									o->points[p1].y + v1.y,
+									o->points[p1].z + v1.z);
+						glVertex3f(o->points[p2].x + v2.x,
+									o->points[p2].y + v2.y,
+									o->points[p2].z + v2.z);
+#endif
 					glEnd();
 				}
 			}
