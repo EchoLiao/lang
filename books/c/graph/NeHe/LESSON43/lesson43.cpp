@@ -34,7 +34,6 @@ freetype::font_data our_font;
 SDL_Surface *surface;
 
 GLfloat	cnt1;
-GLfloat	cnt2;
 
 /* function to release/destroy our resources and restoring the old desktop */
 void Quit( int returnCode )
@@ -145,7 +144,7 @@ int drawGLScene( )
 	// I have put in some code to rotate and scale the text.
 
 	// Red text
-	glColor3ub(0xff,0,0);
+	glColor3ub(0xff,0xff,0);
 
 	glPushMatrix();
 	glLoadIdentity();
@@ -156,10 +155,9 @@ int drawGLScene( )
 	glPopMatrix();
 
 	//Uncomment this to test out print's ability to handle newlines.
-	//freetype::print(our_font, 320, 200, "Here\nthere\nbe\n\nnewlines\n.", cnt1);
+	freetype::print(our_font, 320, 200, "Here\nthere\nbe\n\nnewlines\n.", cnt1);
 
 	cnt1+=0.051f;	// Increase The First Counter
-	cnt2+=0.005f;	// Increase The First Counter
 
 	SDL_GL_SwapBuffers( );
     return( TRUE );

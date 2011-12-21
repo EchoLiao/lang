@@ -48,6 +48,7 @@ void make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base ) {
 	int height = next_p2( bitmap.rows );
 
 	//Allocate memory for the texture data.
+    // 申请两倍大小的原因: 我们使用的是 GL_LUMINANCE_ALPHA !
 	GLubyte* expanded_data = new GLubyte[ 2 * width * height];
 
 	//Here we fill in the data for the expanded bitmap.
@@ -238,9 +239,9 @@ void print(const font_data &ft_font, float x, float y, const char *fmt, ...)  {
 	const char *start_line=text;
 	vector<string> lines;
 
-	const char * c = text;;
+	const char * c = text;
 
-	//for(const char *c=text;*c;c++) {
+	//for(const char *c=text;*c;c++) 
 	for(;*c;c++) {
 		if(*c=='\n') {
 			string line;
