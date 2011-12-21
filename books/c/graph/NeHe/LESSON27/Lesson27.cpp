@@ -169,80 +169,62 @@ void DrawGLRoom()										// Draw The Room (Box)
 
 void DrawGLScene()									// Main Drawing Routine
 {
+#if 0
   GLmatrix16f Minv;
-  GLmatrix16f Inv;
   GLvector4f wlp, lp;
 
   // Clear Color Buffer, Depth Buffer, Stencil Buffer
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 	
-  // glLoadIdentity();									// Reset Modelview Matrix
+  glLoadIdentity();									// Reset Modelview Matrix
+  glTranslatef(0.0f, 0.0f, -20.0f);					// Zoom Into Screen 20 Units
+  glLightfv(GL_LIGHT1, GL_POSITION, LightPos);		// Position Light1
+  glTranslatef(SpherePos[0], SpherePos[1], SpherePos[2]);	// Position The Sphere
+  gluSphere(q, 1.5f, 32, 16);							// Draw A Sphere
 
   // calculate light's position relative to local coordinate system
   // dunno if this is the best way to do it, but it actually works
   // if u find another aproach, let me know ;)
 
-  // // we build the inversed matrix by doing all the actions in reverse order
-  // // and with reverse parameters (notice -xrot, -yrot, -ObjPos[], etc.)
-  // glLoadIdentity();									// Reset Matrix
-  // glRotatef(-yrot, 0.0f, 1.0f, 0.0f);					// Rotate By -yrot On Y Axis
-  // glRotatef(-xrot, 1.0f, 0.0f, 0.0f);					// Rotate By -xrot On X Axis
-  // glGetFloatv(GL_MODELVIEW_MATRIX,Minv);				// Retrieve ModelView Matrix (Stores In Minv)
-  // lp[0] = LightPos[0];								// Store Light Position X In lp[0]
-  // lp[1] = LightPos[1];								// Store Light Position Y In lp[1]
-  // lp[2] = LightPos[2];								// Store Light Position Z In lp[2]
-  // lp[3] = LightPos[3];								// Store Light Direction In lp[3]
-  // VMatMult(Minv, lp);									// We Store Rotated Light Vector In 'lp' Array
-  // glTranslatef(-ObjPos[0], -ObjPos[1], -ObjPos[2]);	// Move Negative On All Axis Based On ObjPos[] Values (X, Y, Z)
-  // glGetFloatv(GL_MODELVIEW_MATRIX,Minv);				// Retrieve ModelView Matrix From Minv
-  // wlp[0] = 0.0f;										// World Local Coord X To 0
-  // wlp[1] = 0.0f;										// World Local Coord Y To 0
-  // wlp[2] = 0.0f;										// World Local Coord Z To 0
-  // wlp[3] = 1.0f;
-  // VMatMult(Minv, wlp);								// We Store The Position Of The World Origin Relative To The
-  // // Local Coord. System In 'wlp' Array
-  // lp[0] += wlp[0];									// Adding These Two Gives Us The
-  // lp[1] += wlp[1];									// Position Of The Light Relative To
-  // lp[2] += wlp[2];									// The Local Coordinate System
+  // we build the inversed matrix by doing all the actions in reverse order
+  // and with reverse parameters (notice -xrot, -yrot, -ObjPos[], etc.)
+  glLoadIdentity();									// Reset Matrix
+  glRotatef(-yrot, 0.0f, 1.0f, 0.0f);					// Rotate By -yrot On Y Axis
+  glRotatef(-xrot, 1.0f, 0.0f, 0.0f);					// Rotate By -xrot On X Axis
+  glGetFloatv(GL_MODELVIEW_MATRIX,Minv);				// Retrieve ModelView Matrix (Stores In Minv)
+  lp[0] = LightPos[0];								// Store Light Position X In lp[0]
+  lp[1] = LightPos[1];								// Store Light Position Y In lp[1]
+  lp[2] = LightPos[2];								// Store Light Position Z In lp[2]
+  lp[3] = LightPos[3];								// Store Light Direction In lp[3]
+  VMatMult(Minv, lp);									// We Store Rotated Light Vector In 'lp' Array
+  glTranslatef(-ObjPos[0], -ObjPos[1], -ObjPos[2]);	// Move Negative On All Axis Based On ObjPos[] Values (X, Y, Z)
+  glGetFloatv(GL_MODELVIEW_MATRIX,Minv);				// Retrieve ModelView Matrix From Minv
+  wlp[0] = 0.0f;										// World Local Coord X To 0
+  wlp[1] = 0.0f;										// World Local Coord Y To 0
+  wlp[2] = 0.0f;										// World Local Coord Z To 0
+  wlp[3] = 1.0f;
+  VMatMult(Minv, wlp);								// We Store The Position Of The World Origin Relative To The
+  // Local Coord. System In 'wlp' Array
+  lp[0] += wlp[0];									// Adding These Two Gives Us The
+  lp[1] += wlp[1];									// Position Of The Light Relative To
+  lp[2] += wlp[2];									// The Local Coordinate System
 
   glColor4f(0.7f, 0.4f, 0.0f, 1.0f);					// Set Color To An Orange
   glLoadIdentity();									// Reset Modelview Matrix
-
-  glTranslatef(0.0f, 0.0f, -20.0f);					// Zoom Into Screen 20 Units
-  glLightfv(GL_LIGHT1, GL_POSITION, LightPos);		// Position Light1
-
-  glPushMatrix(); {
-      glTranslatef(SpherePos[0], SpherePos[1], SpherePos[2]);	// Position The Sphere
-      gluSphere(q, 1.5f, 32, 16);							// Draw A Sphere
-  } glPopMatrix();
-  glPushMatrix(); {
-      DrawGLRoom();										// Draw The Room
-  } glPopMatrix();
-  glPushMatrix(); {
-      glTranslatef(ObjPos[0], ObjPos[1], ObjPos[2]);		// Position The Object
-      glRotatef(xrot, 1.0f, 0.0f, 0.0f);					// Spin It On The X Axis By xrot
-      glRotatef(yrot, 0.0f, 1.0f, 0.0f);					// Spin It On The Y Axis By yrot
-      DrawGLObject(obj);									// Procedure For Drawing The Loaded Object
-      glGetFloatv(GL_MODELVIEW_MATRIX,Minv);
-      m3dInvertMatrix44(Inv, Minv);
-      lp[0] = LightPos[0];								// Store Light Position X In lp[0]
-      lp[1] = LightPos[1];								// Store Light Position Y In lp[1]
-      lp[2] = LightPos[2];								// Store Light Position Z In lp[2]
-      lp[3] = LightPos[3];								// Store Light Direction In lp[3]
-      VMatMult(Inv, lp);									// We Store Rotated Light Vector In 'lp' Array
-  } glPopMatrix();
-
-  glPushMatrix(); {
-      CastShadow(&obj, lp);								// Procedure For Casting The Shadow Based On The Silhouette
-  } glPopMatrix();
+  glTranslatef(0.0f, 0.0f, -20.0f);					// Zoom Into The Screen 20 Units
+  DrawGLRoom();										// Draw The Room
+  glTranslatef(ObjPos[0], ObjPos[1], ObjPos[2]);		// Position The Object
+  glRotatef(xrot, 1.0f, 0.0f, 0.0f);					// Spin It On The X Axis By xrot
+  glRotatef(yrot, 0.0f, 1.0f, 0.0f);					// Spin It On The Y Axis By yrot
+  DrawGLObject(obj);									// Procedure For Drawing The Loaded Object
+  CastShadow(&obj, lp);								// Procedure For Casting The Shadow Based On The Silhouette
 
   glColor4f(0.7f, 0.4f, 0.0f, 1.0f);					// Set Color To Purplish Blue
   glDisable(GL_LIGHTING);								// Disable Lighting
   glDepthMask(GL_FALSE);								// Disable Depth Mask
-  glPushMatrix(); {
-      glTranslatef(lp[0], lp[1], lp[2]);					// Translate To Light's Position
-      gluSphere(q, 0.2f, 16, 8);							// Draw A Little Yellow Sphere (Represents Light)
-  } glPopMatrix();
+  glTranslatef(lp[0], lp[1], lp[2]);					// Translate To Light's Position
+  // Notice We're Still In Local Coordinate System
+  gluSphere(q, 0.2f, 16, 8);							// Draw A Little Yellow Sphere (Represents Light)
   glEnable(GL_LIGHTING);								// Enable Lighting
   glDepthMask(GL_TRUE);								// Enable Depth Mask
 
@@ -251,6 +233,57 @@ void DrawGLScene()									// Main Drawing Routine
 
   glFlush();
   glutSwapBuffers();
+#else
+  GLmatrix16f Minv, Inv;
+  GLvector4f  lp;
+
+  // Clear Color Buffer, Depth Buffer, Stencil Buffer
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+  glColor4f(0.7f, 0.4f, 0.0f, 1.0f);
+  glLoadIdentity();
+
+  glPushMatrix(); {
+      glTranslatef(0.0f, 0.0f, -20.0f);					// Zoom Into Screen 20 Units
+      glLightfv(GL_LIGHT1, GL_POSITION, LightPos);		// Position Light1
+      glTranslatef(SpherePos[0], SpherePos[1], SpherePos[2]);	// Position The Sphere
+      gluSphere(q, 1.5f, 32, 16);							// Draw A Sphere
+  } glPopMatrix();
+
+  glPushMatrix(); {
+      glTranslatef(0.0f, 0.0f, -20.0f);					// Zoom Into The Screen 20 Units
+      DrawGLRoom();										// Draw The Room
+      glTranslatef(ObjPos[0], ObjPos[1], ObjPos[2]);		// Position The Object
+      glRotatef(xrot, 1.0f, 0.0f, 0.0f);					// Spin It On The X Axis By xrot
+      glRotatef(yrot, 0.0f, 1.0f, 0.0f);					// Spin It On The Y Axis By yrot
+      DrawGLObject(obj);									// Procedure For Drawing The Loaded Object
+
+      // 获得光源的位置(返回值是在视觉坐标系下的)
+      glGetLightfv(GL_LIGHT1, GL_POSITION, lp);
+      glGetFloatv(GL_MODELVIEW_MATRIX, Minv);
+      m3dInvertMatrix44(Inv, Minv);
+      // 把光源位置从视觉坐标系下变换到当前的场景坐标系(obj)下.
+      VMatMult(Inv, lp);
+      // 开始渲染阴影
+      CastShadow(&obj, lp);
+
+      // 用一个小黄球标记出光源的位置
+      glPushMatrix(); {
+          glColor4f(0.7f, 0.4f, 0.0f, 1.0f);					// Set Color To Purplish Blue
+          glDisable(GL_LIGHTING);								// Disable Lighting
+          glDepthMask(GL_FALSE);								// Disable Depth Mask
+          glTranslatef(lp[0], lp[1], lp[2]);
+          gluSphere(q, 0.2f, 16, 8);
+          glEnable(GL_LIGHTING);								// Enable Lighting
+          glDepthMask(GL_TRUE);								// Enable Depth Mask
+      } glPopMatrix();
+  } glPopMatrix();
+
+  xrot += xspeed;	
+  yrot += yspeed;	
+
+  glFlush();
+  glutSwapBuffers();
+#endif
 }
 
 void SpecialFunc(int key, int x, int y)					// Process Key Presses
