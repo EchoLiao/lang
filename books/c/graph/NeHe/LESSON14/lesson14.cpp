@@ -6,12 +6,10 @@
  the program with glut32.lib, glu32.lib, opengl32.lib
 */
 
+#include <unistd.h>
 #include <stdio.h>     // Standard C/C++ IO  
-#include <windows.h>   // Standard Header For MSWindows Applications
-#include <gl/glut.h>   // The GL Utility Toolkit (GLUT) Header
-
-// The Following Directive Fixes The Problem With Extra Console Window
-#pragma comment(linker, "/subsystem:\"windows\" /entry:\"mainCRTStartup\"")
+#include <GL/glut.h>   // The GL Utility Toolkit (GLUT) Header
+#include <math.h>
 
 #define WCX 640        // Window Width
 #define WCY 480        // Window Height
@@ -25,7 +23,6 @@ GLfloat	g_rot = 0.0f;  // Used To Rotate The Text
 void render_stroke_string(void* font, const char* string)
 {
 	char* p;
-	float width = 0;
 
 	// Center Our Text On The Screen
     glPushMatrix();
@@ -113,22 +110,9 @@ void special_keys(int a_keys, int x, int y)
 	}
 }
 
-// Ask The User If He Wish To Enter GameMode Or Not
-void ask_gamemode()
-{
-	int answer;
-	// Use Windows MessageBox To Ask The User For Game Or Windowed Mode
-	answer = MessageBox(NULL, "Do you want to enter game mode?", "Question",
-						MB_ICONQUESTION | MB_YESNO);
-	g_gamemode = (answer == IDYES);
-	// If Not Game Mode Selected, Use Windowed Mode (User Can Change That With F1)
-	g_fullscreen = false; 
-}
-
 // Main Function For Bringing It All Together.
 int main(int argc, char** argv)
 {
-	ask_gamemode();                                  // Ask For Fullscreen Mode
 	glutInit(&argc, argv);                           // GLUT Initializtion
 	glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE);     // Display Mode (Rgb And Double Buffered)
 	if (g_gamemode) {

@@ -6,17 +6,17 @@ PROJ = lesson14
 
 # aliases
 CC = gcc
-RC = windres
-RM = -del
-CP = -copy
+RM = -rm -f
+CP = -cp -f
 
 # include and library paths
-INCPATH = -I/app/include 
-LIBPATH = -L/app/lib
+INCPATH = -I/usr/X11R6/include 
+LIBPATH = -L/usr/X11R6/lib -L/usr/lib
 
 # compiler and linker switches
-CFLAGS = -O2 -fomit-frame-pointer 
-LDFLAGS = -mwindows -lwinmm -lglut32 -lglu32 -lopengl32 
+CFLAGS = -Wall -g
+LDFLAGS = -lX11 -lXi -lXmu -lglut -lGL -lGLU -lm
+
 
 # add here additional object files
 OBJS = $(PROJ).o  
@@ -32,8 +32,6 @@ $(PROJ).exe: $(OBJS)
 %.o: %.cpp
 	$(CC) $(INCPATH) $(CFLAGS) -c $*.cpp
 
-%.o: %.rc
-	$(RC) -i $*.rc -o $*.o
 
 clean:
 	$(RM) *.o
