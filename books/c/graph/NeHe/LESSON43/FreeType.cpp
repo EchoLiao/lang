@@ -237,6 +237,8 @@ inline void pop_projection_matrix() {
     } glPopAttrib();
 }
 
+#define TEXT_SIZE   256
+
 ///Much like Nehe's glPrint function, but modified to work
 ///with freetype fonts.
 void print(const font_data &ft_font, float x, float y, const char *fmt, ...)  
@@ -249,14 +251,18 @@ void print(const font_data &ft_font, float x, float y, const char *fmt, ...)
     // 使行与行之间有一定的空隙
     float h=ft_font.h/.63f;						//We make the height about 1.5* that of
 
-    char		text[256];						// Holds Our String
+    char		text[TEXT_SIZE];						// Holds Our String
     va_list		ap;										// Pointer To List Of Arguments
 
     if (fmt == NULL)									// If There's No Text
         *text=0;											// Do Nothing
     else {
         va_start(ap, fmt);
-        vsprintf(text, fmt, ap);
+        // vsnprintf() 从 fmt 中最多格式化 TEXT_SIZE 个字符到 text 中(包括'\0'),
+        // 返回值是 fmt 字符串的长度(不包括'\0').
+        int fmt_len = vsnprintf(text, TEXT_SIZE, fmt, ap);
+        if ( fmt_len + 1 > TEXT_SIZE )
+            fprintf(stdout, "NO enough space to format!!\n");
         va_end(ap);
     }
 
