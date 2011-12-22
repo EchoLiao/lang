@@ -28,7 +28,8 @@ void render_stroke_string(void* font, const char* string)
     glPushMatrix();
 	// Render The Text
 	p = (char*) string;
-	while (*p != '\0') glutStrokeCharacter(font, *p++);
+	while (*p != '\0') 
+        glutStrokeCharacter(font, *p++);
 	glPopMatrix();
 }
 
@@ -63,6 +64,8 @@ void render(void)
  	sprintf(str, "NeHe - %3.2f",g_rot/50);				// Print GL Text To The Screen
 	render_stroke_string(GLUT_STROKE_ROMAN, str);
 	g_rot += 0.5f;										// Increase The Rotation Variable
+
+    usleep(1000 * 10);
 
     // Swap The Buffers To Become Our Rendering Visible
     glutSwapBuffers();
