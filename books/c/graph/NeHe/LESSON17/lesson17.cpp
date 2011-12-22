@@ -123,6 +123,7 @@ void build_font(void)
 	float cy;											// Holds Our Y Character Coord
 
 	g_base = glGenLists(256);							// Creating 256 Display Lists
+#if 1
 	glBindTexture(GL_TEXTURE_2D, g_texid[0]);			// Select Our Font Texture
 	for (i=0 ; i<256 ; i++) {                           // Loop Through All 256 Lists
 		cx = float(i%16)/16.0f;							// X Position Of Current Character
@@ -141,6 +142,8 @@ void build_font(void)
 			glTranslated(10,0,0);						// Move To The Right Of The Character
 		glEndList();									// Done Building The Display List
 	}													// Loop Until All 256 Are Built
+#else
+#endif
 }
 
 // Delete The Font From Memory (NEW)
@@ -155,16 +158,22 @@ void glPrint(GLint x, GLint y, const char* string, int set)
 	if (set > 1) set = 1;
 	glBindTexture(GL_TEXTURE_2D, g_texid[0]);			// Select Our Font Texture
 	glDisable(GL_DEPTH_TEST);							// Disables Depth Testing
+
 	glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
 	glPushMatrix();										// Store The Projection Matrix
 	glLoadIdentity();									// Reset The Projection Matrix
+    // 画字时, 我们选用正交投影
 	glOrtho(0,640,0,480,-100,100);						// Set Up An Ortho Screen
+
 	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
 	glPushMatrix();										// Store The Modelview Matrix
 	glLoadIdentity();									// Reset The Modelview Matrix
+
 	glTranslated(x,y,0);								// Position The Text (0,0 - Bottom Left)
+
 	glListBase(g_base-32+(128*set));					// Choose The Font Set (0 or 1)
 	glCallLists(strlen(string),GL_BYTE,string);			// Write The Text To The Screen
+
 	glMatrixMode(GL_PROJECTION);						// Select The Projection Matrix
 	glPopMatrix();										// Restore The Old Projection Matrix
 	glMatrixMode(GL_MODELVIEW);							// Select The Modelview Matrix
@@ -191,6 +200,7 @@ void render(void)
 {
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear The Screen And The Depth Buffer
 	glLoadIdentity();									// Reset The Modelview Matrix
+
 	glBindTexture(GL_TEXTURE_2D, g_texid[1]);			// Select Our Second Texture
 	glTranslatef(0.0f,0.0f,-5.0f);						// Move Into The Screen 5 Units
 	glRotatef(45.0f,0.0f,0.0f,1.0f);					// Rotate On The Z Axis 45 Degrees (Clockwise)
@@ -228,11 +238,11 @@ void render(void)
 	glColor3f(1.0f*float(sin(g_cnt2)),1.0f-0.5f*float(cos(g_cnt1+g_cnt2)),1.0f*float(cos(g_cnt1)));
 	glPrint(int((280+230*cos(g_cnt2))),int(235+200*sin(g_cnt1)),"OpenGL",1); // Print GL Text To The Screen
 
+    // 模拟特效字体
 	glColor3f(0.0f,0.0f,1.0f);
 	glPrint(int(240+200*cos((g_cnt2+g_cnt1)/5)),2,"Giuseppe D'Agata",0);
-
 	glColor3f(1.0f,1.0f,1.0f);
-	glPrint(int(242+200*cos((g_cnt2+g_cnt1)/5)),2,"Giuseppe D'Agata",0);
+	glPrint(int(242+200*cos((g_cnt2+g_cnt1)/5)),4,"Giuseppe D'Agata",0);
 
 	g_cnt1 += 0.01f;									// Increase The Counters
 	g_cnt2 += 0.0081f;	
