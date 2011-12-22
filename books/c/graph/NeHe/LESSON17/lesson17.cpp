@@ -6,11 +6,13 @@
  the program with glut32.lib, glu32.lib, opengl32.lib
 */
 
+#include <assert.h>
 #include <math.h>
 #include <unistd.h>
 #include <string.h>
 #include <stdio.h>           // Standard C/C++ Input-Output
 #include <GL/glut.h>         // The GL Utility Toolkit (GLUT) Header
+#include "../LESSON11/bmprw.h"
 
 #define WCX          640     // Window Width
 #define WCY          480     // Window Height 
@@ -71,19 +73,28 @@ bool load_rgb_image(const char* file_name, int w, int h, RGBIMG* refimg)
 bool setup_textures(void)
 {
 	RGBIMG img;
+    sbitData *bmpw;
 
     // Create The Textures' Id List
 	glGenTextures(TEXTURES_NUM, g_texid);          
 
 	// Load The Image From A Disk File
 	if (!load_rgb_image("font_256x256.raw", 256, 256, &img)) return false;
+
 	// Create Nearest Filtered Texture
 	glBindTexture(GL_TEXTURE_2D, g_texid[0]);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, img.w, img.h, 0, GL_RGB, GL_UNSIGNED_BYTE, img.data);
+
+    bmpw = bmpCreateObjForWrite(EBMP_BGR, 0, img.w, img.h, 24, img.data);
+    assert( bmpw != NULL );
+    assert( bmpWrite("font_256x256.bmp", bmpw) );
+    assert( bmpDestroyObjForWrite(&bmpw) );
+
 	// Finished With Our Image, Free The Allocated Data
 	delete img.data;
+
 
 	// Load The Image From A Disk File
 	if (!load_rgb_image("bumps_128x128.raw", 128, 128, &img)) return false;
@@ -92,6 +103,12 @@ bool setup_textures(void)
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, img.w, img.h, 0, GL_RGB, GL_UNSIGNED_BYTE, img.data);
+
+    bmpw = bmpCreateObjForWrite(EBMP_BGR, 0, img.w, img.h, 24, img.data);
+    assert( bmpw != NULL );
+    assert( bmpWrite("bumps_128x128.bmp", bmpw) );
+    assert( bmpDestroyObjForWrite(&bmpw) );
+
 	// Finished With Our Image, Free The Allocated Data
 	delete img.data;
 

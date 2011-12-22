@@ -19,7 +19,7 @@ LDFLAGS = -lX11 -lXi -lXmu -lglut -lGL -lGLU -lm -lstdc++
 
 
 # add here additional object files
-OBJS = $(PROJ).o  
+OBJS = $(PROJ).o bmprw.o
 
 all: $(PROJ).exe
 
@@ -32,6 +32,8 @@ $(PROJ).exe: $(OBJS)
 %.o: %.cpp
 	$(CC) $(INCPATH) $(CFLAGS) -c $*.cpp
 
+bmprw.o: ../LESSON11/bmprw.h
+	$(CC) $(INCPATH) $(CFLAGS) -c ../LESSON11/bmprw.cpp
 
 clean:
 	$(RM) *.o
