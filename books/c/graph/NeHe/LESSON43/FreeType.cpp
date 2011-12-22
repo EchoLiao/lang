@@ -150,7 +150,7 @@ void make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base ) {
 
 	//increment the raster position as if we were a bitmap font.
 	//(only needed if you want to calculate text length)
-	//glBitmap(0,0,0,0,face->glyph->advance.x >> 6,0,NULL);
+	glBitmap(0,0,0,0,face->glyph->advance.x >> 6,0,NULL);
 
 	//Finnish the display list
 	glEndList();
@@ -320,12 +320,13 @@ void print(const font_data &ft_font, float x, float y, const char *fmt, ...)
                 //  know the length of the text that you are creating.
                 //  If you decide to use it make sure to also uncomment the glBitmap command
                 //  in make_dlist().
-                //	glRasterPos2f(0,0);
+                glRasterPos2f(0,0);
                 // glCallLists() 会修改当前矩阵!     // NOTE1
                 glCallLists(lines[i].length(), GL_UNSIGNED_BYTE, lines[i].c_str());
-                //	float rpos[4];
-                //	glGetFloatv(GL_CURRENT_RASTER_POSITION ,rpos);
-                //	float len=x-rpos[0];
+                float rpos[4];
+                glGetFloatv(GL_CURRENT_RASTER_POSITION ,rpos);
+                float len;
+                len = x - rpos[0];
             } glPopMatrix();
         }
     } glPopAttrib();		
