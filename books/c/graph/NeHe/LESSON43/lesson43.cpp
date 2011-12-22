@@ -129,11 +129,6 @@ int initGL( )
 int drawGLScene( )
 {
  	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);	// Clear Screen And Depth Buffer
-	glLoadIdentity();					// Reset The Current Modelview Matrix
-	glTranslatef(0.0f,0.0f,-1.0f);				// Move One Unit Into The Screen
-
-	// Blue Text
-	glColor3ub(0,0,0xff);
 
 	// Position The WGL Text On The Screen
 	glRasterPos2f(-0.40f, 0.35f);
@@ -155,7 +150,7 @@ int drawGLScene( )
 	glPopMatrix();
 
 	//Uncomment this to test out print's ability to handle newlines.
-	freetype::print(our_font, 320, 200, "Here\nthere\nbe\n\nnewlines\n.", cnt1);
+	freetype::print(our_font, 320, 200, "Here\nthere\nbe\n\nnewlines\n.");
 
 	cnt1+=0.051f;	// Increase The First Counter
 
@@ -250,6 +245,7 @@ int main( int argc, char **argv )
 				isActive = TRUE;
 			    break;			    
 			case SDL_VIDEORESIZE:
+#if 0
 			    /* handle resize event */
 			    surface = SDL_SetVideoMode( event.resize.w,
 							event.resize.h,
@@ -260,6 +256,7 @@ int main( int argc, char **argv )
 				    Quit( 1 );
 				}
 			    resizeWindow( event.resize.w, event.resize.h );
+#endif
 			    break;
 			case SDL_KEYDOWN:
 			    /* handle key presses */
