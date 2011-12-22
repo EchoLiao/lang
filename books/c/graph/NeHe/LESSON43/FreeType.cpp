@@ -217,6 +217,7 @@ void font_data::clean() {
 /// a projection matrix that will make object world 
 /// coordinates identical to window coordinates.
 inline void pushScreenCoordinateMatrix() {
+    // 把到目前为止的所有的矩阵变换保存, 以防止其被glLoadIdentity等破坏!
     glPushAttrib(GL_TRANSFORM_BIT); {
         GLint	viewport[4];
         glGetIntegerv(GL_VIEWPORT, viewport);
