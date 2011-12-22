@@ -6,6 +6,7 @@
  the program with glut32.lib, glu32.lib, opengl32.lib
 */
 
+#include <unistd.h>
 #include <stdio.h>     // Standard C/C++ IO  
 #include <math.h>
 #include <GL/glut.h>   // The GL Utility Toolkit (GLUT) Header
@@ -24,7 +25,8 @@ GLfloat	g_cnt2 = 0.0f; // 2nd Counter Used To Move Text & For Coloring
 void render_string(void* font, const char* string)
 {
 	char* p = (char*) string;
-	while (*p != '\0') glutBitmapCharacter(font, *p++);
+	while (*p != '\0') 
+        glutBitmapCharacter(font, *p++);
 }
 
 // Our GL Specific Initializations
@@ -54,6 +56,8 @@ void render(void)
 	render_string(GLUT_BITMAP_HELVETICA_18, str);
 	g_cnt1 += 0.051f;									// Increase The First Counter
 	g_cnt2 += 0.005f;									// Increase The Second Counter
+
+    usleep(1000 * 10);
 
     // Swap The Buffers To Become Our Rendering Visible
     glutSwapBuffers ( );
