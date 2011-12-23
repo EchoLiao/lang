@@ -100,13 +100,13 @@ void make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base )
 #if 1 // For Debug
     char dstBmpFile[128];
     if ( ch == '\0' )
-        sprintf(dstBmpFile, "%03d-00.bmp", (int)ch);
+        sprintf(dstBmpFile, "%03d-0x%02x-0%03o-00.bmp", (int)ch, (int)ch, (int)ch);
     else if ( ch == '\\' ) 
-        sprintf(dstBmpFile, "%03d-5c.bmp", (int)ch);
+        sprintf(dstBmpFile, "%03d-0x%02x-0%03o-5c.bmp", (int)ch, (int)ch, (int)ch);
     else if ( ch == '/' ) 
-        sprintf(dstBmpFile, "%03d-2f.bmp", (int)ch);
+        sprintf(dstBmpFile, "%03d-0x%02x-0%03o-2f.bmp", (int)ch, (int)ch, (int)ch);
     else
-        sprintf(dstBmpFile, "%03d-%c.bmp", (int)ch, ch);
+        sprintf(dstBmpFile, "%03d-0x%02x-0%03o-%c.bmp", (int)ch, (int)ch, (int)ch, ch);
     sbitData *bmpw = bmpCreateObjForWrite(EBMP_BGR, 1, width, height, 16, expanded_data);
     assert( bmpw != NULL );
     assert( bmpWrite(dstBmpFile, bmpw) );
