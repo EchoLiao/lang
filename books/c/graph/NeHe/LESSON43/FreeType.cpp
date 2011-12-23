@@ -27,7 +27,9 @@ void make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base ) {
 	//into a bitmap.  This actually requires a couple of FreeType commands:
 
 	//Load the Glyph for our character.
-    // 载入给定字符的轮廓
+    // 载入给定字符的轮廓.
+    // 对于 FT_Get_Char_Index(face, ch), ch 最好是unicode编码的, 因为大多数
+    // 的*.ttf字体文件都包含有unicode编码索引表.
 	if(FT_Load_Glyph( face, FT_Get_Char_Index( face, ch ), FT_LOAD_DEFAULT ))
 		throw std::runtime_error("FT_Load_Glyph failed");
 
