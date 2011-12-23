@@ -1,5 +1,5 @@
 CC = gcc -Wall -ansi -g
-SOURCE = lesson43.cpp FreeType.cpp
+SOURCE = lesson43.cpp FreeType.cpp ../LESSON11/bmprw.cpp
 FREETYPE_INCLUDE = /usr/include/freetype2
 FLAGS = -lGL -lGLU -lfreetype `sdl-config --cflags --libs` -L/usr/lib64 -lstdc++ -lm
 BINARY = freetype

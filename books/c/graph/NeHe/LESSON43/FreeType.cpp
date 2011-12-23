@@ -7,6 +7,9 @@
 
 //Include our header file.
 #include "FreeType.h"
+#include "../LESSON11/bmprw.h"
+#include <assert.h>
+#include <stdio.h>
 
 namespace freetype {
 
@@ -21,7 +24,8 @@ inline int next_p2 ( int a )
 }
 
 ///Create a display list coresponding to the give character.
-void make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base ) {
+void make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base ) 
+{
 
 	//The first thing we do is get FreeType to render our character
 	//into a bitmap.  This actually requires a couple of FreeType commands:
@@ -92,6 +96,22 @@ void make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base ) {
 	//we are using 2 channel data.
     glTexImage2D( GL_TEXTURE_2D, 0, GL_RGBA, width, height,
 		  0, GL_LUMINANCE_ALPHA, GL_UNSIGNED_BYTE, expanded_data );
+
+#if 1 // For Debug
+    char dstBmpFile[128];
+    if ( ch == '\0' )
+        sprintf(dstBmpFile, "%03d-00.bmp", (int)ch);
+    else if ( ch == '\\' ) 
+        sprintf(dstBmpFile, "%03d-5c.bmp", (int)ch);
+    else if ( ch == '/' ) 
+        sprintf(dstBmpFile, "%03d-2f.bmp", (int)ch);
+    else
+        sprintf(dstBmpFile, "%03d-%c.bmp", (int)ch, ch);
+    sbitData *bmpw = bmpCreateObjForWrite(EBMP_BGR, 1, width, height, 16, expanded_data);
+    assert( bmpw != NULL );
+    assert( bmpWrite(dstBmpFile, bmpw) );
+    assert( bmpDestroyObjForWrite(&bmpw) );
+#endif
 
 	//With the texture created, we don't need to expanded data anymore
     delete [] expanded_data;
