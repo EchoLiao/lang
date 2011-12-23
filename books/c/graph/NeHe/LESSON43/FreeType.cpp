@@ -356,4 +356,77 @@ void print(const font_data &ft_font, float x, float y, const char *fmt, ...)
     pop_projection_matrix();
 }
 
+
+void wprint(const font_data &ft_font, float x, float y, const char *fmt, ...)  
+{
+    // We want a coordinate system where things coresponding to window pixels.
+    // 画字时, 我们选择正交投影
+    pushScreenCoordinateMatrix();					
+
+    GLuint font = ft_font.list_base;
+    // 使行与行之间有一定的空隙
+    float       h = ft_font.h/.63f;						//We make the height about 1.5* that of
+    char		text[TEXT_SIZE];						// Holds Our String
+    va_list		ap;										// Pointer To List Of Arguments
+
+    if (fmt == NULL)									// If There's No Text
+        *text=0;											// Do Nothing
+    else {
+        va_start(ap, fmt);
+        // vsnprintf() 从 fmt 中最多格式化 TEXT_SIZE 个字符到 text 中(包括'\0'),
+        // 返回值是 fmt 字符串的长度(不包括'\0').
+        int fmt_len = vsnprintf(text, TEXT_SIZE, fmt, ap);
+        if ( fmt_len + 1 > TEXT_SIZE )
+            fprintf(stderr, "NO enough space to format!!\n");
+        va_end(ap);
+    }
+
+    //Here is some code to split the text int lines.
+    const char *start_line=text;
+    vector<string> lines; // 用于保存提取出来的各行
+    const char * c = text;
+    for(;*c;c++) {
+        if(*c=='\n') {
+            string line;
+            for(const char *n=start_line;n<c;n++) line.append(1,*n);
+            lines.push_back(line);
+            start_line=c+1;
+        }
+    }
+    if(start_line) {
+        string line;
+        for(const char *n=start_line;n<c;n++) line.append(1,*n);
+        lines.push_back(line);
+    }
+
+    glPushAttrib(GL_LIST_BIT | GL_CURRENT_BIT  | GL_ENABLE_BIT | GL_TRANSFORM_BIT); {
+        glMatrixMode(GL_MODELVIEW);
+        glDisable(GL_LIGHTING);
+        glEnable(GL_TEXTURE_2D);
+        glDisable(GL_DEPTH_TEST);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);	
+
+        glListBase(font);
+
+        float modelview_matrix[16];	
+        glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
+
+        for(unsigned int i=0;i<lines.size();i++) {
+            glPushMatrix(); {
+                glLoadIdentity();
+                glTranslatef(x,y-h*i,0);
+                glMultMatrixf(modelview_matrix);
+
+                // vector<FT_ULong> ftlist;
+                // getULongList(vlist[i], ftlist);
+                // drawlinetext(ftlist);
+
+            } glPopMatrix();
+        }
+    } glPopAttrib();		
+
+    pop_projection_matrix();
+}
+
 }

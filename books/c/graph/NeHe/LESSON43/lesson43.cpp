@@ -150,7 +150,7 @@ int drawGLScene( )
 	glPopMatrix();
 
 	//Uncomment this to test out print's ability to handle newlines.
-	freetype::print(our_font, 320, 200, "Here\nthere\nbe\n\nnewlines\n.");
+	freetype::wprint(our_font, 320, 200, "Here\nthere\nbe\n\nnewlines\n.");
 
 	cnt1+=0.051f;	// Increase The First Counter
 
