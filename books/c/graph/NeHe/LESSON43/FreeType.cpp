@@ -10,12 +10,142 @@
 #include "../LESSON11/bmprw.h"
 #include <assert.h>
 #include <stdio.h>
+#include <map>
 
 namespace freetype {
 
+/*
+ * Unicode 与 UTF-8 的关系:
+ *
+ *   Unicode 编码                     UTF-8 存储码
+ * ========================  =====================================================
+ * U-00000000 - U-0000007F:  0xxxxxxx
+ * U-00000080 - U-000007FF:  110xxxxx 10xxxxxx
+ * U-00000800 - U-0000FFFF:  1110xxxx 10xxxxxx 10xxxxxx
+ * U-00010000 - U-001FFFFF:  11110xxx 10xxxxxx 10xxxxxx 10xxxxxx
+ * U-00200000 - U-03FFFFFF:  111110xx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+ * U-04000000 - U-7FFFFFFF:  1111110x 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx 10xxxxxx
+ * 
+ *  (前面几个1就代表后面几个字节是属于一起的)
+ *  
+ */
+
+typedef struct STF_TEXTURE_DATA
+{
+    GLuint m_list;
+    GLuint m_texture;
+    STF_TEXTURE_DATA():m_list(0),m_texture(0){}
+}STF_TEXTURE_DATA;
+
+//
+std::map<FT_ULong,STF_TEXTURE_DATA>    m_ch2texlistMap;
+
+FT_Face face;
+
+
+
+
+/*****************************************************************************
+ * 根据字符的UTF-8编码的第一个字节求出该字符用UTF-8编码存储时所需要多少个
+ * 字节空间. 特殊地, 对于只占一个字节的字符(ASCII), 返回值为 0 .
+ *
+ * 参数:
+ *    char c    字符的UTF-8编码的第一个字节的值
+ *
+ * 返回值:
+ *   该字符用UTF-8编码存储时所需要多少个字节空间.
+ *   特殊地, 对于只占一个字节的字符(ASCII), 返回值为 0 .
+ ****************************************************************************/
+int enc_get_utf8_size(char c)
+{
+    char t = 1 << 7;
+    char r = c;
+    int count = 0;
+    while (r & t)
+    {
+        r = r << 1;
+        count++;
+    }
+    return count;
+}
+
+
+/*****************************************************************************
+ * 将UTF8编码转换成Unicode(UCS-2)编码.
+ *
+ * 参数:
+ *    char* pInput   指向输入字符串(以'\0'结尾)的指针
+ *    char* pOutput  指向输出字符串指针的指针
+ *    int   outsize  pOutput 缓冲的大小
+ *
+ * 返回值:
+ *    返回转换后的Unicode字符串的字节数, 如果出错则返回 -1
+ *
+ * 注意:
+ *     1. UTF8没有字节序问题, 但是Unicode字符有字节序,
+ *        字节序分为大端(Big Endian)和小端(Little Endian)两种,
+ *        在Intel处理器中采用小端法表示, 本例中采用小端法表示. (低地址存低位)
+ *     2. 请保证 pOutput 缓冲区有足够的空间, 若空间不足, 则只进行部分转换.
+ ****************************************************************************/
+int enc_utf8_to_unicode(const char* pInput, char* pOutput, int outsize)
+{
+    assert(pInput != NULL && pOutput != NULL);
+    assert(outsize >= 3);
+
+    int  outputSize = 0;  //记录转换后的Unicode字符串的字节数
+    char *pout = pOutput;
+
+    while ( *pInput && outputSize + 2 + 1 <= outsize )
+    {
+        if (*pInput > 0x00 && *pInput <= 0x7F) // 处理单字节UTF8字符
+        {
+            *pout     = *pInput;
+            *(pout+1) = 0;       // 小端法表示, 在高地址填补0
+            pInput += 1;
+        }
+        else if (((*pInput) & 0xE0) == 0xC0) // 处理双字节UTF8字符
+        {
+            char high = *pInput;
+            char low  = *(pInput + 1);
+
+            if ((low & 0xC0) != 0x80) // 检查是否为合法的UTF8字符表示
+                return -1;
+
+            *pout     = (high << 6) + (low & 0x3F);
+            *(pout+1) = (high >> 2) & 0x07;
+            pInput += 2;
+        }
+        else if (((*pInput) & 0xF0) == 0xE0) // 处理三字节UTF8字符
+        {
+            char high   = *pInput;
+            char middle = *(pInput + 1);
+            char low    = *(pInput + 2);
+
+            if (((middle & 0xC0) != 0x80) || ((low & 0xC0) != 0x80))
+                return -1;
+
+            *pout     = (middle << 6) + (low & 0x7F);
+            *(pout+1) = (high << 4) + ((middle >> 2) & 0x0F);
+            pInput += 3;
+        }
+        else //对于其他字节数的UTF8字符不进行处理
+        {
+            return -1;
+        }
+
+        pout += 2;
+        outputSize += 2;
+    }
+
+    *pout = 0;
+
+    return outputSize;
+}
+
+    
 ///This function gets the first power of 2 >= the
 ///int that we pass it.
-// 这个函数返回比a大的，并且是最接近a的2的次方的数
+// 这个函数返回比a大的, 并且是最接近a的2的次方的数
 inline int next_p2 ( int a )
 {
 	int rval=1;
@@ -179,7 +309,6 @@ void make_dlist ( FT_Face face, char ch, GLuint list_base, GLuint * tex_base )
 }
 
 
-
 void font_data::init(const char * fname, unsigned int h) {
 	//Allocate some memory to store the texture ids.
 	textures = new GLuint[128];
@@ -195,7 +324,7 @@ void font_data::init(const char * fname, unsigned int h) {
 	//The object in which Freetype holds information on a given
 	//font is called a "face".
     // 在FreeType库中保存字体信息的类叫做face
-	FT_Face face;
+	// FT_Face face;
 
 	//This is where we load in the font information from the file.
 	//Of all the places where the code might die, this is the most likely,
@@ -223,10 +352,10 @@ void font_data::init(const char * fname, unsigned int h) {
 
 	//We don't need the face information now that the display
 	//lists have been created, so we free the assosiated resources.
-	FT_Done_Face(face);
+	// FT_Done_Face(face);
 
 	//Ditto for the library.
-	FT_Done_FreeType(library);
+	// FT_Done_FreeType(library);
 }
 
 void font_data::clean() {
@@ -356,6 +485,169 @@ void print(const font_data &ft_font, float x, float y, const char *fmt, ...)
     pop_projection_matrix();
 }
 
+int getULongList(string &str, vector<FT_ULong> &list)
+{
+    if ( str == "" )
+        return 0;
+
+    char          buff[256];
+    unsigned int  len = str.size();  // 单位为字节
+    unsigned int  i = 0;
+    FT_ULong      tmpdata = 0;
+    char          unibuff[3];
+
+    while ( i < len )
+    {
+        char c = str[i];
+        int size = enc_get_utf8_size(c);
+        if (size > 0) // 非ASCII字符
+        {
+            memset(buff, 0, 256);
+            unsigned int count = i + size;
+            unsigned int k = 0;
+            while (i < count)
+                buff[k++] = str[i++];
+            enc_utf8_to_unicode(buff, unibuff, 3);
+            assert(sizeof(FT_ULong) ==  4);
+            unsigned short tmp = *((unsigned short *)&unibuff);
+            tmpdata = (FT_ULong)tmp;
+        }
+        else          // ASCII字符
+        {
+            tmpdata = str[i++];
+        }
+        list.push_back(tmpdata);
+    } // while
+    return 0;
+
+}
+
+bool hasTexListData(FT_ULong ch, STF_TEXTURE_DATA &data)
+{
+    std::map<FT_ULong,STF_TEXTURE_DATA>::iterator iter = m_ch2texlistMap.find(ch);
+    if (iter != m_ch2texlistMap.end())
+    {
+        data = iter->second;
+        return true;
+    }
+    return false;
+}
+
+// 处理多字节字符的情况
+void make_wlist(FT_Face face, FT_ULong ch,
+        GLuint list, GLuint texture)
+{
+    if (FT_Load_Glyph(face, FT_Get_Char_Index(face,ch),FT_LOAD_DEFAULT))
+    {
+        throw std::runtime_error("FT_Load_Glyph failed");
+    }
+
+    FT_Glyph glyph;
+
+    if (FT_Get_Glyph(face->glyph, &glyph))
+        throw std::runtime_error("FT_Get_Glyph failed");
+
+    FT_Glyph_To_Bitmap(&glyph, ft_render_mode_normal,0, 1);
+    FT_BitmapGlyph bitmap_glyph = (FT_BitmapGlyph)glyph;
+
+    FT_Bitmap& bitmap = bitmap_glyph->bitmap;
+    // 我们需要获取位图的信息
+    int width = next_p2(bitmap.width);
+    int height = next_p2(bitmap.rows);
+
+    GLubyte* expanded_data = new GLubyte[2 * width * height];
+
+    for(int j = 0; j < height; j++)
+    {
+        for (int i = 0; i < width; i++)
+        {
+            expanded_data[2 *(i+j*width)] = expanded_data[2*(i+j*width)+1] =
+                (i >= bitmap.width || j >= bitmap.rows) ?
+                0 : bitmap.buffer[i + bitmap.width * j];
+        }
+    }
+
+    // 设置纹理啦
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_LUMINANCE_ALPHA,
+            GL_UNSIGNED_BYTE, expanded_data);
+
+    delete [] expanded_data;
+
+    glNewList(list, GL_COMPILE);
+    glBindTexture(GL_TEXTURE_2D, texture);
+    glPushMatrix();
+
+    glTranslatef(bitmap_glyph->left, 0, 0);
+    glTranslatef(0, bitmap_glyph->top-bitmap.rows, 0);
+
+    float x = (float)bitmap.width / (float)width;
+    float y = (float)bitmap.rows / (float) height;
+
+    glBegin(GL_QUADS);
+    glTexCoord2d(0,0); glVertex2f(0,bitmap.rows);
+    glTexCoord2d(0,y); glVertex2f(0,0);
+    glTexCoord2d(x,y); glVertex2f(bitmap.width,0);
+    glTexCoord2d(x,0); glVertex2f(bitmap.width,bitmap.rows);
+    glEnd();
+    glPopMatrix();
+    glTranslatef(face->glyph->advance.x >> 6 ,0,0);
+
+    glEndList();
+
+    // 保存需要的信息
+    STF_TEXTURE_DATA tmpdata;
+
+    tmpdata.m_list = list;
+    tmpdata.m_texture = texture;
+
+    m_ch2texlistMap[ch] = tmpdata;
+}
+
+void createTexListData(FT_ULong ch, STF_TEXTURE_DATA& data)
+{
+    data.m_list = glGenLists(1);
+    glGenTextures(1, &data.m_texture);
+
+    make_wlist(face, ch, data.m_list, data.m_texture);
+}
+
+void drawlinetext(const font_data &ft_font, vector<FT_ULong> &list)
+{
+    GLuint tmplist[list.size()];
+
+    for (unsigned int i = 0; i < list.size(); i++)
+    {
+        if (list[i] > 128) // 判断下
+        {
+            STF_TEXTURE_DATA tmpdata;
+            if (hasTexListData(list[i], tmpdata))
+            {
+                tmplist[i] = tmpdata.m_list;
+                //glCallList(tmpdata.m_list);
+            }
+            else
+            {
+                createTexListData(list[i], tmpdata);
+                tmplist[i] = tmpdata.m_list;
+                //glCallList(tmpdata.m_list);
+            }
+        }
+        else
+        {
+            tmplist[i] = ft_font.list_base + list[i];
+            //glCallList(m_list_base + list[i]);
+            //glCallList(list[i]);
+        }
+    }
+
+    // 获取了所有的显示列表 开始显示 数据
+    // 这里可能要一个一个调用哦 如果下面的这个函数无法实现的话
+    glCallLists(list.size(), GL_UNSIGNED_INT, tmplist);
+}
 
 void wprint(const font_data &ft_font, float x, float y, const char *fmt, ...)  
 {
@@ -363,7 +655,7 @@ void wprint(const font_data &ft_font, float x, float y, const char *fmt, ...)
     // 画字时, 我们选择正交投影
     pushScreenCoordinateMatrix();					
 
-    GLuint font = ft_font.list_base;
+    // GLuint font = ft_font.list_base;
     // 使行与行之间有一定的空隙
     float       h = ft_font.h/.63f;						//We make the height about 1.5* that of
     char		text[TEXT_SIZE];						// Holds Our String
@@ -407,7 +699,7 @@ void wprint(const font_data &ft_font, float x, float y, const char *fmt, ...)
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);	
 
-        glListBase(font);
+        // glListBase(font);
 
         float modelview_matrix[16];	
         glGetFloatv(GL_MODELVIEW_MATRIX, modelview_matrix);
@@ -418,9 +710,9 @@ void wprint(const font_data &ft_font, float x, float y, const char *fmt, ...)
                 glTranslatef(x,y-h*i,0);
                 glMultMatrixf(modelview_matrix);
 
-                // vector<FT_ULong> ftlist;
-                // getULongList(vlist[i], ftlist);
-                // drawlinetext(ftlist);
+                vector<FT_ULong> ftlist;
+                getULongList(lines[i], ftlist);
+                drawlinetext(ft_font, ftlist);
 
             } glPopMatrix();
         }

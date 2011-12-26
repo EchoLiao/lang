@@ -120,7 +120,7 @@ int initGL( )
     /* Really Nice Perspective Calculations */
     glHint( GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST );
 
-    our_font.init("Test.ttf", 16);
+    our_font.init("simfang.ttf", 16);
 
     return( TRUE );
 }
@@ -146,11 +146,11 @@ int drawGLScene( )
 	glRotatef(cnt1,0,0,1);
 	glScalef(1,.8+.3*cos(cnt1/5),1);
 	glTranslatef(-180,0,0);
-	freetype::print(our_font, 320, 240, "Active FreeType Text - %7.2f", cnt1);
+	// freetype::print(our_font, 320, 240, "Active FreeType Text - %7.2f", cnt1);
+	freetype::wprint(our_font, 320, 240, "廖杨Active FreeType Text - %7.2f", cnt1);
 	glPopMatrix();
 
-	//Uncomment this to test out print's ability to handle newlines.
-	freetype::wprint(our_font, 320, 200, "Here\nthere\nbe\n\nnewlines\n.");
+	freetype::wprint(our_font, 320, 200, "我不要He.我要的我可以的naA");
 
 	cnt1+=0.051f;	// Increase The First Counter
 
