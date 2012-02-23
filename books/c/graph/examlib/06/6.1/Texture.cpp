@@ -1,7 +1,9 @@
 #include <stdio.h>														// 标准输入输出头文件
-//#include <olectl.h>														// OLE控制库头文件
+#include <assert.h>
 #include <math.h>														// 数学函数头文件
 #include <GL/gl.h>														// OpenGL32库的头文件
+
+#include "bmprw.h"
 #include "Texture.h"
 
 BOOL BuildTexture(char *szPathName, GLuint &texid)						// 载入图片并转换为纹理
@@ -104,7 +106,12 @@ BOOL BuildTexture(char *szPathName, GLuint &texid)						// 载入图片并转换为纹理
 		pPixel[3]		= 255;											// ALPHA值设为255
 	}
 #else
-#endif
+    sbitData *bmpr;
+    int ret;
+
+    bmpr = bmpCreateObjForRead(EBMP_RGB, 0);
+    ret = bmpRead(szPathName, bmpr);
+    assert(ret);
 
 	glGenTextures(1, &texid);											// 创建纹理
 
@@ -113,6 +120,8 @@ BOOL BuildTexture(char *szPathName, GLuint &texid)						// 载入图片并转换为纹理
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	// 线形滤波
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);   // 线形滤波
 
+    glTexImage2D(GL_TEXTURE_2D, 0, 3, bmpr->w, bmpr->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, bmpr->pdata);
+
 	// 生成纹理
 	// glTexImage2D(GL_TEXTURE_2D, 0, 3, lWidthPixels, lHeightPixels, 0, GL_RGBA, GL_UNSIGNED_BYTE, pBits);
 
@@ -120,6 +129,8 @@ BOOL BuildTexture(char *szPathName, GLuint &texid)						// 载入图片并转换为纹理
 	// DeleteDC(hdcTemp);													// 删除设备描述表
 
 	// pPicture->Release();												// 释放 IPicture
+    bmpDestroyObjForRead(&bmpr);
+#endif
 
 	return TRUE;														// 返回 TRUE
 }

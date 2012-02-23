@@ -1,4 +1,4 @@
-OBJECTS= Nehe.o Texture.o Vector3D.o
+OBJECTS= Nehe.o Texture.o Vector3D.o bmprw.o
 
 CC= g++
 
