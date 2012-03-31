@@ -2,13 +2,13 @@ OBJECTS= Nehe.o Texture.o Vector3D.o bmprw.o
 
 CC= g++
 
-all: Nehe
+all: light
 
 %.o: %.cpp
 	$(CC) -Os -Wall -ansi -pedantic -ffloat-store -c -g -o $@ $<
 
 clean:
-	rm -f *.o;rm -f Nehe
+	rm -f *.o;rm -f light
 
-Nehe: $(OBJECTS)
-	$(CC) -g -o Nehe $(OBJECTS) -L/usr/X11R6/lib -lm -lGL -lglut -lGLU
+light: $(OBJECTS)
+	$(CC) -g -o light $(OBJECTS) -L/usr/X11R6/lib -lm -lGL -lglut -lGLU

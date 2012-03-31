@@ -22,9 +22,10 @@
 
 #include <string.h>
 #include <unistd.h>
-#include <stdio.h>           // Standard C/C++ Input-Output
-#include <math.h>            // Math Functions
-#include <GL/glut.h>         // The GL Utility Toolkit (GLUT) Header
+#include <stdio.h>
+#include <math.h>
+#include <assert.h>
+#include <GL/glut.h>
 
 #include "Texture.h"
 #include "Vector3D.h"
@@ -147,6 +148,46 @@ void MoveCameraPassSpecalPoint(void)
 
     // 使用gluLookAt建立观察矩阵
     gluLookAt(currentPos.x, currentPos.y, currentPos.z, currentPos.y, 0.0f, 0.0f, 1.0f, currentPos.y, 0.0f);
+}
+
+void DrawCone(float h, float r, int s)
+{
+    assert(s > 0);
+
+    int i;
+    float texs, text;
+    float vx, vy, vz;
+    float theta = 3.141592653 * 2 / s;
+
+    glBegin(GL_TRIANGLE_FAN); {
+        for ( i = 0; i < s + 1 + 1; i++ )
+        {
+            if ( i == 0 )
+            {
+                texs = 0.0;
+                text = 1.0;
+                vx = vy = vz = 0.0;
+            }
+            else 
+            {
+                if ( i % 2 == 0 )
+                {
+                    texs = 0.0;
+                    text = 0.0;
+                }
+                else 
+                {
+                    texs = 1.0;
+                    text = 0.0;
+                }
+                vx = r * cosf(theta * i);
+                vy = h;
+                vz = r * sinf(theta * i);
+            }
+            glTexCoord2f(texs, text);
+            glVertex3f(vx, vy, vz);
+        }
+    } glEnd();
 }
 
 void RenderWorld(void)
@@ -296,27 +337,37 @@ void RenderWorld(void)
         } glEnd(); */
 
         // 绘制锥体（顶点向下的锥体）
+#if 0
         glColor3f(0.0f, 1.0f, 1.0f);
         glBegin(GL_TRIANGLE_FAN); {
-            glTexCoord2f(0.6f, 1.0f); glVertex3f( 0.0f, 0.0f, 0.0f);
+            glTexCoord2f(0.0f, 1.0f); glVertex3f( 0.0f, 0.0f, 0.0f);
             glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.1f, 1.1f, 0.1f);
             glTexCoord2f(1.0f, 0.0f); glVertex3f( 0.1f, 1.1f, 0.1f);
             glTexCoord2f(0.0f, 0.0f); glVertex3f( 0.1f, 1.1f,-0.1f);
             glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.1f, 1.1f,-0.1f);
             glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.1f, 1.1f, 0.1f);
         } glEnd();
-
 
         glScalef(-1.0, -1.0, -1.0);
         glColor3f(1.0f, 1.0f, 0.0f);
         glBegin(GL_TRIANGLE_FAN); {
-            glTexCoord2f(0.6f, 1.0f); glVertex3f( 0.0f, 0.0f, 0.0f);
+            glTexCoord2f(0.0f, 1.0f); glVertex3f( 0.0f, 0.0f, 0.0f);
             glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.1f, 1.1f, 0.1f);
             glTexCoord2f(1.0f, 0.0f); glVertex3f( 0.1f, 1.1f, 0.1f);
             glTexCoord2f(0.0f, 0.0f); glVertex3f( 0.1f, 1.1f,-0.1f);
             glTexCoord2f(1.0f, 0.0f); glVertex3f(-0.1f, 1.1f,-0.1f);
             glTexCoord2f(0.0f, 0.0f); glVertex3f(-0.1f, 1.1f, 0.1f);
         } glEnd();
+#else
+        glColor3f(0.0f, 1.0f, 1.0f);
+        DrawCone(1.1, 0.13, 4);
+
+        glScalef(-1.0, -1.0, -1.0);
+        glColor3f(1.0f, 1.0f, 0.0f);
+        DrawCone(1.1, 0.13, 4);
+#endif
+
+
         glPopMatrix();
     }
 
