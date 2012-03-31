@@ -28,13 +28,38 @@
 #include "Texture.h"
 #include "Vector3D.h"
 
+typedef struct N3D_Vertex
+{
+	GLfloat fX;
+	GLfloat fY;
+	GLfloat fZ;
+	GLfloat fS;
+	GLfloat fT;
+	GLfloat fNX;
+	GLfloat fNY;
+	GLfloat fNZ;
+} N3D_Vertex;
+
+typedef struct N3D_Cone
+{
+    N3D_Vertex  *pVx;
+    GLfloat     fHeight;
+    GLfloat     fRadius;
+    GLint       iStacks;
+} N3D_Cone;
+
+
+
+GLint  ConeCreate(N3D_Cone *pCone);
+GLvoid ConeDraw(N3D_Cone *pCone);
+
 
 
 GLuint  pyramidTex;
-GLfloat tex_y;														// 纹理的Y方向位置
-BOOL	Pause = FALSE;												// 视点运动是否暂停
+GLfloat tex_y;
+BOOL	Pause = FALSE;
 static float gRotateY = 0.0;
-
+static N3D_Cone sCone = { NULL, 1.1, 0.13, 4 };
 
 
 // Our GL Specific Initializations. Returns true On Success, false On Fail.
@@ -50,9 +75,18 @@ bool init(void)
 
     BuildTexture((char*)"Data/Reflection.bmp", pyramidTex);
 
+
+    int ret;
+    ret = ConeCreate(&sCone);
+    assert(ret != 0);
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_TEXTURE_COORD_ARRAY);
+
     return TRUE;
 }
 
+#if 0
 void DrawCone(float h, float r, int s)
 {
     assert(s > 0);
@@ -71,14 +105,14 @@ void DrawCone(float h, float r, int s)
                 text = 1.0;
                 vx = vy = vz = 0.0;
             }
-            else 
+            else
             {
                 if ( i % 2 == 0 )
                 {
                     texs = 0.0;
                     text = 0.0;
                 }
-                else 
+                else
                 {
                     texs = 1.0;
                     text = 0.0;
@@ -92,6 +126,70 @@ void DrawCone(float h, float r, int s)
         }
     } glEnd();
 }
+#else
+GLint ConeCreate(N3D_Cone *pCone)
+{
+    assert(pCone != NULL && pCone->iStacks > 0 && pCone->pVx == NULL);
+
+    GLint           i;
+    GLfloat         texs, text;
+    GLfloat         vx, vy, vz;
+    GLfloat         theta = 3.141592653 * 2 / pCone->iStacks;
+
+    pCone->pVx = (N3D_Vertex *) calloc(pCone->iStacks + 1 + 1,
+            sizeof(pCone->pVx[0]));
+    if ( pCone->pVx == NULL )
+        return 0;
+
+    for ( i = 0; i < pCone->iStacks + 1 + 1; i++ )
+    {
+        if ( i == 0 )
+        {
+            texs = 0.0;
+            text = 1.0;
+            vx = vy = vz = 0.0;
+        }
+        else
+        {
+            if ( i % 2 == 0 )
+            {
+                texs = 0.0;
+                text = 0.0;
+            }
+            else
+            {
+                texs = 1.0;
+                text = 0.0;
+            }
+            vx = pCone->fRadius * cosf(theta * i);
+            vy = pCone->fHeight;
+            vz = pCone->fRadius * sinf(theta * i);
+        }
+        pCone->pVx[i].fX = vx;
+        pCone->pVx[i].fY = vy;
+        pCone->pVx[i].fZ = vz;
+        pCone->pVx[i].fS = texs;
+        pCone->pVx[i].fT = text;
+
+        // glTexCoord2f(texs, text);
+        // glVertex3f(vx, vy, vz);
+    }
+
+    return 1;
+}
+
+GLvoid ConeDraw(N3D_Cone *pCone)
+{
+    assert(pCone != NULL && pCone->pVx != NULL);
+
+    glVertexPointer(3, GL_FLOAT, sizeof(N3D_Vertex), &(pCone->pVx[0].fX));
+    glTexCoordPointer(2, GL_FLOAT, sizeof(N3D_Vertex), &(pCone->pVx[0].fS));
+    // glNormalPointer(GL_FLOAT, sizeof(N3D_Vertex), &(pCone->pVx[0].fNX));
+
+    glDrawArrays(GL_TRIANGLE_FAN, 0, pCone->iStacks + 2);
+}
+
+#endif
 
 void RenderWorld(void)
 {
@@ -109,6 +207,7 @@ void RenderWorld(void)
     // glScalef(0.0f, tex_y, 0.0f);
 
     glMatrixMode(GL_MODELVIEW);
+#if 0
     for (int i=0; i<1; i++)
     {
         glPushMatrix();
@@ -135,14 +234,22 @@ void RenderWorld(void)
         } glEnd();
 #else
         glColor3f(0.0f, 1.0f, 1.0f);
-        DrawCone(1.1, 0.13, 4);
+        // DrawCone(1.1, 0.13, 4);
 
         glScalef(-1.0, -1.0, -1.0);
         glColor3f(1.0f, 1.0f, 0.0f);
-        DrawCone(1.1, 0.13, 4);
+        // DrawCone(1.1, 0.13, 4);
 #endif
         glPopMatrix();
     }
+#else
+    glColor3f(0.0f, 1.0f, 1.0f);
+    ConeDraw(&sCone);
+
+    glScalef(-1.0, -1.0, -1.0);
+    glColor3f(1.0f, 1.0f, 0.0f);
+    ConeDraw(&sCone);
+#endif
 
     // 重置纹理矩阵
     glMatrixMode(GL_TEXTURE);
