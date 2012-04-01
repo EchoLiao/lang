@@ -59,14 +59,14 @@ GLuint  pyramidTex;
 GLfloat tex_y;
 BOOL	Pause = FALSE;
 static float gRotateY = 0.0;
-static N3D_Cone sCone = { NULL, 1.1, 0.13, 4 };
+static N3D_Cone sCone = { NULL, 0.8, 0.13, 9 };
 
 
 // Our GL Specific Initializations. Returns true On Success, false On Fail.
 bool init(void)
 {
     // 在此处初始化绘制场景
-    glClearColor(0.0f, 0.0f, 0.0f, 0.5f);							// 清屏为黑色
+    glClearColor(0.2f, 0.2f, 0.2f, 0.5f);							// 清屏为黑色
     glClearDepth(1.0f);												// 设置深度缓存
     glDepthFunc(GL_LEQUAL);											// 选择深度测试方式
     glEnable(GL_DEPTH_TEST);										// 开启深度测试
@@ -131,49 +131,51 @@ GLint ConeCreate(N3D_Cone *pCone)
 {
     assert(pCone != NULL && pCone->iStacks > 0 && pCone->pVx == NULL);
 
-    GLint           i;
+    GLint           i = 0;
     GLfloat         texs, text;
     GLfloat         vx, vy, vz;
     GLfloat         theta = 3.141592653 * 2 / pCone->iStacks;
+    GLfloat         tCen = 1.0 / pCone->iStacks;
 
     pCone->pVx = (N3D_Vertex *) calloc(pCone->iStacks + 1 + 1,
             sizeof(pCone->pVx[0]));
     if ( pCone->pVx == NULL )
         return 0;
 
-    for ( i = 0; i < pCone->iStacks + 1 + 1; i++ )
+    pCone->pVx[0].fX = 0.0;
+    pCone->pVx[0].fY = 0.0;
+    pCone->pVx[0].fZ = 0.0;
+    pCone->pVx[0].fS = 0.5;
+    pCone->pVx[0].fT = 0.0;
+    for ( i = 0; i < pCone->iStacks; i++ )
     {
-        if ( i == 0 )
-        {
-            texs = 0.0;
-            text = 1.0;
-            vx = vy = vz = 0.0;
-        }
-        else
-        {
-            if ( i % 2 == 0 )
-            {
-                texs = 0.0;
-                text = 0.0;
-            }
-            else
-            {
-                texs = 1.0;
-                text = 0.0;
-            }
             vx = pCone->fRadius * cosf(theta * i);
             vy = pCone->fHeight;
             vz = pCone->fRadius * sinf(theta * i);
-        }
-        pCone->pVx[i].fX = vx;
-        pCone->pVx[i].fY = vy;
-        pCone->pVx[i].fZ = vz;
-        pCone->pVx[i].fS = texs;
-        pCone->pVx[i].fT = text;
-
+            texs = tCen * i;
+            text = 1.0;
+#if 0 // NALD
+        printf("NALL &&& i=%d, xyz(%f, %f, %f); st(%f,%f); [%s:%d]\n", i,
+                pCone->pVx[i].fX, pCone->pVx[i].fY, pCone->pVx[i].fZ,
+                pCone->pVx[i].fS, pCone->pVx[i].fT,
+                __FILE__, __LINE__);
+        getchar();
+#endif
         // glTexCoord2f(texs, text);
         // glVertex3f(vx, vy, vz);
+        pCone->pVx[i + 1].fX = vx;
+        pCone->pVx[i + 1].fY = vy;
+        pCone->pVx[i + 1].fZ = vz;
+        pCone->pVx[i + 1].fS = texs;
+        pCone->pVx[i + 1].fT = text;
     }
+    pCone->pVx[i + 1].fX = pCone->pVx[1].fX;
+    pCone->pVx[i + 1].fY = pCone->pVx[1].fY;
+    pCone->pVx[i + 1].fZ = pCone->pVx[1].fZ;
+    pCone->pVx[i + 1].fS = 1.0;
+    pCone->pVx[i + 1].fT = pCone->pVx[1].fT;
+
+    assert(i + 1 + 1 == pCone->iStacks + 1 + 1);
 
     return 1;
 }
@@ -243,11 +245,13 @@ void RenderWorld(void)
         glPopMatrix();
     }
 #else
+    //glDisable(GL_TEXTURE_2D);
     glColor3f(0.0f, 1.0f, 1.0f);
     ConeDraw(&sCone);
 
     glScalef(-1.0, -1.0, -1.0);
-    glColor3f(1.0f, 1.0f, 0.0f);
+    // glColor3f(1.0f, 1.0f, 0.0f);
+    glColor3f(1.0f, 1.0f, 1.0f);
     ConeDraw(&sCone);
 #endif
 
