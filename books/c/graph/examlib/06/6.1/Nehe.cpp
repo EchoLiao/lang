@@ -54,6 +54,7 @@ GLint  ConeCreate(N3D_Cone *pCone);
 GLvoid ConeDraw(N3D_Cone *pCone);
 
 
+#define LNUM    10
 
 GLuint  pyramidTex;
 GLfloat tex_y;
@@ -193,6 +194,20 @@ GLvoid ConeDraw(N3D_Cone *pCone)
 
 #endif
 
+void RenderRect(void)
+{
+    glBegin(GL_TRIANGLE_FAN);
+    glTexCoord2f(0.0, 0.0);
+    glVertex3f(-0.15,  0.0,  0.0);
+    glTexCoord2f(1.0, 0.0);
+    glVertex3f( 0.15,  0.0,  0.0);
+    glTexCoord2f(1.0, 1.0);
+    glVertex3f( 0.15,  1.0,  0.0);
+    glTexCoord2f(0.0, 1.0);
+    glVertex3f(-0.15,  1.0,  0.0);
+    glEnd();
+}
+
 void RenderWorld(void)
 {
     glEnable(GL_TEXTURE_2D);
@@ -245,14 +260,19 @@ void RenderWorld(void)
         glPopMatrix();
     }
 #else
+#if 0
     //glDisable(GL_TEXTURE_2D);
-    glColor3f(0.0f, 1.0f, 1.0f);
-    ConeDraw(&sCone);
+    // glColor3f(0.0f, 1.0f, 1.0f);
+    // ConeDraw(&sCone);
 
-    glScalef(-1.0, -1.0, -1.0);
-    // glColor3f(1.0f, 1.0f, 0.0f);
-    glColor3f(1.0f, 1.0f, 1.0f);
+    // glScalef(-1.0, -1.0, -1.0);
+    // // glColor3f(1.0f, 1.0f, 0.0f);
+    // glColor3f(1.0f, 1.0f, 1.0f);
     ConeDraw(&sCone);
+#else
+    // glDisable(GL_TEXTURE_2D);
+    RenderRect();
+#endif
 #endif
 
     // 重置纹理矩阵
@@ -264,7 +284,7 @@ void RenderWorld(void)
     glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
 
-    tex_y -= 0.01f;
+    tex_y += 0.001f;
 }
 
 
@@ -274,31 +294,54 @@ void render(void)
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if ( ! Pause )
-        gRotateY += 0.7;
+        gRotateY += 1.5;
 
     glLoadIdentity();
-    glTranslatef(0.0, 0.0, -2.0);
 
-
+    // 画出最开始的坐标系的原点
     glPushMatrix(); {
-
-        glPushMatrix(); {
-            // 画出最开始的坐标系的原点
-            glDisable(GL_TEXTURE_2D);
-            glDisable(GL_DEPTH_TEST);
-            glDisable(GL_BLEND);
-            glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
-            glRectf(-0.01, 0.01, 0.01, -0.01);
-        } glPopMatrix();
-
-        glPushMatrix(); {
-            glRotatef( gRotateY, 0.0, 1.0, 0.0);
-            glRotatef( 60, 1.0, 0, 0);
-            RenderWorld();
-        } glPopMatrix();
-
+        glTranslatef(0.0, -0.0, -2.0);
+        glDisable(GL_TEXTURE_2D);
+        glDisable(GL_DEPTH_TEST);
+        glDisable(GL_BLEND);
+        glColor4f(1.0f, 1.0f, 1.0f, 1.0f);
+        glRectf(-0.01, 0.01, 0.01, -0.01);
     } glPopMatrix();
 
+
+    float fRCen = 360.0 / (LNUM / 2);
+    float fR;
+    float fcColor[][4] = {
+        {1.0, 1.0, 1.0, 1.0}, {1.0, 0.0, 0.0, 1.0},
+        {0.0, 1.0, 0.0, 1.0}, {0.0, 0.0, 1.0, 1.0},
+        {1.0, 1.0, 0.0, 1.0}, {1.0, 0.0, 1.0, 1.0},
+        {0.0, 1.0, 1.0, 1.0}, {0.5, 0.5, 0.5, 1.0},
+        {0.5, 0.0, 0.0, 1.0}, {0.0, 0.5, 0.0, 1.0},
+        // {0.0, 0.0, 0.5, 1.0}, {0.5, 0.5, 0.0, 1.0},
+    };
+    extern int dummy[ LNUM % 2 == 0 ? 1 : -1 ];
+    extern int dummy[ sizeof(fcColor) / sizeof(fcColor[0]) == LNUM ? 1 : -1 ];
+
+    glTranslatef(0.0, -0.4, -2.0);
+    glPushMatrix(); {
+        for ( int k = 0; k < 1; k++ )
+        {
+            for ( int i = 0; i < LNUM; i++ )
+            {
+                glPushMatrix(); {
+                    fR = gRotateY + (i / 2) * fRCen;
+                    glRotatef(fR, 0.0, 1.0, 0.0);
+                    glRotatef(70.0, 1.0, 0, 0);
+                    glRotatef(-fR, 0.0, 1.0, 0.0);
+
+                    if ( i % 2 == 1 )
+                        glScalef(-1.0, -1.0, -1.0);
+                    glColor3fv(fcColor[i]);
+                    RenderWorld();
+                } glPopMatrix();
+            }
+        }
+    } glPopMatrix();
 
     glFlush ();
     glutSwapBuffers();

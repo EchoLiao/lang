@@ -109,7 +109,7 @@ BOOL BuildTexture(char *szPathName, GLuint &texid)						// 载入图片并转换为纹理
     sbitData *bmpr;
     int ret;
 
-    bmpr = bmpCreateObjForRead(EBMP_RGB, 0);
+    bmpr = bmpCreateObjForRead(EBMP_RGB, 1);
     ret = bmpRead(szPathName, bmpr);
     assert(ret);
 
