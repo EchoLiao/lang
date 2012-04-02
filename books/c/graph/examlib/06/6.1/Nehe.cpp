@@ -271,6 +271,7 @@ void RenderWorld(void)
     ConeDraw(&sCone);
 #else
     // glDisable(GL_TEXTURE_2D);
+    // glDisable(GL_BLEND);
     RenderRect();
 #endif
 #endif
@@ -294,7 +295,11 @@ void render(void)
     glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if ( ! Pause )
+    {
         gRotateY += 1.5;
+        if ( gRotateY > 360.0 )
+            gRotateY = 0.0;
+    }
 
     glLoadIdentity();
 
@@ -315,8 +320,8 @@ void render(void)
         {1.0, 1.0, 1.0, 1.0}, {1.0, 0.0, 0.0, 1.0},
         {0.0, 1.0, 0.0, 1.0}, {0.0, 0.0, 1.0, 1.0},
         {1.0, 1.0, 0.0, 1.0}, {1.0, 0.0, 1.0, 1.0},
-        {0.0, 1.0, 1.0, 1.0}, {0.5, 0.5, 0.5, 1.0},
-        {0.5, 0.0, 0.0, 1.0}, {0.0, 0.5, 0.0, 1.0},
+        {0.0, 1.0, 1.0, 1.0}, {1.0, 0.5, 0.0, 1.0},
+        {1.0, 0.0, 0.5, 1.0}, {0.0, 1.0, 0.5, 1.0},
         // {0.0, 0.0, 0.5, 1.0}, {0.5, 0.5, 0.0, 1.0},
     };
     extern int dummy[ LNUM % 2 == 0 ? 1 : -1 ];
@@ -330,9 +335,9 @@ void render(void)
             {
                 glPushMatrix(); {
                     fR = gRotateY + (i / 2) * fRCen;
-                    glRotatef(fR, 0.0, 1.0, 0.0);
-                    glRotatef(70.0, 1.0, 0, 0);
                     glRotatef(-fR, 0.0, 1.0, 0.0);
+                    glRotatef(70.0, 1.0, 0, 0);
+                    glRotatef(fR, 0.0, 1.0, 0.0);
 
                     if ( i % 2 == 1 )
                         glScalef(-1.0, -1.0, -1.0);
