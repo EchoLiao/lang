@@ -66,6 +66,10 @@ static N3D_Cone sCone = { NULL, 0.8, 0.13, 9 };
 // Our GL Specific Initializations. Returns true On Success, false On Fail.
 bool init(void)
 {
+    char *chr = (char*)glGetString(GL_VERSION);
+    printf("%s\n", chr);
+    free(chr);
+
     // 在此处初始化绘制场景
     glClearColor(0.2f, 0.2f, 0.2f, 0.5f);							// 清屏为黑色
     glClearDepth(1.0f);												// 设置深度缓存
