@@ -109,7 +109,7 @@ BOOL BuildTexture(char *szPathName, GLuint &texid)						// 载入图片并转换为纹理
     sbitData *bmpr;
     int ret;
 
-    bmpr = bmpCreateObjForRead(EBMP_RGB, 1);
+    bmpr = bmpCreateObjForRead(EBMP_RGBA, 1);
     ret = bmpRead(szPathName, bmpr);
     assert(ret);
 
@@ -120,7 +120,8 @@ BOOL BuildTexture(char *szPathName, GLuint &texid)						// 载入图片并转换为纹理
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);	// 线形滤波
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);   // 线形滤波
 
-    glTexImage2D(GL_TEXTURE_2D, 0, 3, bmpr->w, bmpr->h, 0, GL_RGBA, GL_UNSIGNED_BYTE, bmpr->pdata);
+    glTexImage2D(GL_TEXTURE_2D, 0, bmpr->iBitCount / 8, bmpr->w, bmpr->h,
+            0, GL_RGBA, GL_UNSIGNED_BYTE, bmpr->pdata);
 
 	// 生成纹理
 	// glTexImage2D(GL_TEXTURE_2D, 0, 3, lWidthPixels, lHeightPixels, 0, GL_RGBA, GL_UNSIGNED_BYTE, pBits);
