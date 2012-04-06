@@ -7,7 +7,7 @@ PROJ = lesson19
 # aliases
 CC = gcc
 RC = windres
-RM = -rm
+RM = -rm -f
 CP = -cp
 
 # include and library paths
@@ -22,7 +22,10 @@ LDFLAGS = -lglut -lGLU -lGL -lstdc++
 # add here additional object files
 OBJS = $(PROJ).o bmprw.o
 
-all: $(PROJ).exe
+all: $(PROJ).exe burst.exe
+
+burst.exe: burst.o bmprw.o
+	$(CC) $(LIBPATH) -o $@ $^ $(LDFLAGS)
 
 $(PROJ).exe: $(OBJS)
 	$(CC) $(LIBPATH) -o $@ $(OBJS) $(LDFLAGS)
@@ -38,4 +41,4 @@ $(PROJ).exe: $(OBJS)
 
 clean:
 	$(RM) *.o
-	$(RM) $(PROJ).exe
+	$(RM) $(PROJ).exe *.exe
