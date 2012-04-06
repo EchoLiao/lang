@@ -20,7 +20,7 @@ CFLAGS = -O2 -fomit-frame-pointer -Wall
 LDFLAGS = -lglut -lGLU -lGL -lstdc++
 
 # add here additional object files
-OBJS = $(PROJ).o 
+OBJS = $(PROJ).o bmprw.o
 
 all: $(PROJ).exe
 

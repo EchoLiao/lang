@@ -6,10 +6,13 @@
  the program with glut32.lib, glu32.lib, opengl32.lib
 */
 
+#include <assert.h>
 #include <string.h>
 #include <stdio.h>           // Standard C/C++ Input-Output
 #include <stdlib.h>          // Standard C/C++ Library
 #include <GL/glut.h>         // The GL Utility Toolkit (GLUT) Header
+
+#include "bmprw.h"
 
 
 #define WCX           640    // Window Width
@@ -113,6 +116,17 @@ bool setup_textures()
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
 	glTexImage2D(GL_TEXTURE_2D, 0, 3, img.w, img.h, 0, GL_RGB, GL_UNSIGNED_BYTE, img.data);
+
+#if 1 // NALD
+    sbitData *bmpw;
+    int ret;
+
+    bmpw = bmpCreateObjForWrite(EBMP_RGB, 0, img.w, img.h, 24, img.data);
+    ret = bmpWrite("nal01.bmp", bmpw);
+    assert(ret);
+    bmpDestroyObjForWrite(&bmpw);
+#endif
+
 	// Finished With Our Image, Free The Allocated Data
 	delete img.data;
 	return true;
