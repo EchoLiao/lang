@@ -6,6 +6,7 @@
 #include <GL/glut.h>         // The GL Utility Toolkit (GLUT) Header
 
 #include "bmprw.h"
+#include "nal_fps.h"
 
 
 #define WCX           640    // Window Width
@@ -14,6 +15,8 @@
 #define	MAX_DIV_X     30
 #define	MAX_DIV_Y     30
 #define	MAX_PARTICLES (MAX_DIV_X * MAX_DIV_Y)
+#define NOT_BURST_FRAME_NUM     20
+
 
 
 // A Structure For RGB Bitmaps
@@ -35,7 +38,8 @@ float	g_zoom =  -2.0f;       // Used To Zoom Out
 GLuint	g_col = 0;             // Current Color Selection
 GLuint	g_delay = 0;           // Rainbow Effect Delay
 GLuint	g_texid[TEXTURES_NUM]; // Our Textures' Id List
-int     g_notBurstNum = 20;
+int     g_notBurstNum = NOT_BURST_FRAME_NUM;
+float   g_lastResetTime;
 const float g_leftBtoX = 0.0;
 const float g_leftBtoY = 0.0;
 const float g_leftBtoZ = 0.0;
@@ -75,6 +79,7 @@ typedef struct {    // Create A Structure For Particle
 } particles;        // Particles Structure
 
 particles g_particle[MAX_PARTICLES];
+particles g_OriPtile[MAX_PARTICLES];
 
 static GLfloat COLORS[12][3] = {     // Rainbow Of Colors
     {1.0f,0.5f,0.5f},{1.0f,0.75f,0.5f},{1.0f,1.0f,0.5f},{0.75f,1.0f,0.5f},
@@ -149,30 +154,60 @@ bool particlesInit()
     for ( i=0; i<MAX_PARTICLES; i++ ) {
         int ix = i % MAX_DIV_X;
         int iy = i / MAX_DIV_Y;
-        g_particle[i].active = true;
-        g_particle[i].life   = 1.0f;
-        g_particle[i].fade   = float(rand()%100)/1000.0f+0.003f;
-        g_particle[i].r  = COLORS[(i+1)/(MAX_PARTICLES/12)][0];
-        g_particle[i].g  = COLORS[(i+1)/(MAX_PARTICLES/12)][1];
-        g_particle[i].b  = COLORS[(i+1)/(MAX_PARTICLES/12)][2];
-        g_particle[i].x  = bsX + (float)ix * g_divObjW;
-        g_particle[i].y  = bsY + (float)iy * g_divObjH;
-        g_particle[i].z  = bsZ;
-        g_particle[i].s  = bsS + (float)ix * g_divTexW;
-        g_particle[i].t  = bsT + (float)iy * g_divTexH;
-        g_particle[i].xi = float((rand()%50)-26.0f)*10.0f;
-        g_particle[i].yi = float((rand()%50)-25.0f)*10.0f;
-        g_particle[i].zi = float((rand()%50)-25.0f)*10.0f;
-        g_particle[i].xg = 0.0f;
-        g_particle[i].yg = -0.8f;
-        g_particle[i].zg = 0.0f;
+        g_OriPtile[i].active = g_particle[i].active = true;
+        g_OriPtile[i].life   = g_particle[i].life   = 1.0f;
+        g_OriPtile[i].fade   = g_particle[i].fade   = float(rand()%100)/1000.0f+0.003f;
+        g_OriPtile[i].r      = g_particle[i].r      = COLORS[(i+1)/(MAX_PARTICLES/12)][0];
+        g_OriPtile[i].g      = g_particle[i].g      = COLORS[(i+1)/(MAX_PARTICLES/12)][1];
+        g_OriPtile[i].b      = g_particle[i].b      = COLORS[(i+1)/(MAX_PARTICLES/12)][2];
+        g_OriPtile[i].x      = g_particle[i].x      = bsX + (float)ix * g_divObjW;
+        g_OriPtile[i].y      = g_particle[i].y      = bsY + (float)iy * g_divObjH;
+        g_OriPtile[i].z      = g_particle[i].z      = bsZ;
+        g_OriPtile[i].s      = g_particle[i].s      = bsS + (float)ix * g_divTexW;
+        g_OriPtile[i].t      = g_particle[i].t      = bsT + (float)iy * g_divTexH;
+        g_OriPtile[i].xi     = g_particle[i].xi     = float((rand()%50)-26.0f)*10.0f;
+        g_OriPtile[i].yi     = g_particle[i].yi     = float((rand()%50)-25.0f)*10.0f;
+        g_OriPtile[i].zi     = g_particle[i].zi     = float((rand()%50)-25.0f)*10.0f;
+        g_OriPtile[i].xg     = g_particle[i].xg     = 0.0f;
+        g_OriPtile[i].yg     = g_particle[i].yg     = -0.8f;
+        g_OriPtile[i].zg     = g_particle[i].zg     = 0.0f;
     }
 
     return true;
 }
 
+void particlesReset()
+{
+    int i;
+
+    g_lastResetTime = Fps_getProgTime();
+    g_notBurstNum = NOT_BURST_FRAME_NUM;
+
+    for ( i = 0; i < MAX_PARTICLES; i++ ) {
+        g_particle[i].active = g_OriPtile[i].active;
+        g_particle[i].life   = g_OriPtile[i].life;
+        g_particle[i].fade   = g_OriPtile[i].fade;
+        g_particle[i].r      = g_OriPtile[i].r;
+        g_particle[i].g      = g_OriPtile[i].g;
+        g_particle[i].b      = g_OriPtile[i].b;
+        g_particle[i].x      = g_OriPtile[i].x;
+        g_particle[i].y      = g_OriPtile[i].y;
+        g_particle[i].z      = g_OriPtile[i].z;
+        g_particle[i].s      = g_OriPtile[i].s;
+        g_particle[i].t      = g_OriPtile[i].t;
+        g_particle[i].xi     = g_OriPtile[i].xi;
+        g_particle[i].yi     = g_OriPtile[i].yi;
+        g_particle[i].zi     = g_OriPtile[i].zi;
+        g_particle[i].xg     = g_OriPtile[i].xg;
+        g_particle[i].yg     = g_OriPtile[i].yg;
+        g_particle[i].zg     = g_OriPtile[i].zg;
+    }
+}
+
 bool init(void)
 {
+    Fps_initProgTime();
+
     if (!setup_textures())
         return false;
 
@@ -211,7 +246,7 @@ void ParticlesDraw()
             float ct = g_divTexH;
 
             glColor4f(g_particle[i].r, g_particle[i].g, g_particle[i].b,
-                   g_particle[i].life);
+                    g_particle[i].life);
 
             //glDisable(GL_TEXTURE_2D); // NALD
             glBegin(GL_TRIANGLE_STRIP);
@@ -280,6 +315,9 @@ void ParticlesUpdate()
 {
     int i;
 
+    if ( --g_notBurstNum > 0 )
+        return;
+
     for (i=0 ; i<MAX_PARTICLES ; i++) {
         if ( g_particle[i].active ) {
             g_particle[i].x += g_particle[i].xi/(g_slowdown*1000);
@@ -291,7 +329,8 @@ void ParticlesUpdate()
             g_particle[i].zi += g_particle[i].zg;
             g_particle[i].life -= g_particle[i].fade;
 
-            if ( g_particle[i].life < 0.0f ) {
+            if ( g_particle[i].life < 0.0f ) 
+            {
                 g_particle[i].life = 1.0f;
                 g_particle[i].fade = float(rand()%100)/1000.0f+0.003f;
                 g_particle[i].x = 0.0f;
@@ -323,16 +362,20 @@ void render(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
+
+
     ParticlesDraw();
 
-    if ( --g_notBurstNum < 0 )
+    if ( Fps_getProgTime() - g_lastResetTime > 3.00 )
     {
-        ParticlesUpdate();
+        particlesReset();
     }
+    ParticlesUpdate();
 
     glFlush();
     glutSwapBuffers ( );
 
+    Fps_updateFPS();
     //usleep(30 * 1000);
 }
 
@@ -451,6 +494,9 @@ int main(int argc, char** argv)
     glutKeyboardUpFunc(normal_keys_up);
     glutSpecialUpFunc(special_keys_up);
     glutIdleFunc(game_function);
+
+    g_lastResetTime = Fps_getProgTime();
     glutMainLoop();
+
     return 0;
 }

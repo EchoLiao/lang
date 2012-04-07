@@ -17,18 +17,18 @@ LIBPATH = -L/app/lib
 # compiler and linker switches
 CFLAGS = -O2 -fomit-frame-pointer -Wall
 #LDFLAGS = -mwindows -lwinmm -lglut32 -lglu32 -lopengl32 
-LDFLAGS = -lglut -lGLU -lGL -lstdc++
+LDFLAGS = -lglut -lGLU -lGL -lstdc++ -lrt
 
 # add here additional object files
-OBJS = $(PROJ).o bmprw.o
+OBJS = bmprw.o nal_fps.o
 
 all: $(PROJ).exe burst.exe
 
-burst.exe: burst.o bmprw.o
+burst.exe: burst.o $(OBJS)
 	$(CC) $(LIBPATH) -o $@ $^ $(LDFLAGS)
 
-$(PROJ).exe: $(OBJS)
-	$(CC) $(LIBPATH) -o $@ $(OBJS) $(LDFLAGS)
+$(PROJ).exe: $(PROJ).o $(OBJS)
+	$(CC) $(LIBPATH) -o $@ $^ $(LDFLAGS)
 
 %.o: %.c
 	$(CC) $(INCPATH) $(CFLAGS) -c $*.c
