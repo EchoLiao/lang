@@ -229,24 +229,23 @@ bool init(void)
     return true;
 }
 
-void ParticlesDraw()
+void ParticlesDraw(particles *par, int n)
 {
     int i;
 
-    for (i=0 ; i<MAX_PARTICLES ; i++) {
-        if (g_particle[i].active) {
-            float x  = g_particle[i].x;
-            float y  = g_particle[i].y;
-            float z  = g_particle[i].z + g_zoom;
+    for ( i=0; i < n; i++ ) {
+        if (par[i].active) {
+            float x  = par[i].x;
+            float y  = par[i].y;
+            float z  = par[i].z + g_zoom;
             float cx = g_divObjW;
             float cy = g_divObjH;
-            float s  = g_particle[i].s;
-            float t  = g_particle[i].t;
+            float s  = par[i].s;
+            float t  = par[i].t;
             float cs = g_divTexW;
             float ct = g_divTexH;
 
-            glColor4f(g_particle[i].r, g_particle[i].g, g_particle[i].b,
-                    g_particle[i].life);
+            glColor4f(par[i].r, par[i].g, par[i].b, par[i].life);
 
             //glDisable(GL_TEXTURE_2D); // NALD
             glBegin(GL_TRIANGLE_STRIP);
@@ -263,94 +262,94 @@ void ParticlesDraw()
             glTexCoord2d(0,0); glVertex3f(x-0.5f,y-0.5f,z);
             glEnd();
 
-            g_particle[i].x += g_particle[i].xi/(g_slowdown*1000);
-            g_particle[i].y += g_particle[i].yi/(g_slowdown*1000);
-            g_particle[i].z += g_particle[i].zi/(g_slowdown*1000);
+            par[i].x += par[i].xi/(g_slowdown*1000);
+            par[i].y += par[i].yi/(g_slowdown*1000);
+            par[i].z += par[i].zi/(g_slowdown*1000);
 
-            g_particle[i].xi += g_particle[i].xg;
-            g_particle[i].yi += g_particle[i].yg;
-            g_particle[i].zi += g_particle[i].zg;
-            g_particle[i].life -= g_particle[i].fade;
+            par[i].xi += par[i].xg;
+            par[i].yi += par[i].yg;
+            par[i].zi += par[i].zg;
+            par[i].life -= par[i].fade;
 
-            if (g_particle[i].life < 0.0f) {
-                g_particle[i].life = 1.0f;
-                g_particle[i].fade = float(rand()%100)/1000.0f+0.003f;
-                g_particle[i].x = 0.0f;
-                g_particle[i].y = 0.0f;
-                g_particle[i].z = 0.0f;
-                g_particle[i].xi = g_xspeed+float((rand()%60)-32.0f);
-                g_particle[i].yi = g_yspeed+float((rand()%60)-30.0f);
-                g_particle[i].zi = float((rand()%60)-30.0f);
-                g_particle[i].r = COLORS[g_col][0];
-                g_particle[i].g = COLORS[g_col][1];
-                g_particle[i].b = COLORS[g_col][2];
+            if (par[i].life < 0.0f) {
+                par[i].life = 1.0f;
+                par[i].fade = float(rand()%100)/1000.0f+0.003f;
+                par[i].x = 0.0f;
+                par[i].y = 0.0f;
+                par[i].z = 0.0f;
+                par[i].xi = g_xspeed+float((rand()%60)-32.0f);
+                par[i].yi = g_yspeed+float((rand()%60)-30.0f);
+                par[i].zi = float((rand()%60)-30.0f);
+                par[i].r = COLORS[g_col][0];
+                par[i].g = COLORS[g_col][1];
+                par[i].b = COLORS[g_col][2];
             }
 
             // If Number Pad 8 And Y Gravity Is Less Than 1.5 Increase Pull Upwards
-            if (g_keys['8'] && (g_particle[i].yg<1.5f)) g_particle[i].yg += 1.01f;
+            if (g_keys['8'] && (par[i].yg<1.5f)) par[i].yg += 1.01f;
 
             // If Number Pad 2 And Y Gravity Is Greater Than -1.5 Increase Pull Downwards
-            if (g_keys['2'] && (g_particle[i].yg>-1.5f)) g_particle[i].yg -= 1.01f;
+            if (g_keys['2'] && (par[i].yg>-1.5f)) par[i].yg -= 1.01f;
 
             // If Number Pad 6 And X Gravity Is Less Than 1.5 Increase Pull Right
-            if (g_keys['6'] && (g_particle[i].xg<1.5f)) g_particle[i].xg += 1.01f;
+            if (g_keys['6'] && (par[i].xg<1.5f)) par[i].xg += 1.01f;
 
             // If Number Pad 4 And X Gravity Is Greater Than -1.5 Increase Pull Left
-            if (g_keys['4'] && (g_particle[i].xg>-1.5f)) g_particle[i].xg -= 1.01f;
+            if (g_keys['4'] && (par[i].xg>-1.5f)) par[i].xg -= 1.01f;
 
             if (g_keys['\t']) {
-                g_particle[i].x = 0.0f;
-                g_particle[i].y = 0.0f;
-                g_particle[i].z = 0.0f;
-                g_particle[i].xi = float((rand()%50)-26.0f)*10.0f;
-                g_particle[i].yi = float((rand()%50)-25.0f)*10.0f;
-                g_particle[i].zi = float((rand()%50)-25.0f)*10.0f;
+                par[i].x = 0.0f;
+                par[i].y = 0.0f;
+                par[i].z = 0.0f;
+                par[i].xi = float((rand()%50)-26.0f)*10.0f;
+                par[i].yi = float((rand()%50)-25.0f)*10.0f;
+                par[i].zi = float((rand()%50)-25.0f)*10.0f;
             }
 #endif
         }
     }
 }
 
-void ParticlesUpdate()
+void ParticlesUpdate(particles *par, int n)
 {
     int i;
 
     if ( --g_notBurstNum > 0 )
         return;
 
-    for (i=0 ; i<MAX_PARTICLES ; i++) {
-        if ( g_particle[i].active ) {
-            g_particle[i].x += g_particle[i].xi/(g_slowdown*1000);
-            g_particle[i].y += g_particle[i].yi/(g_slowdown*1000);
-            g_particle[i].z += g_particle[i].zi/(g_slowdown*1000);
+    for ( i=0; i < n; i++ ) {
+        if ( par[i].active ) {
+            par[i].x += par[i].xi/(g_slowdown*1000);
+            par[i].y += par[i].yi/(g_slowdown*1000);
+            par[i].z += par[i].zi/(g_slowdown*1000);
 
-            g_particle[i].xi += g_particle[i].xg;
-            g_particle[i].yi += g_particle[i].yg;
-            g_particle[i].zi += g_particle[i].zg;
-            g_particle[i].life -= g_particle[i].fade;
+            par[i].xi += par[i].xg;
+            par[i].yi += par[i].yg;
+            par[i].zi += par[i].zg;
+            par[i].life -= par[i].fade;
 
-            if ( g_particle[i].life < 0.0f ) 
+            if ( par[i].life < 0.0f ) 
             {
-                g_particle[i].life = 1.0f;
-                g_particle[i].fade = float(rand()%100)/1000.0f+0.003f;
-                g_particle[i].x = 0.0f;
-                g_particle[i].y = 0.0f;
-                g_particle[i].z = 0.0f;
-                g_particle[i].xi = g_xspeed+float((rand()%60)-32.0f);
-                g_particle[i].yi = g_yspeed+float((rand()%60)-30.0f);
-                g_particle[i].zi = float((rand()%60)-30.0f);
-                g_particle[i].r = COLORS[g_col][0];
-                g_particle[i].g = COLORS[g_col][1];
-                g_particle[i].b = COLORS[g_col][2];
+                par[i].life = 1.0f;
+                par[i].fade = float(rand()%100)/1000.0f+0.003f;
+                par[i].x = 0.0f;
+                par[i].y = 0.0f;
+                par[i].z = 0.0f;
+                par[i].xi = g_xspeed+float((rand()%60)-32.0f);
+                par[i].yi = g_yspeed+float((rand()%60)-30.0f);
+                par[i].zi = float((rand()%60)-30.0f);
+                par[i].r = COLORS[g_col][0];
+                par[i].g = COLORS[g_col][1];
+                par[i].b = COLORS[g_col][2];
             }
 
             if (g_keys['\t']) {
-                g_particle[i].x = 0.0f;
-                g_particle[i].y = 0.0f;
-                g_particle[i].z = 0.0f;
-                g_particle[i].xi = float((rand()%50)-26.0f)*10.0f;
-                g_particle[i].yi = float((rand()%50)-25.0f)*10.0f;
-                g_particle[i].zi = float((rand()%50)-25.0f)*10.0f;
+                par[i].x = 0.0f;
+                par[i].y = 0.0f;
+                par[i].z = 0.0f;
+                par[i].xi = float((rand()%50)-26.0f)*10.0f;
+                par[i].yi = float((rand()%50)-25.0f)*10.0f;
+                par[i].zi = float((rand()%50)-25.0f)*10.0f;
             }
         }
     }
@@ -364,13 +363,13 @@ void render(void)
 
 
 
-    ParticlesDraw();
+    ParticlesDraw(g_particle, MAX_PARTICLES);
 
     if ( Fps_getProgTime() - g_lastResetTime > 3.00 )
     {
         particlesReset();
     }
-    ParticlesUpdate();
+    ParticlesUpdate(g_particle, MAX_PARTICLES);
 
     glFlush();
     glutSwapBuffers ( );
