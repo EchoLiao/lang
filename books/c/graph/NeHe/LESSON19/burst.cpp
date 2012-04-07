@@ -1,3 +1,4 @@
+#include <unistd.h>
 #include <assert.h>
 #include <string.h>
 #include <stdio.h>           // Standard C/C++ Input-Output
@@ -34,6 +35,7 @@ float	g_zoom =  -2.0f;       // Used To Zoom Out
 GLuint	g_col = 0;             // Current Color Selection
 GLuint	g_delay = 0;           // Rainbow Effect Delay
 GLuint	g_texid[TEXTURES_NUM]; // Our Textures' Id List
+int     g_notBurstNum = 20;
 const float g_leftBtoX = 0.0;
 const float g_leftBtoY = 0.0;
 const float g_leftBtoZ = 0.0;
@@ -72,7 +74,7 @@ typedef struct {    // Create A Structure For Particle
     float zg;       // Z Gravity
 } particles;        // Particles Structure
 
-particles g_particle[MAX_PARTICLES]; // Particle Array (Room For Particle Info)
+particles g_particle[MAX_PARTICLES];
 
 static GLfloat COLORS[12][3] = {     // Rainbow Of Colors
     {1.0f,0.5f,0.5f},{1.0f,0.75f,0.5f},{1.0f,1.0f,0.5f},{0.75f,1.0f,0.5f},
@@ -80,8 +82,6 @@ static GLfloat COLORS[12][3] = {     // Rainbow Of Colors
     {0.5f,0.5f,1.0f},{0.75f,0.5f,1.0f},{1.0f,0.5f,1.0f},{1.0f,0.5f,0.75f}
 };
 
-// Loads A RGB Raw Image From A Disk File And Updates Our Image Reference
-// Returns true On Success, False On Fail.
 bool load_rgb_image(const char* file_name, int w, int h, RGBIMG* refimg)
 {
     GLuint   sz;    // Our Image's Data Field Length In Bytes
@@ -116,7 +116,6 @@ bool load_rgb_image(const char* file_name, int w, int h, RGBIMG* refimg)
     return true;
 }
 
-// Setup Our Textures. Returns true On Success, false On Fail
 bool setup_textures()
 {
     int         ret;
@@ -138,34 +137,18 @@ bool setup_textures()
     return true;
 }
 
-// Our GL Specific Initializations. Returns true On Success, false On Fail.
-bool init(void)
+bool particlesInit()
 {
     int i;
-
-    if (!setup_textures())
-        return false;
-
-    glShadeModel(GL_SMOOTH);
-    glClearColor(0.0f,0.0f,0.0f,0.0f);
-    glClearDepth(1.0f);
-
-    glDisable(GL_DEPTH_TEST);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA,GL_ONE);
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);
-    glHint(GL_POINT_SMOOTH_HINT,GL_NICEST);
-    glEnable(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D,g_texid[0]);
-
     float bsX = g_leftBtoX - g_ObjW / 2.0;
     float bsY = g_leftBtoY - g_ObjH / 2.0;
     float bsZ = g_leftBtoZ - g_ObjL / 2.0;
     float bsS = g_leftBtoS;
     float bsT = g_leftBtoT;
+
     for ( i=0; i<MAX_PARTICLES; i++ ) {
-        int ix = i % MAX_DIV_X; 
-        int iy = i / MAX_DIV_Y; 
+        int ix = i % MAX_DIV_X;
+        int iy = i / MAX_DIV_Y;
         g_particle[i].active = true;
         g_particle[i].life   = 1.0f;
         g_particle[i].fade   = float(rand()%100)/1000.0f+0.003f;
@@ -184,17 +167,36 @@ bool init(void)
         g_particle[i].yg = -0.8f;
         g_particle[i].zg = 0.0f;
     }
+
+    return true;
+}
+
+bool init(void)
+{
+    if (!setup_textures())
+        return false;
+
+    glShadeModel(GL_SMOOTH);
+    glClearColor(0.0f,0.0f,0.0f,0.0f);
+    glClearDepth(1.0f);
+
+    glDisable(GL_DEPTH_TEST);
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA,GL_ONE);
+    glHint(GL_PERSPECTIVE_CORRECTION_HINT,GL_NICEST);
+    glHint(GL_POINT_SMOOTH_HINT,GL_NICEST);
+    glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D,g_texid[0]);
+
+    particlesInit();
     memset(g_keys,0,sizeof(g_keys));
 
     return true;
 }
 
-// Our Rendering Is Done Here
-void render(void)
+void ParticlesDraw()
 {
     int i;
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glLoadIdentity();
 
     for (i=0 ; i<MAX_PARTICLES ; i++) {
         if (g_particle[i].active) {
@@ -209,7 +211,7 @@ void render(void)
             float ct = g_divTexH;
 
             glColor4f(g_particle[i].r, g_particle[i].g, g_particle[i].b,
-                    g_particle[i].life);
+                   g_particle[i].life);
 
             //glDisable(GL_TEXTURE_2D); // NALD
             glBegin(GL_TRIANGLE_STRIP);
@@ -272,9 +274,14 @@ void render(void)
 #endif
         }
     }
+}
+
+void ParticlesUpdate()
+{
+    int i;
 
     for (i=0 ; i<MAX_PARTICLES ; i++) {
-        if (g_particle[i].active) {
+        if ( g_particle[i].active ) {
             g_particle[i].x += g_particle[i].xi/(g_slowdown*1000);
             g_particle[i].y += g_particle[i].yi/(g_slowdown*1000);
             g_particle[i].z += g_particle[i].zi/(g_slowdown*1000);
@@ -284,7 +291,7 @@ void render(void)
             g_particle[i].zi += g_particle[i].zg;
             g_particle[i].life -= g_particle[i].fade;
 
-            if (g_particle[i].life < 0.0f) {
+            if ( g_particle[i].life < 0.0f ) {
                 g_particle[i].life = 1.0f;
                 g_particle[i].fade = float(rand()%100)/1000.0f+0.003f;
                 g_particle[i].x = 0.0f;
@@ -308,23 +315,38 @@ void render(void)
             }
         }
     }
-
-    // Swap The Buffers To Become Our Rendering Visible
-    glutSwapBuffers ( );
 }
 
-// Our Reshaping Handler (Required Even In Fullscreen-Only Modes)
+// Our Rendering Is Done Here
+void render(void)
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glLoadIdentity();
+
+    ParticlesDraw();
+
+    if ( --g_notBurstNum < 0 )
+    {
+        ParticlesUpdate();
+    }
+
+    glFlush();
+    glutSwapBuffers ( );
+
+    //usleep(30 * 1000);
+}
+
 void reshape(int w, int h)
 {
     glViewport(0, 0, w, h);
 
-    glMatrixMode(GL_PROJECTION);     
-    glLoadIdentity();               
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
 
     if (h == 0) h = 1;
     glFrustum(-(float)w/h/2.0, (float)w/h/2.0, -0.5, 0.5, 1.0, 100);
 
-    glMatrixMode(GL_MODELVIEW);      
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
 
@@ -332,24 +354,18 @@ void game_function(void)
 {
     if (g_keys[GLUT_KEY_PAGE_UP])	g_zoom += 0.1f;	// Zoom In
     if (g_keys[GLUT_KEY_PAGE_DOWN])	g_zoom -= 0.1f;	// Zoom Out
-    // If Up Arrow And Y Speed Is Less Than 200 Increase Upward Speed
     if (g_keys[GLUT_KEY_UP] && (g_yspeed < 200)) g_yspeed += 9.0f;
-    // If Down Arrow And Y Speed Is Greater Than -200 Increase Downward Speed
     if (g_keys[GLUT_KEY_DOWN] && (g_yspeed > -200)) g_yspeed -= 9.0f;
-    // If Right Arrow And X Speed Is Less Than 200 Increase Speed To The Right
     if (g_keys[GLUT_KEY_RIGHT] && (g_xspeed < 200)) g_xspeed += 9.0f;
-    // If Left Arrow And X Speed Is Greater Than -200 Increase Speed To The Left
     if (g_keys[GLUT_KEY_LEFT] && (g_xspeed > -200)) g_xspeed -= 9.0f;
-    if (g_keys[' '] || (g_rainbow && (g_delay>25))) { // Space Or Rainbow Mode
+    if (g_keys[' '] || (g_rainbow && (g_delay>25))) {
         if (g_keys[' ']) g_rainbow = false;
         g_delay = 0;
         g_col++;
         if (g_col > 11) g_col = 0;
     }
-    // Increase Rainbow Mode Color Cycling Delay Counter
     g_delay++;
 
-    // Do The Rendering
     render();
 }
 
@@ -375,12 +391,10 @@ void keyboard(unsigned char key, int x, int y)
     }
 }
 
-// Our Keyboard Handler For Special Keys (Like Arrow Keys And Function Keys)
 void special_keys(int a_keys, int x, int y)
 {
     switch (a_keys) {
         case GLUT_KEY_F1:
-            // We Can Switch Between Windowed Mode And Fullscreen Mode Only
             if (!g_gamemode) {
                 g_fullscreen = !g_fullscreen;
                 if (g_fullscreen) glutFullScreen();
