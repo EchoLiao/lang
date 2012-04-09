@@ -17,7 +17,7 @@ LIBPATH = -L/app/lib
 # compiler and linker switches
 CFLAGS = -O2 -fomit-frame-pointer -Wall
 #LDFLAGS = -mwindows -lwinmm -lglut32 -lglu32 -lopengl32 
-LDFLAGS = -lglut -lGLU -lGL -lstdc++ -lrt
+LDFLAGS = -lglut -lGLU -lGL -lstdc++ -lrt -lm
 
 # add here additional object files
 OBJS = bmprw.o nal_fps.o
