@@ -32,6 +32,16 @@ typedef struct _RGBIMG {
     GLubyte* data; // Image's Data (Pixels)
 } RGBIMG;
 
+typedef struct tagPTSObj {
+    int     iDivX, iDivY;
+    float   flbX, flbY, flbZ; // left bottom XYZ
+    float   flbS, flbT;
+    float   fobjW, fobjH, fobjL;
+    float   ftexW, ftexH;
+    float   fdivObjW, fdivObjH, fdivObjL;
+    float   fdivTexW, fdivTexH;
+} PTSObj;
+
 typedef struct {    // Create A Structure For Particle
     bool  active;   // Active (Yes/No)
     float life;     // Particle Life
@@ -81,24 +91,11 @@ float   g_cenX[MAX_PARTICLES] = { 0.0, };
 float   g_cenY[MAX_PARTICLES] = { 0.0, };
 float   g_cenZ[MAX_PARTICLES] = { 0.0, };
 const int   g_tranSteps  = 100;
-const float g_leftBtoX = 0.0;
-const float g_leftBtoY = 0.0;
-const float g_leftBtoZ = 0.0;
-const float g_leftBtoS = 0.0;
-const float g_leftBtoT = 0.0;
-const float g_ObjW     = 1.0;
-const float g_ObjH     = 1.0;
-const float g_ObjL     = 0.0;
-const float g_TexW     = 1.0;
-const float g_TexH     = 1.0;
-const float g_divObjW  = g_ObjW / MAX_DIV_X;
-const float g_divObjH  = g_ObjH / MAX_DIV_Y;
-const float g_divObjL  = 0.0;
-const float g_divTexW  = g_TexW / MAX_DIV_X;
-const float g_divTexH  = g_TexH / MAX_DIV_Y;
 
+PTSObj    g_ptsObj;
 particles g_particle[MAX_PARTICLES];
 particles g_OriPtile[MAX_PARTICLES];
+
 PTSlookat g_lookat = {
     0.0, 0.0,  0.0,
     0.0, 0.0, -2.0,
@@ -186,36 +183,67 @@ bool setup_textures()
     return true;
 }
 
-bool particlesInit()
+bool PTS_initObj(PTSObj *ptsO)
+{
+    ptsO->iDivX     = MAX_DIV_X;
+    ptsO->iDivY     = MAX_DIV_Y;
+    ptsO->flbX      = 0.0;
+    ptsO->flbY      = 0.0;
+    ptsO->flbZ      = 0.0;
+    ptsO->flbS      = 0.0;
+    ptsO->flbT      = 0.0;
+    ptsO->fobjW     = 1.0;
+    ptsO->fobjH     = 1.0;
+    ptsO->fobjL     = 0.0;
+    ptsO->ftexW     = 1.0;
+    ptsO->ftexH     = 1.0;
+    ptsO->fdivObjW  = ptsO->fobjW / ptsO->iDivX;
+    ptsO->fdivObjH  = ptsO->fobjH / ptsO->iDivY;
+    ptsO->fdivObjL  = 0.0;
+    ptsO->fdivTexW  = ptsO->ftexW / ptsO->iDivX;
+    ptsO->fdivTexH  = ptsO->ftexH / ptsO->iDivY;
+
+    return true;
+}
+
+bool PTS_initParticles(particles *pars, particles *parsOri, PTSObj *ptsO)
 {
     int i;
-    float bsX = g_leftBtoX - g_ObjW / 2.0;
-    float bsY = g_leftBtoY - g_ObjH / 2.0;
-    float bsZ = g_leftBtoZ - g_ObjL / 2.0;
-    float bsS = g_leftBtoS;
-    float bsT = g_leftBtoT;
+    float bsX = ptsO->flbX - ptsO->fobjW / 2.0;
+    float bsY = ptsO->flbY - ptsO->fobjH / 2.0;
+    float bsZ = ptsO->flbZ - ptsO->fobjL / 2.0;
+    float bsS = ptsO->flbS;
+    float bsT = ptsO->flbT;
 
-    for ( i=0; i<MAX_PARTICLES; i++ ) {
-        int ix = i % MAX_DIV_X;
-        int iy = i / MAX_DIV_Y;
-        g_OriPtile[i].active = g_particle[i].active = true;
-        g_OriPtile[i].life   = g_particle[i].life   = 1.0f;
-        g_OriPtile[i].fade   = g_particle[i].fade   = float(rand()%100)/1000.0f+0.003f;
-        g_OriPtile[i].r      = g_particle[i].r      = COLORS[(i+1)/(MAX_PARTICLES/12)][0];
-        g_OriPtile[i].g      = g_particle[i].g      = COLORS[(i+1)/(MAX_PARTICLES/12)][1];
-        g_OriPtile[i].b      = g_particle[i].b      = COLORS[(i+1)/(MAX_PARTICLES/12)][2];
-        g_OriPtile[i].x      = g_particle[i].x      = bsX + (float)ix * g_divObjW;
-        g_OriPtile[i].y      = g_particle[i].y      = bsY + (float)iy * g_divObjH;
-        g_OriPtile[i].z      = g_particle[i].z      = bsZ;
-        g_OriPtile[i].s      = g_particle[i].s      = bsS + (float)ix * g_divTexW;
-        g_OriPtile[i].t      = g_particle[i].t      = bsT + (float)iy * g_divTexH;
-        g_OriPtile[i].xi     = g_particle[i].xi     = float((rand()%50)-26.0f)*10.0f;
-        g_OriPtile[i].yi     = g_particle[i].yi     = float((rand()%50)-25.0f)*10.0f;
-        g_OriPtile[i].zi     = g_particle[i].zi     = float((rand()%50)-25.0f)*10.0f;
-        g_OriPtile[i].xg     = g_particle[i].xg     = 0.0f;
-        g_OriPtile[i].yg     = g_particle[i].yg     = -0.8f;
-        g_OriPtile[i].zg     = g_particle[i].zg     = 0.0f;
+    for ( i=0; i < MAX_PARTICLES; i++ ) {
+        int ix = i % ptsO->iDivX;
+        int iy = i / ptsO->iDivX;
+        parsOri[i].active = pars[i].active = true;
+        parsOri[i].life = pars[i].life = 1.0f;
+        parsOri[i].fade = pars[i].fade = float(rand()%100)/1000.0f+0.003f;
+        parsOri[i].r  = pars[i].r  = COLORS[(i+1)/(MAX_PARTICLES/12)][0];
+        parsOri[i].g  = pars[i].g  = COLORS[(i+1)/(MAX_PARTICLES/12)][1];
+        parsOri[i].b  = pars[i].b  = COLORS[(i+1)/(MAX_PARTICLES/12)][2];
+        parsOri[i].x  = pars[i].x  = bsX + (float)ix * ptsO->fdivObjW;
+        parsOri[i].y  = pars[i].y  = bsY + (float)iy * ptsO->fdivObjH;
+        parsOri[i].z  = pars[i].z  = bsZ;
+        parsOri[i].s  = pars[i].s  = bsS + (float)ix * ptsO->fdivTexW;
+        parsOri[i].t  = pars[i].t  = bsT + (float)iy * ptsO->fdivTexH;
+        parsOri[i].xi = pars[i].xi = float((rand()%50)-26.0f)*10.0f;
+        parsOri[i].yi = pars[i].yi = float((rand()%50)-25.0f)*10.0f;
+        parsOri[i].zi = pars[i].zi = float((rand()%50)-25.0f)*10.0f;
+        parsOri[i].xg = pars[i].xg = 0.0f;
+        parsOri[i].yg = pars[i].yg = -0.8f;
+        parsOri[i].zg = pars[i].zg = 0.0f;
     }
+
+    return true;
+}
+
+bool PTS_init(PTSObj *ptsO, particles *pars, particles *parsOri)
+{
+    PTS_initObj(ptsO);
+    PTS_initParticles(pars, parsOri, ptsO);
 
     return true;
 }
@@ -267,13 +295,13 @@ bool init(void)
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D,g_texid[0]);
 
-    particlesInit();
+    PTS_init(&g_ptsObj, g_particle, g_OriPtile);
     memset(g_keys,0,sizeof(g_keys));
 
     return true;
 }
 
-void ParticlesDraw(particles *par, int n)
+void ParticlesDraw(particles *par, int n, PTSObj *ptsO)
 {
     int i;
 
@@ -291,12 +319,12 @@ void ParticlesDraw(particles *par, int n)
         float x  = par[i].x;
         float y  = par[i].y;
         float z  = par[i].z + g_zoom;
-        float cx = g_divObjW;
-        float cy = g_divObjH;
+        float cx = ptsO->fdivObjW;
+        float cy = ptsO->fdivObjH;
         float s  = par[i].s;
         float t  = par[i].t;
-        float cs = g_divTexW;
-        float ct = g_divTexH;
+        float cs = ptsO->fdivTexW;
+        float ct = ptsO->fdivTexH;
 #if 0 // NALD
         if ( i==0 || i==3 || i==23 )
             printf("NAL &&& i=%d, (x,y,z)=(%f,%f,%f)\n", i, x, y, z);
@@ -382,7 +410,7 @@ void ParTranInit()
 
 void PTS_draw()
 {
-    ParticlesDraw(g_particle, MAX_PARTICLES);
+    ParticlesDraw(g_particle, MAX_PARTICLES, &g_ptsObj);
 }
 
 void PTS_updateLookAt(PTSlookat *lat, PTSlookat *latOri, PTSlookat *latOff,
