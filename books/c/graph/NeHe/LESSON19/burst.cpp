@@ -33,7 +33,7 @@ bool    g_keys[256];           // Keys Array
 bool    g_rainbow=true;
 float	g_slowdown = 2.0f;     // Slow Down Particles
 float   g_xspeed = 0.0f;	   // X Rotation Speed
-float   g_yspeed = 0.0f;	   // Y Rotation Speed
+float   g_yspeed = 42.0f;	   // Y Rotation Speed
 float	g_zoom =  -2.0f;       // Used To Zoom Out
 GLuint	g_col = 0;             // Current Color Selection
 GLuint	g_delay = 0;           // Rainbow Effect Delay
@@ -365,12 +365,16 @@ void ParticlesUpdate(particles *par, int n)
             }
 
             if (g_keys['\t']) {
+#if 1
+                particlesReset();
+#else
                 par[i].x = 0.0f;
                 par[i].y = 0.0f;
                 par[i].z = 0.0f;
                 par[i].xi = float((rand()%50)-26.0f)*10.0f;
                 par[i].yi = float((rand()%50)-25.0f)*10.0f;
                 par[i].zi = float((rand()%50)-25.0f)*10.0f;
+#endif
             }
         }
     }
@@ -458,10 +462,10 @@ void game_function(void)
 {
     if (g_keys[GLUT_KEY_PAGE_UP])	g_zoom += 0.1f;	// Zoom In
     if (g_keys[GLUT_KEY_PAGE_DOWN])	g_zoom -= 0.1f;	// Zoom Out
-    if (g_keys[GLUT_KEY_UP] && (g_yspeed < 200)) g_yspeed += 9.0f;
-    if (g_keys[GLUT_KEY_DOWN] && (g_yspeed > -200)) g_yspeed -= 9.0f;
-    if (g_keys[GLUT_KEY_RIGHT] && (g_xspeed < 200)) g_xspeed += 9.0f;
-    if (g_keys[GLUT_KEY_LEFT] && (g_xspeed > -200)) g_xspeed -= 9.0f;
+    if (g_keys[GLUT_KEY_UP] && (g_yspeed < 200))    g_yspeed += 1.0f;
+    if (g_keys[GLUT_KEY_DOWN] && (g_yspeed > -200)) g_yspeed -= 1.0f;
+    if (g_keys[GLUT_KEY_RIGHT] && (g_xspeed < 200)) g_xspeed += 1.0f;
+    if (g_keys[GLUT_KEY_LEFT] && (g_xspeed > -200)) g_xspeed -= 1.0f;
     if (g_keys[' '] || (g_rainbow && (g_delay>25))) {
         if (g_keys[' ']) g_rainbow = false;
         g_delay = 0;
@@ -477,6 +481,10 @@ void game_function(void)
 void keyboard(unsigned char key, int x, int y)
 {
     switch (key) {
+        case 'p':
+            printf("NALL &&**&& zoom=%f, xs=%f, ys=%f,\n",
+                    g_zoom, g_xspeed, g_yspeed);
+            break;
         case 27:
             exit(0);
             break;
