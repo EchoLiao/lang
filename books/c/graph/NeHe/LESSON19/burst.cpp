@@ -431,21 +431,6 @@ void render(void)
     PTS_update();
     PTS_draw();
 
-
-    // ParticlesDraw(g_particle, MAX_PARTICLES);
-
-    // if ( Fps_getProgTime() - g_lastResetTime > 3.00 )
-    // {
-    //     g_isTran = 1;
-    //     if ( g_tranStep == 0 )
-    //         ParTranInit();
-    //     // particlesReset();
-    // }
-    // else
-    // {
-    //     ParticlesUpdate(g_particle, MAX_PARTICLES);
-    // }
-
     glFlush();
     glutSwapBuffers ( );
 
