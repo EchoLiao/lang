@@ -10,8 +10,8 @@
 #include "nal_fps.h"
 
 
-#define WCX           640    // Window Width
-#define WCY           480    // Window Height
+#define WCX           1280/1.5    // Window Width
+#define WCY           720/1.5    // Window Height
 #define TEXTURES_NUM  1      // We Have 1 Texture
 #define	MAX_DIV_X     30
 #define	MAX_DIV_Y     30
@@ -103,6 +103,26 @@ PTSlookat g_lookat = {
     0.0, 0.0,  0.0,
     0.0, 0.0, -2.0,
     0.0, 1.0,  0.0
+};
+PTSlookat g_lookatOri = {
+    0.0, 0.0,  0.0,
+    0.0, 0.0, -2.0,
+    0.0, 1.0,  0.0
+};
+PTSlookat g_lookatOff = {
+    2.0, 0.2,  3.0,
+    2.0, 0.2,  1.0,
+    2.0, 3.0,  3.0
+};
+PTSlookat g_lookatCen = {
+    0.01,  0.01,  0.01,
+    0.002, 0.002, 0.002,
+    0.01,  0.00,  0.01
+};
+PTSlookat g_lookatDir = {
+    1.0, 1.0, 1.0,
+    1.0, 1.0, 1.0,
+    1.0, 1.0, 1.0
 };
 
 static GLfloat COLORS[12][3] = {     // Rainbow Of Colors
@@ -365,9 +385,36 @@ void PTS_draw()
     ParticlesDraw(g_particle, MAX_PARTICLES);
 }
 
+void PTS_updateLookAt(PTSlookat *lat, PTSlookat *latOri, PTSlookat *latOff,
+        PTSlookat *latCen, PTSlookat *latDir)
+{
+    lat->ex += latCen->ex * latDir->ex; 
+    lat->ey += latCen->ey * latDir->ey; 
+    lat->ez -= latCen->ez * latDir->ez; 
+    lat->cx += latCen->cx * latDir->cx;
+    lat->cy += latCen->cy * latDir->cy;
+    lat->cz += latCen->cz * latDir->cz;
+    lat->ux += latCen->ux * latDir->ux; 
+    lat->uy += latCen->uy * latDir->uy; 
+    lat->uz += latCen->uz * latDir->uz; 
+
+    if ( fabsf(lat->ex - latOri->ex) > latOff->ex ) latDir->ex *= -1;
+    if ( fabsf(lat->ey - latOri->ey) > latOff->ey ) latDir->ey *= -1;
+    if ( fabsf(lat->ez - latOri->ez) > latOff->ez ) latDir->ez *= -1;
+    if ( fabsf(lat->cx - latOri->cx) > latOff->cx ) latDir->cx *= -1;
+    if ( fabsf(lat->cy - latOri->cy) > latOff->cy ) latDir->cy *= -1;
+    if ( fabsf(lat->cz - latOri->cz) > latOff->cz ) latDir->cz *= -1;
+    if ( fabsf(lat->ux - latOri->ux) > latOff->ux ) latDir->ux *= -1;
+    if ( fabsf(lat->uy - latOri->uy) > latOff->uy ) latDir->uy *= -1;
+    if ( fabsf(lat->uz - latOri->uz) > latOff->uz ) latDir->uz *= -1;
+}
+
 void PTS_update()
 {
     int i;
+    PTS_updateLookAt(&g_lookat, &g_lookatOri, &g_lookatOff,
+            &g_lookatCen, &g_lookatDir);
+
     if ( g_keys['2'] || g_keys['4'] || g_keys['6'] || g_keys['8'] )
     {
         for ( i=0; i < MAX_PARTICLES; i++ ) 
@@ -528,6 +575,22 @@ void game_function(void)
 void keyboard(unsigned char key, int x, int y)
 {
     switch (key) {
+        case 'a': g_lookat.ex += 0.1; break;
+        case 'A': g_lookat.ex -= 0.1; break;
+        case 's': g_lookat.ey += 0.1; break;
+        case 'S': g_lookat.ey -= 0.1; break;
+        case 'w': g_lookat.ez += 0.1; break;
+        case 'W': g_lookat.ez -= 0.1; break;
+        case 'c': g_lookat.cx += 0.02; break;
+        case 'C': g_lookat.cx -= 0.02; break;
+        case 'r': g_lookat.cy += 0.02; break;
+        case 'R': g_lookat.cy -= 0.02; break;
+        case 'e': g_lookat.cz += 0.02; break;
+        case 'E': g_lookat.cz -= 0.02; break;
+        case 'd': g_lookat.ux += 0.1; break;
+        case 'D': g_lookat.ux -= 0.1; break;
+        case 'b': g_lookat.uz += 0.1; break;
+        case 'B': g_lookat.uz -= 0.1; break;
         case 'p':
             printf("NALL &&**&& zoom=%f, xs=%f, ys=%f,\n",
                     g_zoom, g_xspeed, g_yspeed);
