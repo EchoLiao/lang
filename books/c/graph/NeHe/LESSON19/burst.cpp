@@ -244,6 +244,7 @@ void ParticlesDraw(particles *par, int n)
     {
         if ( !par[i].active ) 
             continue;
+
         if ( g_isTran ) 
         {
             par[i].x += g_cenX[i];
@@ -259,14 +260,12 @@ void ParticlesDraw(particles *par, int n)
         float t  = par[i].t;
         float cs = g_divTexW;
         float ct = g_divTexH;
-
 #if 0 // NALD
         if ( i==0 || i==3 || i==23 )
             printf("NAL &&& i=%d, (x,y,z)=(%f,%f,%f)\n", i, x, y, z);
 #endif
 
         // glColor4f(par[i].r, par[i].g, par[i].b, par[i].life);
-
         //glDisable(GL_TEXTURE_2D); // NALD
         glBegin(GL_TRIANGLE_STRIP);
         glTexCoord2d(s   , t+ct); glVertex3f(x,    y+cy, z);
@@ -274,58 +273,6 @@ void ParticlesDraw(particles *par, int n)
         glTexCoord2d(s+cs, t+ct); glVertex3f(x+cx, y+cy, z);
         glTexCoord2d(s+cs, t   ); glVertex3f(x+cx, y,    z);
         glEnd();
-#if 0
-        glBegin(GL_TRIANGLE_STRIP);
-        glTexCoord2d(1,1); glVertex3f(x+0.5f,y+0.5f,z);
-        glTexCoord2d(0,1); glVertex3f(x-0.5f,y+0.5f,z);
-        glTexCoord2d(1,0); glVertex3f(x+0.5f,y-0.5f,z);
-        glTexCoord2d(0,0); glVertex3f(x-0.5f,y-0.5f,z);
-        glEnd();
-
-        par[i].x += par[i].xi/(g_slowdown*1000);
-        par[i].y += par[i].yi/(g_slowdown*1000);
-        par[i].z += par[i].zi/(g_slowdown*1000);
-
-        par[i].xi += par[i].xg;
-        par[i].yi += par[i].yg;
-        par[i].zi += par[i].zg;
-        par[i].life -= par[i].fade;
-
-        if (par[i].life < 0.0f) {
-            par[i].life = 1.0f;
-            par[i].fade = float(rand()%100)/1000.0f+0.003f;
-            par[i].x = 0.0f;
-            par[i].y = 0.0f;
-            par[i].z = 0.0f;
-            par[i].xi = g_xspeed+float((rand()%60)-32.0f);
-            par[i].yi = g_yspeed+float((rand()%60)-30.0f);
-            par[i].zi = float((rand()%60)-30.0f);
-            par[i].r = COLORS[g_col][0];
-            par[i].g = COLORS[g_col][1];
-            par[i].b = COLORS[g_col][2];
-        }
-
-        // If Number Pad 8 And Y Gravity Is Less Than 1.5 Increase Pull Upwards
-        if (g_keys['8'] && (par[i].yg<1.5f)) par[i].yg += 1.01f;
-
-        // If Number Pad 2 And Y Gravity Is Greater Than -1.5 Increase Pull Downwards
-        if (g_keys['2'] && (par[i].yg>-1.5f)) par[i].yg -= 1.01f;
-
-        // If Number Pad 6 And X Gravity Is Less Than 1.5 Increase Pull Right
-        if (g_keys['6'] && (par[i].xg<1.5f)) par[i].xg += 1.01f;
-
-        // If Number Pad 4 And X Gravity Is Greater Than -1.5 Increase Pull Left
-        if (g_keys['4'] && (par[i].xg>-1.5f)) par[i].xg -= 1.01f;
-
-        if (g_keys['\t']) {
-            par[i].x = 0.0f;
-            par[i].y = 0.0f;
-            par[i].z = 0.0f;
-            par[i].xi = float((rand()%50)-26.0f)*10.0f;
-            par[i].yi = float((rand()%50)-25.0f)*10.0f;
-            par[i].zi = float((rand()%50)-25.0f)*10.0f;
-        }
-#endif
     }
 }
 
@@ -403,6 +350,18 @@ void PTS_draw()
 
 void PTS_update()
 {
+    int i;
+    if ( g_keys['2'] || g_keys['4'] || g_keys['6'] || g_keys['8'] )
+    {
+        for ( i=0; i < MAX_PARTICLES; i++ ) 
+        {
+            if (g_keys['6'] && (g_particle[i].xg<1.5f))  g_particle[i].xg += 1.01f;
+            if (g_keys['4'] && (g_particle[i].xg>-1.5f)) g_particle[i].xg -= 1.01f;
+            if (g_keys['8'] && (g_particle[i].yg<1.5f))  g_particle[i].yg += 1.01f;
+            if (g_keys['2'] && (g_particle[i].yg>-1.5f)) g_particle[i].yg -= 1.01f;
+        }
+    }
+    
     if ( Fps_getProgTime() - g_lastResetTime > 3.00 )
     {
         g_isTran = 1;
