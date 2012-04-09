@@ -83,14 +83,12 @@ GLuint	g_col = 0;             // Current Color Selection
 GLuint	g_delay = 0;           // Rainbow Effect Delay
 GLuint	g_texid[TEXTURES_NUM]; // Our Textures' Id List
 
-int     g_isTran    = 0;
-int     g_tranStep  = 0;
+int       g_isTran    = 0;
+int       g_tranStep  = 0;
+const int g_tranSteps = 100;
 int     g_notBurstNum = NOT_BURST_FRAME_NUM;
 float   g_lastResetTime;
-float   g_cenX[MAX_PARTICLES] = { 0.0, };
-float   g_cenY[MAX_PARTICLES] = { 0.0, };
-float   g_cenZ[MAX_PARTICLES] = { 0.0, };
-const int   g_tranSteps  = 100;
+float   g_recoverCen[MAX_PARTICLES][3] = { {0.0, 0.0, 0.0}, };
 
 PTSObj    g_ptsObj;
 particles g_particle[MAX_PARTICLES];
@@ -206,7 +204,8 @@ bool PTS_initObj(PTSObj *ptsO)
     return true;
 }
 
-bool PTS_initParticles(particles *pars, particles *parsOri, PTSObj *ptsO)
+bool PTS_initParticles(particles *pars, particles *parsOri, PTSObj *ptsO,
+        int n)
 {
     int i;
     float bsX = ptsO->flbX - ptsO->fobjW / 2.0;
@@ -215,15 +214,15 @@ bool PTS_initParticles(particles *pars, particles *parsOri, PTSObj *ptsO)
     float bsS = ptsO->flbS;
     float bsT = ptsO->flbT;
 
-    for ( i=0; i < MAX_PARTICLES; i++ ) {
+    for ( i=0; i < n; i++ ) {
         int ix = i % ptsO->iDivX;
         int iy = i / ptsO->iDivX;
         parsOri[i].active = pars[i].active = true;
         parsOri[i].life = pars[i].life = 1.0f;
         parsOri[i].fade = pars[i].fade = float(rand()%100)/1000.0f+0.003f;
-        parsOri[i].r  = pars[i].r  = COLORS[(i+1)/(MAX_PARTICLES/12)][0];
-        parsOri[i].g  = pars[i].g  = COLORS[(i+1)/(MAX_PARTICLES/12)][1];
-        parsOri[i].b  = pars[i].b  = COLORS[(i+1)/(MAX_PARTICLES/12)][2];
+        parsOri[i].r  = pars[i].r  = COLORS[(i+1)/(n/12)][0];
+        parsOri[i].g  = pars[i].g  = COLORS[(i+1)/(n/12)][1];
+        parsOri[i].b  = pars[i].b  = COLORS[(i+1)/(n/12)][2];
         parsOri[i].x  = pars[i].x  = bsX + (float)ix * ptsO->fdivObjW;
         parsOri[i].y  = pars[i].y  = bsY + (float)iy * ptsO->fdivObjH;
         parsOri[i].z  = pars[i].z  = bsZ;
@@ -243,36 +242,36 @@ bool PTS_initParticles(particles *pars, particles *parsOri, PTSObj *ptsO)
 bool PTS_init(PTSObj *ptsO, particles *pars, particles *parsOri)
 {
     PTS_initObj(ptsO);
-    PTS_initParticles(pars, parsOri, ptsO);
+    PTS_initParticles(pars, parsOri, ptsO, MAX_PARTICLES);
 
     return true;
 }
 
-void particlesReset()
+void particlesReset(particles *pars, particles *parsOri, int n)
 {
     int i;
 
     g_lastResetTime = Fps_getProgTime();
     g_notBurstNum = NOT_BURST_FRAME_NUM;
 
-    for ( i = 0; i < MAX_PARTICLES; i++ ) {
-        g_particle[i].active = g_OriPtile[i].active;
-        g_particle[i].life   = g_OriPtile[i].life;
-        g_particle[i].fade   = g_OriPtile[i].fade;
-        g_particle[i].r      = g_OriPtile[i].r;
-        g_particle[i].g      = g_OriPtile[i].g;
-        g_particle[i].b      = g_OriPtile[i].b;
-        g_particle[i].x      = g_OriPtile[i].x;
-        g_particle[i].y      = g_OriPtile[i].y;
-        g_particle[i].z      = g_OriPtile[i].z;
-        g_particle[i].s      = g_OriPtile[i].s;
-        g_particle[i].t      = g_OriPtile[i].t;
-        g_particle[i].xi     = g_OriPtile[i].xi;
-        g_particle[i].yi     = g_OriPtile[i].yi;
-        g_particle[i].zi     = g_OriPtile[i].zi;
-        g_particle[i].xg     = g_OriPtile[i].xg;
-        g_particle[i].yg     = g_OriPtile[i].yg;
-        g_particle[i].zg     = g_OriPtile[i].zg;
+    for ( i = 0; i < n; i++ ) {
+        pars[i].active = parsOri[i].active;
+        pars[i].life   = parsOri[i].life;
+        pars[i].fade   = parsOri[i].fade;
+        pars[i].r      = parsOri[i].r;
+        pars[i].g      = parsOri[i].g;
+        pars[i].b      = parsOri[i].b;
+        pars[i].x      = parsOri[i].x;
+        pars[i].y      = parsOri[i].y;
+        pars[i].z      = parsOri[i].z;
+        pars[i].s      = parsOri[i].s;
+        pars[i].t      = parsOri[i].t;
+        pars[i].xi     = parsOri[i].xi;
+        pars[i].yi     = parsOri[i].yi;
+        pars[i].zi     = parsOri[i].zi;
+        pars[i].xg     = parsOri[i].xg;
+        pars[i].yg     = parsOri[i].yg;
+        pars[i].zg     = parsOri[i].zg;
     }
 }
 
@@ -301,7 +300,7 @@ bool init(void)
     return true;
 }
 
-void ParticlesDraw(particles *par, int n, PTSObj *ptsO)
+void ParticlesDraw(particles *par, int n, PTSObj *ptsO, float (*rvCen)[3])
 {
     int i;
 
@@ -312,9 +311,9 @@ void ParticlesDraw(particles *par, int n, PTSObj *ptsO)
 
         if ( g_isTran ) 
         {
-            par[i].x += g_cenX[i];
-            par[i].y += g_cenY[i];
-            par[i].z += g_cenZ[i];
+            par[i].x += rvCen[i][0];
+            par[i].y += rvCen[i][1];
+            par[i].z += rvCen[i][2];
         }
         float x  = par[i].x;
         float y  = par[i].y;
@@ -378,7 +377,7 @@ void ParticlesUpdate(particles *par, int n)
 
             if (g_keys['\t']) {
 #if 1
-                particlesReset();
+                particlesReset(g_particle, g_OriPtile, MAX_PARTICLES);
 #else
                 par[i].x = 0.0f;
                 par[i].y = 0.0f;
@@ -392,25 +391,23 @@ void ParticlesUpdate(particles *par, int n)
     }
 }
 
-void ParTranInit()
+void ParTranInit(particles *pars, particles *parsOri, float (*rvCen)[3],
+        int n, int steps)
 {
     int i;
 
-    for ( i = 0; i < MAX_PARTICLES; i++ )
+    for ( i = 0; i < n; i++ )
     {
-        g_cenX[i] = (g_OriPtile[i].x - g_particle[i].x) / g_tranSteps;
-        g_cenY[i] = (g_OriPtile[i].y - g_particle[i].y) / g_tranSteps;
-        g_cenZ[i] = (g_OriPtile[i].z - g_particle[i].z) / g_tranSteps;
-#if 1 // NALD
-        printf("NAL &^^^& i=%d, (%f,%f,%f)\n", i,
-                g_cenX[i], g_cenY[i], g_cenZ[i]);
-#endif
+        rvCen[i][0] = (parsOri[i].x - pars[i].x) / steps;
+        rvCen[i][1] = (parsOri[i].y - pars[i].y) / steps;
+        rvCen[i][2] = (parsOri[i].z - pars[i].z) / steps;
     }
 }
 
 void PTS_draw()
 {
-    ParticlesDraw(g_particle, MAX_PARTICLES, &g_ptsObj);
+    ParticlesDraw(g_particle, MAX_PARTICLES, &g_ptsObj, 
+            g_recoverCen);
 }
 
 void PTS_updateLookAt(PTSlookat *lat, PTSlookat *latOri, PTSlookat *latOff,
@@ -453,12 +450,13 @@ void PTS_update()
             if (g_keys['2'] && (g_particle[i].yg>-1.5f)) g_particle[i].yg -= 1.01f;
         }
     }
-    
+
     if ( Fps_getProgTime() - g_lastResetTime > 3.00 )
     {
         g_isTran = 1;
         if ( g_tranStep == 0 )
-            ParTranInit();
+            ParTranInit(g_particle, g_OriPtile, g_recoverCen, 
+                    MAX_PARTICLES, g_tranSteps);
         // particlesReset();
     }
     else
@@ -620,24 +618,24 @@ void keyboard(unsigned char key, int x, int y)
         case 'b': g_lookat.uz += 0.1; break;
         case 'B': g_lookat.uz -= 0.1; break;
         case 'p':
-            printf("NALL &&**&& zoom=%f, xs=%f, ys=%f,\n",
-                    g_zoom, g_xspeed, g_yspeed);
-            break;
+                  printf("NALL &&**&& zoom=%f, xs=%f, ys=%f,\n",
+                          g_zoom, g_xspeed, g_yspeed);
+                  break;
         case 27:
-            exit(0);
-            break;
+                  exit(0);
+                  break;
         case '+':
-            if (g_slowdown > 1.0f) g_slowdown -= 0.01f;
-            break;
+                  if (g_slowdown > 1.0f) g_slowdown -= 0.01f;
+                  break;
         case '-':
-            if (g_slowdown < 4.0f) g_slowdown += 0.01f;
-            break;
+                  if (g_slowdown < 4.0f) g_slowdown += 0.01f;
+                  break;
         case '\n':
-            g_rainbow = !g_rainbow;
-            break;
+                  g_rainbow = !g_rainbow;
+                  break;
         default:
-            g_keys[key] = true;
-            break;
+                  g_keys[key] = true;
+                  break;
     }
 }
 
