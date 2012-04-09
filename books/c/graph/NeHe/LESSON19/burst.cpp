@@ -335,6 +335,8 @@ void ParticlesUpdate(particles *par, int n)
 
     if ( --g_notBurstNum > 0 )
         return;
+    if ( g_notBurstNum < 0 )
+        g_notBurstNum = 0;
 
     for ( i=0; i < n; i++ ) {
         if ( par[i].active ) {
