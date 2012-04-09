@@ -15,7 +15,7 @@
 #define	MAX_DIV_X     30
 #define	MAX_DIV_Y     30
 #define	MAX_PARTICLES (MAX_DIV_X * MAX_DIV_Y)
-#define NOT_BURST_FRAME_NUM     20
+#define NOT_BURST_FRAME_NUM     30
 
 
 
@@ -38,8 +38,15 @@ float	g_zoom =  -2.0f;       // Used To Zoom Out
 GLuint	g_col = 0;             // Current Color Selection
 GLuint	g_delay = 0;           // Rainbow Effect Delay
 GLuint	g_texid[TEXTURES_NUM]; // Our Textures' Id List
+
+int     g_isTran    = 0;
+int     g_tranStep  = 0;
 int     g_notBurstNum = NOT_BURST_FRAME_NUM;
 float   g_lastResetTime;
+float   g_cenX[MAX_PARTICLES] = { 0.0, };
+float   g_cenY[MAX_PARTICLES] = { 0.0, };
+float   g_cenZ[MAX_PARTICLES] = { 0.0, };
+const int   g_tranSteps  = 100;
 const float g_leftBtoX = 0.0;
 const float g_leftBtoY = 0.0;
 const float g_leftBtoZ = 0.0;
@@ -233,80 +240,92 @@ void ParticlesDraw(particles *par, int n)
 {
     int i;
 
-    for ( i=0; i < n; i++ ) {
-        if (par[i].active) {
-            float x  = par[i].x;
-            float y  = par[i].y;
-            float z  = par[i].z + g_zoom;
-            float cx = g_divObjW;
-            float cy = g_divObjH;
-            float s  = par[i].s;
-            float t  = par[i].t;
-            float cs = g_divTexW;
-            float ct = g_divTexH;
-
-            glColor4f(par[i].r, par[i].g, par[i].b, par[i].life);
-
-            //glDisable(GL_TEXTURE_2D); // NALD
-            glBegin(GL_TRIANGLE_STRIP);
-            glTexCoord2d(s   , t+ct); glVertex3f(x,    y+cy, z);
-            glTexCoord2d(s   , t   ); glVertex3f(x,    y,    z);
-            glTexCoord2d(s+cs, t+ct); glVertex3f(x+cx, y+cy, z);
-            glTexCoord2d(s+cs, t   ); glVertex3f(x+cx, y,    z);
-            glEnd();
-#if 0
-            glBegin(GL_TRIANGLE_STRIP);
-            glTexCoord2d(1,1); glVertex3f(x+0.5f,y+0.5f,z);
-            glTexCoord2d(0,1); glVertex3f(x-0.5f,y+0.5f,z);
-            glTexCoord2d(1,0); glVertex3f(x+0.5f,y-0.5f,z);
-            glTexCoord2d(0,0); glVertex3f(x-0.5f,y-0.5f,z);
-            glEnd();
-
-            par[i].x += par[i].xi/(g_slowdown*1000);
-            par[i].y += par[i].yi/(g_slowdown*1000);
-            par[i].z += par[i].zi/(g_slowdown*1000);
-
-            par[i].xi += par[i].xg;
-            par[i].yi += par[i].yg;
-            par[i].zi += par[i].zg;
-            par[i].life -= par[i].fade;
-
-            if (par[i].life < 0.0f) {
-                par[i].life = 1.0f;
-                par[i].fade = float(rand()%100)/1000.0f+0.003f;
-                par[i].x = 0.0f;
-                par[i].y = 0.0f;
-                par[i].z = 0.0f;
-                par[i].xi = g_xspeed+float((rand()%60)-32.0f);
-                par[i].yi = g_yspeed+float((rand()%60)-30.0f);
-                par[i].zi = float((rand()%60)-30.0f);
-                par[i].r = COLORS[g_col][0];
-                par[i].g = COLORS[g_col][1];
-                par[i].b = COLORS[g_col][2];
-            }
-
-            // If Number Pad 8 And Y Gravity Is Less Than 1.5 Increase Pull Upwards
-            if (g_keys['8'] && (par[i].yg<1.5f)) par[i].yg += 1.01f;
-
-            // If Number Pad 2 And Y Gravity Is Greater Than -1.5 Increase Pull Downwards
-            if (g_keys['2'] && (par[i].yg>-1.5f)) par[i].yg -= 1.01f;
-
-            // If Number Pad 6 And X Gravity Is Less Than 1.5 Increase Pull Right
-            if (g_keys['6'] && (par[i].xg<1.5f)) par[i].xg += 1.01f;
-
-            // If Number Pad 4 And X Gravity Is Greater Than -1.5 Increase Pull Left
-            if (g_keys['4'] && (par[i].xg>-1.5f)) par[i].xg -= 1.01f;
-
-            if (g_keys['\t']) {
-                par[i].x = 0.0f;
-                par[i].y = 0.0f;
-                par[i].z = 0.0f;
-                par[i].xi = float((rand()%50)-26.0f)*10.0f;
-                par[i].yi = float((rand()%50)-25.0f)*10.0f;
-                par[i].zi = float((rand()%50)-25.0f)*10.0f;
-            }
-#endif
+    for ( i=0; i < n; i++ ) 
+    {
+        if ( !par[i].active ) 
+            continue;
+        if ( g_isTran ) 
+        {
+            par[i].x += g_cenX[i];
+            par[i].y += g_cenY[i];
+            par[i].z += g_cenZ[i];
         }
+        float x  = par[i].x;
+        float y  = par[i].y;
+        float z  = par[i].z + g_zoom;
+        float cx = g_divObjW;
+        float cy = g_divObjH;
+        float s  = par[i].s;
+        float t  = par[i].t;
+        float cs = g_divTexW;
+        float ct = g_divTexH;
+
+#if 0 // NALD
+        if ( i==0 || i==3 || i==23 )
+            printf("NAL &&& i=%d, (x,y,z)=(%f,%f,%f)\n", i, x, y, z);
+#endif
+
+        // glColor4f(par[i].r, par[i].g, par[i].b, par[i].life);
+
+        //glDisable(GL_TEXTURE_2D); // NALD
+        glBegin(GL_TRIANGLE_STRIP);
+        glTexCoord2d(s   , t+ct); glVertex3f(x,    y+cy, z);
+        glTexCoord2d(s   , t   ); glVertex3f(x,    y,    z);
+        glTexCoord2d(s+cs, t+ct); glVertex3f(x+cx, y+cy, z);
+        glTexCoord2d(s+cs, t   ); glVertex3f(x+cx, y,    z);
+        glEnd();
+#if 0
+        glBegin(GL_TRIANGLE_STRIP);
+        glTexCoord2d(1,1); glVertex3f(x+0.5f,y+0.5f,z);
+        glTexCoord2d(0,1); glVertex3f(x-0.5f,y+0.5f,z);
+        glTexCoord2d(1,0); glVertex3f(x+0.5f,y-0.5f,z);
+        glTexCoord2d(0,0); glVertex3f(x-0.5f,y-0.5f,z);
+        glEnd();
+
+        par[i].x += par[i].xi/(g_slowdown*1000);
+        par[i].y += par[i].yi/(g_slowdown*1000);
+        par[i].z += par[i].zi/(g_slowdown*1000);
+
+        par[i].xi += par[i].xg;
+        par[i].yi += par[i].yg;
+        par[i].zi += par[i].zg;
+        par[i].life -= par[i].fade;
+
+        if (par[i].life < 0.0f) {
+            par[i].life = 1.0f;
+            par[i].fade = float(rand()%100)/1000.0f+0.003f;
+            par[i].x = 0.0f;
+            par[i].y = 0.0f;
+            par[i].z = 0.0f;
+            par[i].xi = g_xspeed+float((rand()%60)-32.0f);
+            par[i].yi = g_yspeed+float((rand()%60)-30.0f);
+            par[i].zi = float((rand()%60)-30.0f);
+            par[i].r = COLORS[g_col][0];
+            par[i].g = COLORS[g_col][1];
+            par[i].b = COLORS[g_col][2];
+        }
+
+        // If Number Pad 8 And Y Gravity Is Less Than 1.5 Increase Pull Upwards
+        if (g_keys['8'] && (par[i].yg<1.5f)) par[i].yg += 1.01f;
+
+        // If Number Pad 2 And Y Gravity Is Greater Than -1.5 Increase Pull Downwards
+        if (g_keys['2'] && (par[i].yg>-1.5f)) par[i].yg -= 1.01f;
+
+        // If Number Pad 6 And X Gravity Is Less Than 1.5 Increase Pull Right
+        if (g_keys['6'] && (par[i].xg<1.5f)) par[i].xg += 1.01f;
+
+        // If Number Pad 4 And X Gravity Is Greater Than -1.5 Increase Pull Left
+        if (g_keys['4'] && (par[i].xg>-1.5f)) par[i].xg -= 1.01f;
+
+        if (g_keys['\t']) {
+            par[i].x = 0.0f;
+            par[i].y = 0.0f;
+            par[i].z = 0.0f;
+            par[i].xi = float((rand()%50)-26.0f)*10.0f;
+            par[i].yi = float((rand()%50)-25.0f)*10.0f;
+            par[i].zi = float((rand()%50)-25.0f)*10.0f;
+        }
+#endif
     }
 }
 
@@ -355,21 +374,77 @@ void ParticlesUpdate(particles *par, int n)
     }
 }
 
+void ParTranInit()
+{
+    int i;
+
+    for ( i = 0; i < MAX_PARTICLES; i++ )
+    {
+        g_cenX[i] = (g_OriPtile[i].x - g_particle[i].x) / g_tranSteps;
+        g_cenY[i] = (g_OriPtile[i].y - g_particle[i].y) / g_tranSteps;
+        g_cenZ[i] = (g_OriPtile[i].z - g_particle[i].z) / g_tranSteps;
+#if 1 // NALD
+        printf("NAL &^^^& i=%d, (%f,%f,%f)\n", i,
+                g_cenX[i], g_cenY[i], g_cenZ[i]);
+#endif
+    }
+}
+
+void PTS_draw()
+{
+    ParticlesDraw(g_particle, MAX_PARTICLES);
+}
+
+void PTS_update()
+{
+    if ( Fps_getProgTime() - g_lastResetTime > 3.00 )
+    {
+        g_isTran = 1;
+        if ( g_tranStep == 0 )
+            ParTranInit();
+        // particlesReset();
+    }
+    else
+    {
+        ParticlesUpdate(g_particle, MAX_PARTICLES);
+    }
+
+    if ( g_tranStep == g_tranSteps )
+    {
+        g_lastResetTime = Fps_getProgTime();
+        g_isTran = 0;
+        g_tranStep = 0;
+        g_notBurstNum = NOT_BURST_FRAME_NUM;
+    }
+    if ( g_isTran && g_tranStep <= g_tranSteps)
+    {
+        g_tranStep++;
+    }
+}
+
 // Our Rendering Is Done Here
 void render(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
+    PTS_update();
+    PTS_draw();
 
 
-    ParticlesDraw(g_particle, MAX_PARTICLES);
+    // ParticlesDraw(g_particle, MAX_PARTICLES);
 
-    if ( Fps_getProgTime() - g_lastResetTime > 3.00 )
-    {
-        particlesReset();
-    }
-    ParticlesUpdate(g_particle, MAX_PARTICLES);
+    // if ( Fps_getProgTime() - g_lastResetTime > 3.00 )
+    // {
+    //     g_isTran = 1;
+    //     if ( g_tranStep == 0 )
+    //         ParTranInit();
+    //     // particlesReset();
+    // }
+    // else
+    // {
+    //     ParticlesUpdate(g_particle, MAX_PARTICLES);
+    // }
 
     glFlush();
     glutSwapBuffers ( );
