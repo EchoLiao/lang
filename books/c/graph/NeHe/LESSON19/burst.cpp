@@ -86,15 +86,8 @@ bool    g_gamemode;            // GLUT GameMode ON/OFF
 bool    g_fullscreen;
 bool    g_keys[256];           // Keys Array
 
-// bool    g_rainbow=true;
-// float	g_slowdown = 2.0f;     // Slow Down Particles
-// float   g_xspeed = 0.0f;	   // X Rotation Speed
-// float   g_yspeed = 42.0f;	   // Y Rotation Speed
-// float	g_zoom =  -2.0f;       // Used To Zoom Out
-// GLuint	g_col = 0;             // Current Color Selection
-// GLuint	g_delay = 0;           // Rainbow Effect Delay
-
 GLuint	g_texid[TEXTURES_NUM]; // Our Textures' Id List
+
 
 PTSObj          g_ptsObj;
 PTSptiles       g_CurPtile[MAX_PARTICLES];
