@@ -165,9 +165,9 @@ bool PTS_initParticles(PTSptiles *pars, PTSptiles *parsOri, PTSObj *ptsO,
         parsOri[i].active = pars[i].active = true;
         parsOri[i].life = pars[i].life = 1.0f;
         parsOri[i].fade = pars[i].fade = float(rand()%100)/1000.0f+0.003f;
-        parsOri[i].r  = pars[i].r  = g_PTS_COLORS[(i+1)/(n/N_PTS_COLORS)][0];
-        parsOri[i].g  = pars[i].g  = g_PTS_COLORS[(i+1)/(n/N_PTS_COLORS)][1];
-        parsOri[i].b  = pars[i].b  = g_PTS_COLORS[(i+1)/(n/N_PTS_COLORS)][2];
+        parsOri[i].r  = pars[i].r  = g_PTS_COLORS[i/(n/N_PTS_COLORS)][0];
+        parsOri[i].g  = pars[i].g  = g_PTS_COLORS[i/(n/N_PTS_COLORS)][1];
+        parsOri[i].b  = pars[i].b  = g_PTS_COLORS[i/(n/N_PTS_COLORS)][2];
         parsOri[i].x  = pars[i].x  = bsX + (float)ix * ptsO->fdivObjW;
         parsOri[i].y  = pars[i].y  = bsY + (float)iy * ptsO->fdivObjH;
         parsOri[i].z  = pars[i].z  = bsZ;
@@ -333,6 +333,8 @@ void ParticlesDraw(PTSeffMg *ptsEM, PTSptiles *par, int n, PTSObj *ptsO, float (
 
 void ParticlesUpdate(PTSeffMg *ptsEM, PTSptiles *par, int n)
 {
+    assert(ptsEM->colIdx >= 0 && ptsEM->colIdx < N_PTS_COLORS);
+
     int i;
 
     if ( --ptsEM->notBurstNum > 0 )
