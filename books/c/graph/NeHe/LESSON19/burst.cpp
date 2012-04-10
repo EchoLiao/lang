@@ -306,7 +306,7 @@ bool init(void)
     return true;
 }
 
-void ParticlesDraw(PTSeffMg *ptsEM, PTSptiles *par, int n, PTSObj *ptsO, float (*rvCen)[3])
+void ParticlesDraw(PTSeffMg *ptsEM, PTSptiles *par, int n, PTSObj *ptsO)
 {
     int i;
 
@@ -319,9 +319,9 @@ void ParticlesDraw(PTSeffMg *ptsEM, PTSptiles *par, int n, PTSObj *ptsO, float (
 
         if ( ptsEM->isTran )
         {
-            par[i].x += rvCen[i][0];
-            par[i].y += rvCen[i][1];
-            par[i].z += rvCen[i][2];
+            par[i].x += ptsEM->recoverCen[i][0];
+            par[i].y += ptsEM->recoverCen[i][1];
+            par[i].z += ptsEM->recoverCen[i][2];
         }
         float x  = par[i].x;
         float y  = par[i].y;
@@ -435,7 +435,7 @@ void ParticlesUpdate(PTSeffMg *ptsEM, PTSptiles *par, int n)
     }
 }
 
-void ParTranInit(PTSptiles *pars, PTSptiles *parsOri, float (*rvCen)[3],
+void ParTranInit(PTSeffMg *ptsEM, PTSptiles *pars, PTSptiles *parsOri,
         int n, int steps)
 {
     assert(n > 0 && steps != 0);
@@ -443,16 +443,15 @@ void ParTranInit(PTSptiles *pars, PTSptiles *parsOri, float (*rvCen)[3],
     int i;
     for ( i = 0; i < n; i++ )
     {
-        rvCen[i][0] = (parsOri[i].x - pars[i].x) / steps;
-        rvCen[i][1] = (parsOri[i].y - pars[i].y) / steps;
-        rvCen[i][2] = (parsOri[i].z - pars[i].z) / steps;
+        ptsEM->recoverCen[i][0] = (parsOri[i].x - pars[i].x) / steps;
+        ptsEM->recoverCen[i][1] = (parsOri[i].y - pars[i].y) / steps;
+        ptsEM->recoverCen[i][2] = (parsOri[i].z - pars[i].z) / steps;
     }
 }
 
 void PTS_draw()
 {
-    ParticlesDraw(&g_effMg, g_CurPtile, MAX_PARTICLES,
-            &g_ptsObj, g_effMg.recoverCen);
+    ParticlesDraw(&g_effMg, g_CurPtile, MAX_PARTICLES, &g_ptsObj);
 }
 
 void PTS_updateLookAt(PTSlookatMg *latMg)
@@ -492,7 +491,7 @@ void PTS_update(PTSeffMg *ptsEM)
     {
         ptsEM->isTran = 1;
         if ( ptsEM->tranStep == 0 )
-            ParTranInit(g_CurPtile, g_OriPtile, g_effMg.recoverCen,
+            ParTranInit(&g_effMg, g_CurPtile, g_OriPtile,
                     MAX_PARTICLES, ptsEM->tranSteps);
         // particlesReset();
     }
