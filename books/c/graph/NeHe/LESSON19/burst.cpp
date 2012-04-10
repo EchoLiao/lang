@@ -23,15 +23,6 @@ typedef float	N3DVector3f[3];
 typedef float   N3DVector4f[4];
 typedef float   N3DMatrix44f[16];
 
-
-
-// A Structure For RGB Bitmaps
-typedef struct _RGBIMG {
-    GLuint   w;    // Image's Width
-    GLuint   h;    // Image's Height
-    GLubyte* data; // Image's Data (Pixels)
-} RGBIMG;
-
 typedef struct tagPTSObj {
     int     iDivX, iDivY;
     float   flbX, flbY, flbZ; // left bottom XYZ
