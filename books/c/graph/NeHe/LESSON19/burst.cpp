@@ -302,11 +302,12 @@ bool init(void)
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-    
+
     return true;
 }
 
-void ParticlesDraw(PTSeffMg *ptsEM, PTSptiles *par, int n, PTSObj *ptsO)
+void ParticlesDraw(PTSeffMg *ptsEM, PTSptiles *par, int n, PTSObj *ptsO,
+        N3D_Vertex *vers)
 {
     int i;
 
@@ -347,37 +348,37 @@ void ParticlesDraw(PTSeffMg *ptsEM, PTSptiles *par, int n, PTSObj *ptsO)
         glTexCoord2d(s+cs, t   ); glVertex3f(x+cx, y,    z);
         glEnd();
 #else
-        g_vers[i*4+0].fS = s;
-        g_vers[i*4+0].fT = t+ct;
-        g_vers[i*4+0].fX = x;
-        g_vers[i*4+0].fY = y+cy;
-        g_vers[i*4+0].fZ = z;
+        vers[i*4+0].fS = s;
+        vers[i*4+0].fT = t+ct;
+        vers[i*4+0].fX = x;
+        vers[i*4+0].fY = y+cy;
+        vers[i*4+0].fZ = z;
 
-        g_vers[i*4+1].fS = s;
-        g_vers[i*4+1].fT = t;
-        g_vers[i*4+1].fX = x;
-        g_vers[i*4+1].fY = y;
-        g_vers[i*4+1].fZ = z;
+        vers[i*4+1].fS = s;
+        vers[i*4+1].fT = t;
+        vers[i*4+1].fX = x;
+        vers[i*4+1].fY = y;
+        vers[i*4+1].fZ = z;
 
-        g_vers[i*4+2].fS = s+cs;
-        g_vers[i*4+2].fT = t+ct;
-        g_vers[i*4+2].fX = x+cx;
-        g_vers[i*4+2].fY = y+cy;
-        g_vers[i*4+2].fZ = z;
+        vers[i*4+2].fS = s+cs;
+        vers[i*4+2].fT = t+ct;
+        vers[i*4+2].fX = x+cx;
+        vers[i*4+2].fY = y+cy;
+        vers[i*4+2].fZ = z;
 
-        g_vers[i*4+3].fS = s+cs;
-        g_vers[i*4+3].fT = t;
-        g_vers[i*4+3].fX = x+cx;
-        g_vers[i*4+3].fY = y;
-        g_vers[i*4+3].fZ = z;
+        vers[i*4+3].fS = s+cs;
+        vers[i*4+3].fT = t;
+        vers[i*4+3].fX = x+cx;
+        vers[i*4+3].fY = y;
+        vers[i*4+3].fZ = z;
 #endif
     }
 
     for ( i=0; i < n; i++ )
     {
-        glVertexPointer(3, GL_FLOAT, sizeof(N3D_Vertex), &(g_vers[4*i].fX));
-        glTexCoordPointer(2, GL_FLOAT, sizeof(N3D_Vertex), &(g_vers[4*i].fS));
-        // glNormalPointer(GL_FLOAT, sizeof(N3D_Vertex), &(g_vers[4*i].fNX));
+        glVertexPointer(3, GL_FLOAT, sizeof(N3D_Vertex), &(vers[4*i].fX));
+        glTexCoordPointer(2, GL_FLOAT, sizeof(N3D_Vertex), &(vers[4*i].fS));
+        // glNormalPointer(GL_FLOAT, sizeof(N3D_Vertex), &(vers[4*i].fNX));
         glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
     }
 }
@@ -451,7 +452,7 @@ void ParTranInit(PTSeffMg *ptsEM, PTSptiles *pars, PTSptiles *parsOri,
 
 void PTS_draw()
 {
-    ParticlesDraw(&g_effMg, g_CurPtile, MAX_PARTICLES, &g_ptsObj);
+    ParticlesDraw(&g_effMg, g_CurPtile, MAX_PARTICLES, &g_ptsObj, g_vers);
 }
 
 void PTS_updateLookAt(PTSlookatMg *latMg)
