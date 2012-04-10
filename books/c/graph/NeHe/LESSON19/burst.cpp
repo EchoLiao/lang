@@ -19,10 +19,6 @@
 #define NOT_BURST_FRAME_NUM     30
 
 
-typedef float	N3DVector3f[3];
-typedef float   N3DVector4f[4];
-typedef float   N3DMatrix44f[16];
-
 typedef struct tagPTSObj {
     int     iDivX, iDivY;
     float   flbX, flbY, flbZ; // left bottom XYZ
@@ -68,6 +64,7 @@ typedef struct tagPTSlookatMg{
 } PTSlookatMg;
 
 typedef struct tagPTSeffMg{
+    GLint   texId;
     int     isRainbow;
     float   slowdown;
     float   speedX;
@@ -99,10 +96,9 @@ bool    g_keys[256];           // Keys Array
 
 GLuint	g_texid[TEXTURES_NUM]; // Our Textures' Id List
 
-PTSObj    g_ptsObj;
-PTSptiles g_CurPtile[MAX_PARTICLES];
-PTSptiles g_OriPtile[MAX_PARTICLES];
-
+PTSObj          g_ptsObj;
+PTSptiles       g_CurPtile[MAX_PARTICLES];
+PTSptiles       g_OriPtile[MAX_PARTICLES];
 PTSlookatMg     g_lookatMg;
 PTSeffMg        g_effMg;
 
@@ -214,8 +210,9 @@ bool PTS_initLookAtMg(PTSlookatMg *latMg)
     return 1;
 }
 
-bool PTS_initEffMg(PTSeffMg *ptsEM)
+bool PTS_initEffMg(PTSeffMg *ptsEM, GLuint texid)
 {
+    ptsEM->texId            = texid;
     ptsEM->isRainbow        = 1;
     ptsEM->slowdown         = 2.0;
     ptsEM->speedX           = 0.0;
@@ -237,7 +234,7 @@ bool PTS_initEffMg(PTSeffMg *ptsEM)
 bool PTS_init(PTSeffMg *ptsEM, PTSObj *ptsO, PTSptiles *pars,
         PTSptiles *parsOri, PTSlookatMg *latMg)
 {
-    PTS_initEffMg(ptsEM);
+    PTS_initEffMg(ptsEM, g_texid[0]);
     PTS_initObj(ptsO);
     PTS_initParticles(pars, parsOri, ptsO, MAX_PARTICLES);
     PTS_initLookAtMg(latMg);
@@ -245,7 +242,7 @@ bool PTS_init(PTSeffMg *ptsEM, PTSObj *ptsO, PTSptiles *pars,
     return true;
 }
 
-void particlesReset(PTSeffMg *ptsEM, PTSptiles *pars, PTSptiles *parsOri, 
+void particlesReset(PTSeffMg *ptsEM, PTSptiles *pars, PTSptiles *parsOri,
         int n)
 {
     int i;
@@ -302,6 +299,8 @@ bool init(void)
 void ParticlesDraw(PTSeffMg *ptsEM, PTSptiles *par, int n, PTSObj *ptsO, float (*rvCen)[3])
 {
     int i;
+
+    glBindTexture(GL_TEXTURE_2D, ptsEM->texId);
 
     for ( i=0; i < n; i++ )
     {
@@ -456,6 +455,7 @@ void PTS_update(PTSeffMg *ptsEM)
         ParticlesUpdate(&g_effMg, g_CurPtile, MAX_PARTICLES);
     }
 
+    // ...
     if ( ptsEM->tranStep == ptsEM->tranSteps )
     {
         ptsEM->lastResetTime = Fps_getProgTime();
@@ -467,6 +467,15 @@ void PTS_update(PTSeffMg *ptsEM)
     {
         ptsEM->tranStep++;
     }
+
+    // ...
+    if ( ptsEM->isRainbow && (ptsEM->delay > 25) )
+    {
+        ptsEM->delay = 0;
+        ptsEM->colIdx++;
+        if (ptsEM->colIdx >= N_PTS_COLORS) ptsEM->colIdx = 0;
+    }
+    ptsEM->delay++;
 }
 
 
@@ -591,14 +600,6 @@ void game_function(void)
     // if (g_keys[GLUT_KEY_DOWN] && (g_yspeed > -200)) g_yspeed -= 1.0f;
     // if (g_keys[GLUT_KEY_RIGHT] && (g_xspeed < 200)) g_xspeed += 1.0f;
     // if (g_keys[GLUT_KEY_LEFT] && (g_xspeed > -200)) g_xspeed -= 1.0f;
-
-    if (g_keys[' '] || (g_effMg.isRainbow && (g_effMg.delay>25))) {
-        if (g_keys[' ']) g_effMg.isRainbow = false;
-        g_effMg.delay = 0;
-        g_effMg.colIdx++;
-        if (g_effMg.colIdx >= N_PTS_COLORS) g_effMg.colIdx = 0;
-    }
-    g_effMg.delay++;
 
     render();
 }
