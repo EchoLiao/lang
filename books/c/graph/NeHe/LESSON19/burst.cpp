@@ -67,6 +67,14 @@ typedef struct tagPTSlookatMg{
     PTSlookat   latDir;
 } PTSlookatMg;
 
+typedef struct tagPTSeffMg{
+    int     isTran;
+    int     tranStep;
+    int     tranSteps;
+    int     notBurstNum;
+    float   lastResetTime;
+    float   recoverCen[MAX_PARTICLES][3];
+} PTSeffMg;
 
 // Global Variables
 bool    g_gamemode;            // GLUT GameMode ON/OFF
@@ -80,21 +88,22 @@ float   g_yspeed = 42.0f;	   // Y Rotation Speed
 float	g_zoom =  -2.0f;       // Used To Zoom Out
 GLuint	g_col = 0;             // Current Color Selection
 GLuint	g_delay = 0;           // Rainbow Effect Delay
+
 GLuint	g_texid[TEXTURES_NUM]; // Our Textures' Id List
 
-int       g_isTran    = 0;
-int       g_tranStep  = 0;
-const int g_tranSteps = 100;
-int     g_notBurstNum = NOT_BURST_FRAME_NUM;
-float   g_lastResetTime;
-float   g_recoverCen[MAX_PARTICLES][3] = { {0.0, 0.0, 0.0}, };
+// int       g_isTran    = 0;
+// int       g_tranStep  = 0;
+// const int g_tranSteps = 100;
+// int     g_notBurstNum = NOT_BURST_FRAME_NUM;
+// float   g_lastResetTime;
+// float   g_recoverCen[MAX_PARTICLES][3] = { {0.0, 0.0, 0.0}, };
 
 PTSObj    g_ptsObj;
 PTSptiles g_CurPtile[MAX_PARTICLES];
 PTSptiles g_OriPtile[MAX_PARTICLES];
 
 PTSlookatMg     g_lookatMg;
-
+PTSeffMg        g_effMg;
 
 #define N_PTS_COLORS    12
 static GLfloat g_PTS_COLORS[][3] = {
@@ -204,9 +213,23 @@ bool PTS_initLookAtMg(PTSlookatMg *latMg)
     return 1;
 }
 
-bool PTS_init(PTSObj *ptsO, PTSptiles *pars, PTSptiles *parsOri,
-        PTSlookatMg *latMg)
+bool PTS_initEffMg(PTSeffMg *ptsEM)
 {
+    ptsEM->isTran           = 0;
+    ptsEM->tranStep         = 0;
+    ptsEM->tranSteps        = 100;
+    ptsEM->notBurstNum      = NOT_BURST_FRAME_NUM;
+    ptsEM->lastResetTime    = 0.0;
+
+    memset(ptsEM->recoverCen, 0, sizeof(ptsEM->recoverCen));
+
+    return 1;
+}
+
+bool PTS_init(PTSeffMg *ptsEM, PTSObj *ptsO, PTSptiles *pars,
+        PTSptiles *parsOri, PTSlookatMg *latMg)
+{
+    PTS_initEffMg(ptsEM);
     PTS_initObj(ptsO);
     PTS_initParticles(pars, parsOri, ptsO, MAX_PARTICLES);
     PTS_initLookAtMg(latMg);
@@ -214,12 +237,13 @@ bool PTS_init(PTSObj *ptsO, PTSptiles *pars, PTSptiles *parsOri,
     return true;
 }
 
-void particlesReset(PTSptiles *pars, PTSptiles *parsOri, int n)
+void particlesReset(PTSeffMg *ptsEM, PTSptiles *pars, PTSptiles *parsOri, 
+        int n)
 {
     int i;
 
-    g_lastResetTime = Fps_getProgTime();
-    g_notBurstNum = NOT_BURST_FRAME_NUM;
+    ptsEM->lastResetTime = Fps_getProgTime();
+    ptsEM->notBurstNum = NOT_BURST_FRAME_NUM;
 
     for ( i = 0; i < n; i++ ) {
         pars[i].active = parsOri[i].active;
@@ -261,13 +285,13 @@ bool init(void)
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D,g_texid[0]);
 
-    PTS_init(&g_ptsObj, g_CurPtile, g_OriPtile, &g_lookatMg);
+    PTS_init(&g_effMg, &g_ptsObj, g_CurPtile, g_OriPtile, &g_lookatMg);
     memset(g_keys,0,sizeof(g_keys));
 
     return true;
 }
 
-void ParticlesDraw(PTSptiles *par, int n, PTSObj *ptsO, float (*rvCen)[3])
+void ParticlesDraw(PTSeffMg *ptsEM, PTSptiles *par, int n, PTSObj *ptsO, float (*rvCen)[3])
 {
     int i;
 
@@ -276,7 +300,7 @@ void ParticlesDraw(PTSptiles *par, int n, PTSObj *ptsO, float (*rvCen)[3])
         if ( !par[i].active )
             continue;
 
-        if ( g_isTran )
+        if ( ptsEM->isTran )
         {
             par[i].x += rvCen[i][0];
             par[i].y += rvCen[i][1];
@@ -307,14 +331,14 @@ void ParticlesDraw(PTSptiles *par, int n, PTSObj *ptsO, float (*rvCen)[3])
     }
 }
 
-void ParticlesUpdate(PTSptiles *par, int n)
+void ParticlesUpdate(PTSeffMg *ptsEM, PTSptiles *par, int n)
 {
     int i;
 
-    if ( --g_notBurstNum > 0 )
+    if ( --ptsEM->notBurstNum > 0 )
         return;
-    if ( g_notBurstNum < 0 )
-        g_notBurstNum = 0;
+    if ( ptsEM->notBurstNum < 0 )
+        ptsEM->notBurstNum = 0;
 
     for ( i=0; i < n; i++ ) {
         if ( par[i].active ) {
@@ -344,7 +368,7 @@ void ParticlesUpdate(PTSptiles *par, int n)
 
             if (g_keys['\t']) {
 #if 1
-                particlesReset(g_CurPtile, g_OriPtile, MAX_PARTICLES);
+                particlesReset(&g_effMg, g_CurPtile, g_OriPtile, MAX_PARTICLES);
 #else
                 par[i].x = 0.0f;
                 par[i].y = 0.0f;
@@ -374,7 +398,8 @@ void ParTranInit(PTSptiles *pars, PTSptiles *parsOri, float (*rvCen)[3],
 
 void PTS_draw()
 {
-    ParticlesDraw(g_CurPtile, MAX_PARTICLES, &g_ptsObj, g_recoverCen);
+    ParticlesDraw(&g_effMg, g_CurPtile, MAX_PARTICLES,
+            &g_ptsObj, g_effMg.recoverCen);
 }
 
 void PTS_updateLookAt(PTSlookatMg *latMg)
@@ -406,33 +431,33 @@ void PTS_updateLookAt(PTSlookatMg *latMg)
     if ( fabsf(latCur->uz - latOri->uz) > latOff->uz ) latDir->uz *= -1;
 }
 
-void PTS_update()
+void PTS_update(PTSeffMg *ptsEM)
 {
     PTS_updateLookAt(&g_lookatMg);
 
-    if ( Fps_getProgTime() - g_lastResetTime > 3.00 )
+    if ( Fps_getProgTime() - ptsEM->lastResetTime > 3.00 )
     {
-        g_isTran = 1;
-        if ( g_tranStep == 0 )
-            ParTranInit(g_CurPtile, g_OriPtile, g_recoverCen,
-                    MAX_PARTICLES, g_tranSteps);
+        ptsEM->isTran = 1;
+        if ( ptsEM->tranStep == 0 )
+            ParTranInit(g_CurPtile, g_OriPtile, g_effMg.recoverCen,
+                    MAX_PARTICLES, ptsEM->tranSteps);
         // particlesReset();
     }
     else
     {
-        ParticlesUpdate(g_CurPtile, MAX_PARTICLES);
+        ParticlesUpdate(&g_effMg, g_CurPtile, MAX_PARTICLES);
     }
 
-    if ( g_tranStep == g_tranSteps )
+    if ( ptsEM->tranStep == ptsEM->tranSteps )
     {
-        g_lastResetTime = Fps_getProgTime();
-        g_isTran = 0;
-        g_tranStep = 0;
-        g_notBurstNum = NOT_BURST_FRAME_NUM;
+        ptsEM->lastResetTime = Fps_getProgTime();
+        ptsEM->isTran = 0;
+        ptsEM->tranStep = 0;
+        ptsEM->notBurstNum = NOT_BURST_FRAME_NUM;
     }
-    if ( g_isTran && g_tranStep <= g_tranSteps)
+    if ( ptsEM->isTran && ptsEM->tranStep <= ptsEM->tranSteps)
     {
-        g_tranStep++;
+        ptsEM->tranStep++;
     }
 }
 
@@ -526,7 +551,7 @@ void render(void)
 
     PTS_lookAtMg(&g_lookatMg);
 
-    PTS_update();
+    PTS_update(&g_effMg);
     PTS_draw();
 
     glFlush();
@@ -672,7 +697,7 @@ int main(int argc, char** argv)
     glutSpecialUpFunc(special_keys_up);
     glutIdleFunc(game_function);
 
-    g_lastResetTime = Fps_getProgTime();
+    //ptsEM->lastResetTime = Fps_getProgTime();
     glutMainLoop();
 
     return 0;
