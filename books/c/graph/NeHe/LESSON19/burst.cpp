@@ -105,7 +105,8 @@ PTSptiles g_OriPtile[MAX_PARTICLES];
 PTSlookatMg     g_lookatMg;
 
 
-static GLfloat COLORS[12][3] = {     // Rainbow Of Colors
+#define N_PTS_COLORS    12
+static GLfloat g_PTS_COLORS[N_PTS_COLORS][3] = {
     {1.0f,0.5f,0.5f},{1.0f,0.75f,0.5f},{1.0f,1.0f,0.5f},{0.75f,1.0f,0.5f},
     {0.5f,1.0f,0.5f},{0.5f,1.0f,0.75f},{0.5f,1.0f,1.0f},{0.5f,0.75f,1.0f},
     {0.5f,0.5f,1.0f},{0.75f,0.5f,1.0f},{1.0f,0.5f,1.0f},{1.0f,0.5f,0.75f}
@@ -172,9 +173,9 @@ bool PTS_initParticles(PTSptiles *pars, PTSptiles *parsOri, PTSObj *ptsO,
         parsOri[i].active = pars[i].active = true;
         parsOri[i].life = pars[i].life = 1.0f;
         parsOri[i].fade = pars[i].fade = float(rand()%100)/1000.0f+0.003f;
-        parsOri[i].r  = pars[i].r  = COLORS[(i+1)/(n/12)][0];
-        parsOri[i].g  = pars[i].g  = COLORS[(i+1)/(n/12)][1];
-        parsOri[i].b  = pars[i].b  = COLORS[(i+1)/(n/12)][2];
+        parsOri[i].r  = pars[i].r  = g_PTS_COLORS[(i+1)/(n/N_PTS_COLORS)][0];
+        parsOri[i].g  = pars[i].g  = g_PTS_COLORS[(i+1)/(n/N_PTS_COLORS)][1];
+        parsOri[i].b  = pars[i].b  = g_PTS_COLORS[(i+1)/(n/N_PTS_COLORS)][2];
         parsOri[i].x  = pars[i].x  = bsX + (float)ix * ptsO->fdivObjW;
         parsOri[i].y  = pars[i].y  = bsY + (float)iy * ptsO->fdivObjH;
         parsOri[i].z  = pars[i].z  = bsZ;
@@ -343,9 +344,9 @@ void ParticlesUpdate(PTSptiles *par, int n)
                 par[i].xi = g_xspeed+float((rand()%60)-32.0f);
                 par[i].yi = g_yspeed+float((rand()%60)-30.0f);
                 par[i].zi = float((rand()%60)-30.0f);
-                par[i].r = COLORS[g_col][0];
-                par[i].g = COLORS[g_col][1];
-                par[i].b = COLORS[g_col][2];
+                par[i].r = g_PTS_COLORS[g_col][0];
+                par[i].g = g_PTS_COLORS[g_col][1];
+                par[i].b = g_PTS_COLORS[g_col][2];
             }
 
             if (g_keys['\t']) {
@@ -568,7 +569,7 @@ void game_function(void)
         if (g_keys[' ']) g_rainbow = false;
         g_delay = 0;
         g_col++;
-        if (g_col > 11) g_col = 0;
+        if (g_col >= N_PTS_COLORS) g_col = 0;
     }
     g_delay++;
 
