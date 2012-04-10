@@ -62,18 +62,26 @@ typedef struct {    // Create A Structure For Particle
     float zg;       // Z Gravity
 } particles;        // Particles Structure
 
-
 typedef struct tagSCT_PTSlookat{
     float   ex, ey, ez;
     float   cx, cy, cz;
     float   ux, uy, uz;
-}PTSlookat;
+} PTSlookat;
+
+typedef struct tagPTSlookatMg{
+    PTSlookat   latCur;
+    PTSlookat   latOri;
+    PTSlookat   latOff;
+    PTSlookat   latCen;
+    PTSlookat   latDir;
+} PTSlookatMg;
 
 
 // Global Variables
 bool    g_gamemode;            // GLUT GameMode ON/OFF
 bool    g_fullscreen;
 bool    g_keys[256];           // Keys Array
+
 bool    g_rainbow=true;
 float	g_slowdown = 2.0f;     // Slow Down Particles
 float   g_xspeed = 0.0f;	   // X Rotation Speed
@@ -94,31 +102,8 @@ PTSObj    g_ptsObj;
 particles g_particle[MAX_PARTICLES];
 particles g_OriPtile[MAX_PARTICLES];
 
-PTSlookat g_lookat = {
-    0.0, 0.0,  0.0,
-    0.0, 0.0, -2.0,
-    0.0, 1.0,  0.0
-};
-PTSlookat g_lookatOri = {
-    0.0, 0.0,  0.0,
-    0.0, 0.0, -2.0,
-    0.0, 1.0,  0.0
-};
-PTSlookat g_lookatOff = {
-    2.0, 0.2,  3.0,
-    2.0, 0.2,  1.0,
-    2.0, 3.0,  3.0
-};
-PTSlookat g_lookatCen = {
-    0.01,  0.01,  0.01,
-    0.002, 0.002, 0.002,
-    0.01,  0.00,  0.01
-};
-PTSlookat g_lookatDir = {
-    1.0, 1.0, 1.0,
-    1.0, 1.0, 1.0,
-    1.0, 1.0, 1.0
-};
+PTSlookatMg     g_lookatMg;
+
 
 static GLfloat COLORS[12][3] = {     // Rainbow Of Colors
     {1.0f,0.5f,0.5f},{1.0f,0.75f,0.5f},{1.0f,1.0f,0.5f},{0.75f,1.0f,0.5f},
@@ -239,10 +224,31 @@ bool PTS_initParticles(particles *pars, particles *parsOri, PTSObj *ptsO,
     return true;
 }
 
-bool PTS_init(PTSObj *ptsO, particles *pars, particles *parsOri)
+bool PTS_initLookAtMg(PTSlookatMg *latMg)
+{
+    PTSlookat lookat[5] = {
+        /*cur*/ { 0.0, 0.0, 0.0,   0.0, 0.0, -2.0,   0.0, 1.0, 0.0 },
+        /*ori*/ { 0.0, 0.0, 0.0,   0.0, 0.0, -2.0,   0.0, 1.0, 0.0 },
+        /*off*/ { 2.0, 0.2, 3.0,   2.0, 0.2,  1.0,   2.0, 3.0, 3.0 },
+        /*cen*/ { 0.01, 0.01, 0.01,  0.002, 0.002, 0.002,  0.01, 0.00, 0.01 },
+        /*dir*/ { 1.0, 1.0, 1.0,   1.0, 1.0, 1.0,    1.0, 1.0, 1.0 },
+    };
+
+    latMg->latCur = lookat[0];
+    latMg->latOri = lookat[1];
+    latMg->latOff = lookat[2];
+    latMg->latCen = lookat[3];
+    latMg->latDir = lookat[4];
+
+    return 1;
+}
+
+bool PTS_init(PTSObj *ptsO, particles *pars, particles *parsOri,
+        PTSlookatMg *latMg)
 {
     PTS_initObj(ptsO);
     PTS_initParticles(pars, parsOri, ptsO, MAX_PARTICLES);
+    PTS_initLookAtMg(latMg);
 
     return true;
 }
@@ -294,7 +300,7 @@ bool init(void)
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D,g_texid[0]);
 
-    PTS_init(&g_ptsObj, g_particle, g_OriPtile);
+    PTS_init(&g_ptsObj, g_particle, g_OriPtile, &g_lookatMg);
     memset(g_keys,0,sizeof(g_keys));
 
     return true;
@@ -304,12 +310,12 @@ void ParticlesDraw(particles *par, int n, PTSObj *ptsO, float (*rvCen)[3])
 {
     int i;
 
-    for ( i=0; i < n; i++ ) 
+    for ( i=0; i < n; i++ )
     {
-        if ( !par[i].active ) 
+        if ( !par[i].active )
             continue;
 
-        if ( g_isTran ) 
+        if ( g_isTran )
         {
             par[i].x += rvCen[i][0];
             par[i].y += rvCen[i][1];
@@ -360,7 +366,7 @@ void ParticlesUpdate(particles *par, int n)
             par[i].zi += par[i].zg;
             par[i].life -= par[i].fade;
 
-            if ( par[i].life < 0.0f ) 
+            if ( par[i].life < 0.0f )
             {
                 par[i].life = 1.0f;
                 par[i].fade = float(rand()%100)/1000.0f+0.003f;
@@ -394,8 +400,9 @@ void ParticlesUpdate(particles *par, int n)
 void ParTranInit(particles *pars, particles *parsOri, float (*rvCen)[3],
         int n, int steps)
 {
-    int i;
+    assert(n > 0 && steps != 0);
 
+    int i;
     for ( i = 0; i < n; i++ )
     {
         rvCen[i][0] = (parsOri[i].x - pars[i].x) / steps;
@@ -406,56 +413,48 @@ void ParTranInit(particles *pars, particles *parsOri, float (*rvCen)[3],
 
 void PTS_draw()
 {
-    ParticlesDraw(g_particle, MAX_PARTICLES, &g_ptsObj, 
+    ParticlesDraw(g_particle, MAX_PARTICLES, &g_ptsObj,
             g_recoverCen);
 }
 
-void PTS_updateLookAt(PTSlookat *lat, PTSlookat *latOri, PTSlookat *latOff,
-        PTSlookat *latCen, PTSlookat *latDir)
+void PTS_updateLookAt(PTSlookatMg *latMg)
 {
-    lat->ex += latCen->ex * latDir->ex; 
-    lat->ey += latCen->ey * latDir->ey; 
-    lat->ez -= latCen->ez * latDir->ez; 
-    lat->cx += latCen->cx * latDir->cx;
-    lat->cy += latCen->cy * latDir->cy;
-    lat->cz += latCen->cz * latDir->cz;
-    lat->ux += latCen->ux * latDir->ux; 
-    lat->uy += latCen->uy * latDir->uy; 
-    lat->uz += latCen->uz * latDir->uz; 
+    PTSlookat   *latCur = &(latMg->latCur);
+    PTSlookat   *latOri = &(latMg->latOri);
+    PTSlookat   *latOff = &(latMg->latOff);
+    PTSlookat   *latCen = &(latMg->latCen);
+    PTSlookat   *latDir = &(latMg->latDir);
 
-    if ( fabsf(lat->ex - latOri->ex) > latOff->ex ) latDir->ex *= -1;
-    if ( fabsf(lat->ey - latOri->ey) > latOff->ey ) latDir->ey *= -1;
-    if ( fabsf(lat->ez - latOri->ez) > latOff->ez ) latDir->ez *= -1;
-    if ( fabsf(lat->cx - latOri->cx) > latOff->cx ) latDir->cx *= -1;
-    if ( fabsf(lat->cy - latOri->cy) > latOff->cy ) latDir->cy *= -1;
-    if ( fabsf(lat->cz - latOri->cz) > latOff->cz ) latDir->cz *= -1;
-    if ( fabsf(lat->ux - latOri->ux) > latOff->ux ) latDir->ux *= -1;
-    if ( fabsf(lat->uy - latOri->uy) > latOff->uy ) latDir->uy *= -1;
-    if ( fabsf(lat->uz - latOri->uz) > latOff->uz ) latDir->uz *= -1;
+    latCur->ex += latCen->ex * latDir->ex;
+    latCur->ey += latCen->ey * latDir->ey;
+    latCur->ez -= latCen->ez * latDir->ez;
+    latCur->cx += latCen->cx * latDir->cx;
+    latCur->cy += latCen->cy * latDir->cy;
+    latCur->cz += latCen->cz * latDir->cz;
+    latCur->ux += latCen->ux * latDir->ux;
+    latCur->uy += latCen->uy * latDir->uy;
+    latCur->uz += latCen->uz * latDir->uz;
+
+    if ( fabsf(latCur->ex - latOri->ex) > latOff->ex ) latDir->ex *= -1;
+    if ( fabsf(latCur->ey - latOri->ey) > latOff->ey ) latDir->ey *= -1;
+    if ( fabsf(latCur->ez - latOri->ez) > latOff->ez ) latDir->ez *= -1;
+    if ( fabsf(latCur->cx - latOri->cx) > latOff->cx ) latDir->cx *= -1;
+    if ( fabsf(latCur->cy - latOri->cy) > latOff->cy ) latDir->cy *= -1;
+    if ( fabsf(latCur->cz - latOri->cz) > latOff->cz ) latDir->cz *= -1;
+    if ( fabsf(latCur->ux - latOri->ux) > latOff->ux ) latDir->ux *= -1;
+    if ( fabsf(latCur->uy - latOri->uy) > latOff->uy ) latDir->uy *= -1;
+    if ( fabsf(latCur->uz - latOri->uz) > latOff->uz ) latDir->uz *= -1;
 }
 
 void PTS_update()
 {
-    int i;
-    PTS_updateLookAt(&g_lookat, &g_lookatOri, &g_lookatOff,
-            &g_lookatCen, &g_lookatDir);
-
-    if ( g_keys['2'] || g_keys['4'] || g_keys['6'] || g_keys['8'] )
-    {
-        for ( i=0; i < MAX_PARTICLES; i++ ) 
-        {
-            if (g_keys['6'] && (g_particle[i].xg<1.5f))  g_particle[i].xg += 1.01f;
-            if (g_keys['4'] && (g_particle[i].xg>-1.5f)) g_particle[i].xg -= 1.01f;
-            if (g_keys['8'] && (g_particle[i].yg<1.5f))  g_particle[i].yg += 1.01f;
-            if (g_keys['2'] && (g_particle[i].yg>-1.5f)) g_particle[i].yg -= 1.01f;
-        }
-    }
+    PTS_updateLookAt(&g_lookatMg);
 
     if ( Fps_getProgTime() - g_lastResetTime > 3.00 )
     {
         g_isTran = 1;
         if ( g_tranStep == 0 )
-            ParTranInit(g_particle, g_OriPtile, g_recoverCen, 
+            ParTranInit(g_particle, g_OriPtile, g_recoverCen,
                     MAX_PARTICLES, g_tranSteps);
         // particlesReset();
     }
@@ -544,15 +543,28 @@ static inline void PTS_lookAt(GLfloat eyex, GLfloat eyey, GLfloat eyez,
     glTranslatef(-eyex, -eyey, -eyez);
 }
 
+void PTS_lookAtMg(PTSlookatMg *latMg)
+{
+    PTS_lookAt(
+            latMg->latCur.ex,
+            latMg->latCur.ey,
+            latMg->latCur.ez,
+            latMg->latCur.cx,
+            latMg->latCur.cy,
+            latMg->latCur.cz,
+            latMg->latCur.ux,
+            latMg->latCur.uy,
+            latMg->latCur.uz
+            );
+}
+
 // Our Rendering Is Done Here
 void render(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
 
-    PTS_lookAt(g_lookat.ex, g_lookat.ey, g_lookat.ez,
-            g_lookat.cx, g_lookat.cy, g_lookat.cz,
-            g_lookat.ux, g_lookat.uy, g_lookat.uz);
+    PTS_lookAtMg(&g_lookatMg);
 
     PTS_update();
     PTS_draw();
@@ -601,22 +613,22 @@ void game_function(void)
 void keyboard(unsigned char key, int x, int y)
 {
     switch (key) {
-        case 'a': g_lookat.ex += 0.1; break;
-        case 'A': g_lookat.ex -= 0.1; break;
-        case 's': g_lookat.ey += 0.1; break;
-        case 'S': g_lookat.ey -= 0.1; break;
-        case 'w': g_lookat.ez += 0.1; break;
-        case 'W': g_lookat.ez -= 0.1; break;
-        case 'c': g_lookat.cx += 0.02; break;
-        case 'C': g_lookat.cx -= 0.02; break;
-        case 'r': g_lookat.cy += 0.02; break;
-        case 'R': g_lookat.cy -= 0.02; break;
-        case 'e': g_lookat.cz += 0.02; break;
-        case 'E': g_lookat.cz -= 0.02; break;
-        case 'd': g_lookat.ux += 0.1; break;
-        case 'D': g_lookat.ux -= 0.1; break;
-        case 'b': g_lookat.uz += 0.1; break;
-        case 'B': g_lookat.uz -= 0.1; break;
+        // case 'a': g_lookat.ex += 0.1; break;
+        // case 'A': g_lookat.ex -= 0.1; break;
+        // case 's': g_lookat.ey += 0.1; break;
+        // case 'S': g_lookat.ey -= 0.1; break;
+        // case 'w': g_lookat.ez += 0.1; break;
+        // case 'W': g_lookat.ez -= 0.1; break;
+        // case 'c': g_lookat.cx += 0.02; break;
+        // case 'C': g_lookat.cx -= 0.02; break;
+        // case 'r': g_lookat.cy += 0.02; break;
+        // case 'R': g_lookat.cy -= 0.02; break;
+        // case 'e': g_lookat.cz += 0.02; break;
+        // case 'E': g_lookat.cz -= 0.02; break;
+        // case 'd': g_lookat.ux += 0.1; break;
+        // case 'D': g_lookat.ux -= 0.1; break;
+        // case 'b': g_lookat.uz += 0.1; break;
+        // case 'B': g_lookat.uz -= 0.1; break;
         case 'p':
                   printf("NALL &&**&& zoom=%f, xs=%f, ys=%f,\n",
                           g_zoom, g_xspeed, g_yspeed);
