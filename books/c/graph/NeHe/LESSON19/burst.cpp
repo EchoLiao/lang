@@ -106,11 +106,13 @@ PTSlookatMg     g_lookatMg;
 
 
 #define N_PTS_COLORS    12
-static GLfloat g_PTS_COLORS[N_PTS_COLORS][3] = {
+static GLfloat g_PTS_COLORS[][3] = {
     {1.0f,0.5f,0.5f},{1.0f,0.75f,0.5f},{1.0f,1.0f,0.5f},{0.75f,1.0f,0.5f},
     {0.5f,1.0f,0.5f},{0.5f,1.0f,0.75f},{0.5f,1.0f,1.0f},{0.5f,0.75f,1.0f},
-    {0.5f,0.5f,1.0f},{0.75f,0.5f,1.0f},{1.0f,0.5f,1.0f},{1.0f,0.5f,0.75f}
+    {0.5f,0.5f,1.0f},{0.75f,0.5f,1.0f},{1.0f,0.5f,1.0f},{1.0f,0.5f,0.75f},
 };
+extern int dummy[ (sizeof(g_PTS_COLORS) / sizeof(g_PTS_COLORS[0]))
+    == N_PTS_COLORS ? 0 : -1 ];
 
 
 bool setup_textures()
