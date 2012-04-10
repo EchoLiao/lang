@@ -111,39 +111,6 @@ static GLfloat COLORS[12][3] = {     // Rainbow Of Colors
     {0.5f,0.5f,1.0f},{0.75f,0.5f,1.0f},{1.0f,0.5f,1.0f},{1.0f,0.5f,0.75f}
 };
 
-bool load_rgb_image(const char* file_name, int w, int h, RGBIMG* refimg)
-{
-    GLuint   sz;    // Our Image's Data Field Length In Bytes
-    FILE*    file;  // The Image's File On Disk
-    long     fsize; // File Size In Bytes
-    GLubyte* p;     // Helper Pointer
-
-    // Update The Image's Fields
-    refimg->w = (GLuint) w;
-    refimg->h = (GLuint) h;
-    sz = (((3*refimg->w+3)>>2)<<2)*refimg->h;
-    refimg->data = new GLubyte [sz];
-    if (refimg->data == NULL) return false;
-
-    // Open The File And Read The Pixels
-    file = fopen(file_name , "rb");
-    if (!file) return false;
-    fseek(file, 0L, SEEK_END);
-    fsize = ftell(file);
-    if (fsize != (long)sz) {
-        fclose(file);
-        return false;
-    }
-    fseek(file, 0L, SEEK_SET);
-    p = refimg->data;
-    while (fsize > 0) {
-        fread(p, 1, 1, file);
-        p++;
-        fsize--;
-    }
-    fclose(file);
-    return true;
-}
 
 bool setup_textures()
 {
@@ -413,8 +380,7 @@ void ParTranInit(particles *pars, particles *parsOri, float (*rvCen)[3],
 
 void PTS_draw()
 {
-    ParticlesDraw(g_particle, MAX_PARTICLES, &g_ptsObj,
-            g_recoverCen);
+    ParticlesDraw(g_particle, MAX_PARTICLES, &g_ptsObj, g_recoverCen);
 }
 
 void PTS_updateLookAt(PTSlookatMg *latMg)
