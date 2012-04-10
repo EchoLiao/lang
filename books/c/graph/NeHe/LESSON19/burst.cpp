@@ -42,7 +42,7 @@ typedef struct tagPTSObj {
     float   fdivTexW, fdivTexH;
 } PTSObj;
 
-typedef struct {    // Create A Structure For Particle
+typedef struct tagPTSptiles {
     bool  active;   // Active (Yes/No)
     float life;     // Particle Life
     float fade;     // Fade Speed
@@ -60,7 +60,7 @@ typedef struct {    // Create A Structure For Particle
     float xg;       // X Gravity
     float yg;       // Y Gravity
     float zg;       // Z Gravity
-} particles;        // Particles Structure
+} PTSptiles;        // Particles Structure
 
 typedef struct tagSCT_PTSlookat{
     float   ex, ey, ez;
@@ -99,8 +99,8 @@ float   g_lastResetTime;
 float   g_recoverCen[MAX_PARTICLES][3] = { {0.0, 0.0, 0.0}, };
 
 PTSObj    g_ptsObj;
-particles g_CurPtile[MAX_PARTICLES];
-particles g_OriPtile[MAX_PARTICLES];
+PTSptiles g_CurPtile[MAX_PARTICLES];
+PTSptiles g_OriPtile[MAX_PARTICLES];
 
 PTSlookatMg     g_lookatMg;
 
@@ -156,7 +156,7 @@ bool PTS_initObj(PTSObj *ptsO)
     return true;
 }
 
-bool PTS_initParticles(particles *pars, particles *parsOri, PTSObj *ptsO,
+bool PTS_initParticles(PTSptiles *pars, PTSptiles *parsOri, PTSObj *ptsO,
         int n)
 {
     int i;
@@ -210,7 +210,7 @@ bool PTS_initLookAtMg(PTSlookatMg *latMg)
     return 1;
 }
 
-bool PTS_init(PTSObj *ptsO, particles *pars, particles *parsOri,
+bool PTS_init(PTSObj *ptsO, PTSptiles *pars, PTSptiles *parsOri,
         PTSlookatMg *latMg)
 {
     PTS_initObj(ptsO);
@@ -220,7 +220,7 @@ bool PTS_init(PTSObj *ptsO, particles *pars, particles *parsOri,
     return true;
 }
 
-void particlesReset(particles *pars, particles *parsOri, int n)
+void particlesReset(PTSptiles *pars, PTSptiles *parsOri, int n)
 {
     int i;
 
@@ -273,7 +273,7 @@ bool init(void)
     return true;
 }
 
-void ParticlesDraw(particles *par, int n, PTSObj *ptsO, float (*rvCen)[3])
+void ParticlesDraw(PTSptiles *par, int n, PTSObj *ptsO, float (*rvCen)[3])
 {
     int i;
 
@@ -313,7 +313,7 @@ void ParticlesDraw(particles *par, int n, PTSObj *ptsO, float (*rvCen)[3])
     }
 }
 
-void ParticlesUpdate(particles *par, int n)
+void ParticlesUpdate(PTSptiles *par, int n)
 {
     int i;
 
@@ -364,7 +364,7 @@ void ParticlesUpdate(particles *par, int n)
     }
 }
 
-void ParTranInit(particles *pars, particles *parsOri, float (*rvCen)[3],
+void ParTranInit(PTSptiles *pars, PTSptiles *parsOri, float (*rvCen)[3],
         int n, int steps)
 {
     assert(n > 0 && steps != 0);
