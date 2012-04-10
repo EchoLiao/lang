@@ -68,6 +68,14 @@ typedef struct tagPTSlookatMg{
 } PTSlookatMg;
 
 typedef struct tagPTSeffMg{
+    int     isRainbow;
+    float   slowdown;
+    float   speedX;
+    float   speedY;
+    float   zoom;
+    int     colIdx;
+    int     delay;
+
     int     isTran;
     int     tranStep;
     int     tranSteps;
@@ -81,13 +89,13 @@ bool    g_gamemode;            // GLUT GameMode ON/OFF
 bool    g_fullscreen;
 bool    g_keys[256];           // Keys Array
 
-bool    g_rainbow=true;
-float	g_slowdown = 2.0f;     // Slow Down Particles
-float   g_xspeed = 0.0f;	   // X Rotation Speed
-float   g_yspeed = 42.0f;	   // Y Rotation Speed
-float	g_zoom =  -2.0f;       // Used To Zoom Out
-GLuint	g_col = 0;             // Current Color Selection
-GLuint	g_delay = 0;           // Rainbow Effect Delay
+// bool    g_rainbow=true;
+// float	g_slowdown = 2.0f;     // Slow Down Particles
+// float   g_xspeed = 0.0f;	   // X Rotation Speed
+// float   g_yspeed = 42.0f;	   // Y Rotation Speed
+// float	g_zoom =  -2.0f;       // Used To Zoom Out
+// GLuint	g_col = 0;             // Current Color Selection
+// GLuint	g_delay = 0;           // Rainbow Effect Delay
 
 GLuint	g_texid[TEXTURES_NUM]; // Our Textures' Id List
 
@@ -208,12 +216,19 @@ bool PTS_initLookAtMg(PTSlookatMg *latMg)
 
 bool PTS_initEffMg(PTSeffMg *ptsEM)
 {
+    ptsEM->isRainbow        = 1;
+    ptsEM->slowdown         = 2.0;
+    ptsEM->speedX           = 0.0;
+    ptsEM->speedY           = 42.0;
+    ptsEM->zoom             = -2.0;
+    ptsEM->colIdx           = 0;
+    ptsEM->delay            = 0;
+
     ptsEM->isTran           = 0;
     ptsEM->tranStep         = 0;
     ptsEM->tranSteps        = 100;
     ptsEM->notBurstNum      = NOT_BURST_FRAME_NUM;
     ptsEM->lastResetTime    = 0.0;
-
     memset(ptsEM->recoverCen, 0, sizeof(ptsEM->recoverCen));
 
     return 1;
@@ -301,7 +316,7 @@ void ParticlesDraw(PTSeffMg *ptsEM, PTSptiles *par, int n, PTSObj *ptsO, float (
         }
         float x  = par[i].x;
         float y  = par[i].y;
-        float z  = par[i].z + g_zoom;
+        float z  = par[i].z + ptsEM->zoom;
         float cx = ptsO->fdivObjW;
         float cy = ptsO->fdivObjH;
         float s  = par[i].s;
@@ -335,9 +350,9 @@ void ParticlesUpdate(PTSeffMg *ptsEM, PTSptiles *par, int n)
 
     for ( i=0; i < n; i++ ) {
         if ( par[i].active ) {
-            par[i].x += par[i].xi/(g_slowdown*1000);
-            par[i].y += par[i].yi/(g_slowdown*1000);
-            par[i].z += par[i].zi/(g_slowdown*1000);
+            par[i].x += par[i].xi/(ptsEM->slowdown*1000);
+            par[i].y += par[i].yi/(ptsEM->slowdown*1000);
+            par[i].z += par[i].zi/(ptsEM->slowdown*1000);
 
             par[i].xi += par[i].xg;
             par[i].yi += par[i].yg;
@@ -351,12 +366,12 @@ void ParticlesUpdate(PTSeffMg *ptsEM, PTSptiles *par, int n)
                 par[i].x = 0.0f;
                 par[i].y = 0.0f;
                 par[i].z = 0.0f;
-                par[i].xi = g_xspeed+float((rand()%60)-32.0f);
-                par[i].yi = g_yspeed+float((rand()%60)-30.0f);
+                par[i].xi = ptsEM->speedX+float((rand()%60)-32.0f);
+                par[i].yi = ptsEM->speedY+float((rand()%60)-30.0f);
                 par[i].zi = float((rand()%60)-30.0f);
-                par[i].r = g_PTS_COLORS[g_col][0];
-                par[i].g = g_PTS_COLORS[g_col][1];
-                par[i].b = g_PTS_COLORS[g_col][2];
+                par[i].r = g_PTS_COLORS[ptsEM->colIdx][0];
+                par[i].g = g_PTS_COLORS[ptsEM->colIdx][1];
+                par[i].b = g_PTS_COLORS[ptsEM->colIdx][2];
             }
 
             if (g_keys['\t']) {
@@ -570,19 +585,20 @@ void reshape(int w, int h)
 
 void game_function(void)
 {
-    if (g_keys[GLUT_KEY_PAGE_UP])	g_zoom += 0.1f;	// Zoom In
-    if (g_keys[GLUT_KEY_PAGE_DOWN])	g_zoom -= 0.1f;	// Zoom Out
-    if (g_keys[GLUT_KEY_UP] && (g_yspeed < 200))    g_yspeed += 1.0f;
-    if (g_keys[GLUT_KEY_DOWN] && (g_yspeed > -200)) g_yspeed -= 1.0f;
-    if (g_keys[GLUT_KEY_RIGHT] && (g_xspeed < 200)) g_xspeed += 1.0f;
-    if (g_keys[GLUT_KEY_LEFT] && (g_xspeed > -200)) g_xspeed -= 1.0f;
-    if (g_keys[' '] || (g_rainbow && (g_delay>25))) {
-        if (g_keys[' ']) g_rainbow = false;
-        g_delay = 0;
-        g_col++;
-        if (g_col >= N_PTS_COLORS) g_col = 0;
+    // if (g_keys[GLUT_KEY_PAGE_UP])	g_zoom += 0.1f;	// Zoom In
+    // if (g_keys[GLUT_KEY_PAGE_DOWN])	g_zoom -= 0.1f;	// Zoom Out
+    // if (g_keys[GLUT_KEY_UP] && (g_yspeed < 200))    g_yspeed += 1.0f;
+    // if (g_keys[GLUT_KEY_DOWN] && (g_yspeed > -200)) g_yspeed -= 1.0f;
+    // if (g_keys[GLUT_KEY_RIGHT] && (g_xspeed < 200)) g_xspeed += 1.0f;
+    // if (g_keys[GLUT_KEY_LEFT] && (g_xspeed > -200)) g_xspeed -= 1.0f;
+
+    if (g_keys[' '] || (g_effMg.isRainbow && (g_effMg.delay>25))) {
+        if (g_keys[' ']) g_effMg.isRainbow = false;
+        g_effMg.delay = 0;
+        g_effMg.colIdx++;
+        if (g_effMg.colIdx >= N_PTS_COLORS) g_effMg.colIdx = 0;
     }
-    g_delay++;
+    g_effMg.delay++;
 
     render();
 }
@@ -608,21 +624,21 @@ void keyboard(unsigned char key, int x, int y)
         // case 'b': g_lookat.uz += 0.1; break;
         // case 'B': g_lookat.uz -= 0.1; break;
         case 'p':
-                  printf("NALL &&**&& zoom=%f, xs=%f, ys=%f,\n",
-                          g_zoom, g_xspeed, g_yspeed);
+                  // printf("NALL &&**&& zoom=%f, xs=%f, ys=%f,\n",
+                  //         g_zoom, g_xspeed, g_yspeed);
                   break;
         case 27:
                   exit(0);
                   break;
-        case '+':
-                  if (g_slowdown > 1.0f) g_slowdown -= 0.01f;
-                  break;
-        case '-':
-                  if (g_slowdown < 4.0f) g_slowdown += 0.01f;
-                  break;
-        case '\n':
-                  g_rainbow = !g_rainbow;
-                  break;
+        // case '+':
+        //           if (g_slowdown > 1.0f) g_slowdown -= 0.01f;
+        //           break;
+        // case '-':
+        //           if (g_slowdown < 4.0f) g_slowdown += 0.01f;
+        //           break;
+        // case '\n':
+        //           g_rainbow = !g_rainbow;
+        //           break;
         default:
                   g_keys[key] = true;
                   break;
