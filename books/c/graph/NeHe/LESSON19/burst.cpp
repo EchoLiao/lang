@@ -99,7 +99,7 @@ float   g_lastResetTime;
 float   g_recoverCen[MAX_PARTICLES][3] = { {0.0, 0.0, 0.0}, };
 
 PTSObj    g_ptsObj;
-particles g_particle[MAX_PARTICLES];
+particles g_CurPtile[MAX_PARTICLES];
 particles g_OriPtile[MAX_PARTICLES];
 
 PTSlookatMg     g_lookatMg;
@@ -267,7 +267,7 @@ bool init(void)
     glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D,g_texid[0]);
 
-    PTS_init(&g_ptsObj, g_particle, g_OriPtile, &g_lookatMg);
+    PTS_init(&g_ptsObj, g_CurPtile, g_OriPtile, &g_lookatMg);
     memset(g_keys,0,sizeof(g_keys));
 
     return true;
@@ -350,7 +350,7 @@ void ParticlesUpdate(particles *par, int n)
 
             if (g_keys['\t']) {
 #if 1
-                particlesReset(g_particle, g_OriPtile, MAX_PARTICLES);
+                particlesReset(g_CurPtile, g_OriPtile, MAX_PARTICLES);
 #else
                 par[i].x = 0.0f;
                 par[i].y = 0.0f;
@@ -380,7 +380,7 @@ void ParTranInit(particles *pars, particles *parsOri, float (*rvCen)[3],
 
 void PTS_draw()
 {
-    ParticlesDraw(g_particle, MAX_PARTICLES, &g_ptsObj, g_recoverCen);
+    ParticlesDraw(g_CurPtile, MAX_PARTICLES, &g_ptsObj, g_recoverCen);
 }
 
 void PTS_updateLookAt(PTSlookatMg *latMg)
@@ -420,13 +420,13 @@ void PTS_update()
     {
         g_isTran = 1;
         if ( g_tranStep == 0 )
-            ParTranInit(g_particle, g_OriPtile, g_recoverCen,
+            ParTranInit(g_CurPtile, g_OriPtile, g_recoverCen,
                     MAX_PARTICLES, g_tranSteps);
         // particlesReset();
     }
     else
     {
-        ParticlesUpdate(g_particle, MAX_PARTICLES);
+        ParticlesUpdate(g_CurPtile, MAX_PARTICLES);
     }
 
     if ( g_tranStep == g_tranSteps )
