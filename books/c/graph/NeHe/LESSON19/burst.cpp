@@ -91,13 +91,6 @@ GLuint	g_delay = 0;           // Rainbow Effect Delay
 
 GLuint	g_texid[TEXTURES_NUM]; // Our Textures' Id List
 
-// int       g_isTran    = 0;
-// int       g_tranStep  = 0;
-// const int g_tranSteps = 100;
-// int     g_notBurstNum = NOT_BURST_FRAME_NUM;
-// float   g_lastResetTime;
-// float   g_recoverCen[MAX_PARTICLES][3] = { {0.0, 0.0, 0.0}, };
-
 PTSObj    g_ptsObj;
 PTSptiles g_CurPtile[MAX_PARTICLES];
 PTSptiles g_OriPtile[MAX_PARTICLES];
