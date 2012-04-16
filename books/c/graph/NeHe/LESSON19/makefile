@@ -22,7 +22,11 @@ LDFLAGS = -lglut -lGLU -lGL -lstdc++ -lrt -lm
 # add here additional object files
 OBJS = bmprw.o nal_fps.o
 
-all: $(PROJ).exe burst.exe
+all: $(PROJ).exe burst.exe texEnvf.exe
+
+
+texEnvf.exe: texEnvf.o $(OBJS)
+	$(CC) $(LIBPATH) -o $@ $^ $(LDFLAGS)
 
 burst.exe: burst.o $(OBJS)
 	$(CC) $(LIBPATH) -o $@ $^ $(LDFLAGS)
