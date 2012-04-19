@@ -46,7 +46,8 @@ void VMatMult(GLmatrix16f M, GLvector4f v)
 {
   GLfloat res[4];										// Hold Calculated Results
   res[0]=M[ 0]*v[0]+M[ 4]*v[1]+M[ 8]*v[2]+M[12]*v[3];
-  res[1]=M[ 1]*v[0]+M[ 5]*v[1]+M[ 9]*v[2]+M[13]*v[3];  res[2]=M[ 2]*v[0]+M[ 6]*v[1]+M[10]*v[2]+M[14]*v[3];
+  res[1]=M[ 1]*v[0]+M[ 5]*v[1]+M[ 9]*v[2]+M[13]*v[3];
+  res[2]=M[ 2]*v[0]+M[ 6]*v[1]+M[10]*v[2]+M[14]*v[3];
   res[3]=M[ 3]*v[0]+M[ 7]*v[1]+M[11]*v[2]+M[15]*v[3];
   v[0]=res[0];										// Results Are Stored Back In v[]
   v[1]=res[1];
@@ -169,71 +170,6 @@ void DrawGLRoom()										// Draw The Room (Box)
 
 void DrawGLScene()									// Main Drawing Routine
 {
-#if 0
-  GLmatrix16f Minv;
-  GLvector4f wlp, lp;
-
-  // Clear Color Buffer, Depth Buffer, Stencil Buffer
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-	
-  glLoadIdentity();									// Reset Modelview Matrix
-  glTranslatef(0.0f, 0.0f, -20.0f);					// Zoom Into Screen 20 Units
-  glLightfv(GL_LIGHT1, GL_POSITION, LightPos);		// Position Light1
-  glTranslatef(SpherePos[0], SpherePos[1], SpherePos[2]);	// Position The Sphere
-  gluSphere(q, 1.5f, 32, 16);							// Draw A Sphere
-
-  // calculate light's position relative to local coordinate system
-  // dunno if this is the best way to do it, but it actually works
-  // if u find another aproach, let me know ;)
-
-  // we build the inversed matrix by doing all the actions in reverse order
-  // and with reverse parameters (notice -xrot, -yrot, -ObjPos[], etc.)
-  glLoadIdentity();									// Reset Matrix
-  glRotatef(-yrot, 0.0f, 1.0f, 0.0f);					// Rotate By -yrot On Y Axis
-  glRotatef(-xrot, 1.0f, 0.0f, 0.0f);					// Rotate By -xrot On X Axis
-  glGetFloatv(GL_MODELVIEW_MATRIX,Minv);				// Retrieve ModelView Matrix (Stores In Minv)
-  lp[0] = LightPos[0];								// Store Light Position X In lp[0]
-  lp[1] = LightPos[1];								// Store Light Position Y In lp[1]
-  lp[2] = LightPos[2];								// Store Light Position Z In lp[2]
-  lp[3] = LightPos[3];								// Store Light Direction In lp[3]
-  VMatMult(Minv, lp);									// We Store Rotated Light Vector In 'lp' Array
-  glTranslatef(-ObjPos[0], -ObjPos[1], -ObjPos[2]);	// Move Negative On All Axis Based On ObjPos[] Values (X, Y, Z)
-  glGetFloatv(GL_MODELVIEW_MATRIX,Minv);				// Retrieve ModelView Matrix From Minv
-  wlp[0] = 0.0f;										// World Local Coord X To 0
-  wlp[1] = 0.0f;										// World Local Coord Y To 0
-  wlp[2] = 0.0f;										// World Local Coord Z To 0
-  wlp[3] = 1.0f;
-  VMatMult(Minv, wlp);								// We Store The Position Of The World Origin Relative To The
-  // Local Coord. System In 'wlp' Array
-  lp[0] += wlp[0];									// Adding These Two Gives Us The
-  lp[1] += wlp[1];									// Position Of The Light Relative To
-  lp[2] += wlp[2];									// The Local Coordinate System
-
-  glColor4f(0.7f, 0.4f, 0.0f, 1.0f);					// Set Color To An Orange
-  glLoadIdentity();									// Reset Modelview Matrix
-  glTranslatef(0.0f, 0.0f, -20.0f);					// Zoom Into The Screen 20 Units
-  DrawGLRoom();										// Draw The Room
-  glTranslatef(ObjPos[0], ObjPos[1], ObjPos[2]);		// Position The Object
-  glRotatef(xrot, 1.0f, 0.0f, 0.0f);					// Spin It On The X Axis By xrot
-  glRotatef(yrot, 0.0f, 1.0f, 0.0f);					// Spin It On The Y Axis By yrot
-  DrawGLObject(obj);									// Procedure For Drawing The Loaded Object
-  CastShadow(&obj, lp);								// Procedure For Casting The Shadow Based On The Silhouette
-
-  glColor4f(0.7f, 0.4f, 0.0f, 1.0f);					// Set Color To Purplish Blue
-  glDisable(GL_LIGHTING);								// Disable Lighting
-  glDepthMask(GL_FALSE);								// Disable Depth Mask
-  glTranslatef(lp[0], lp[1], lp[2]);					// Translate To Light's Position
-  // Notice We're Still In Local Coordinate System
-  gluSphere(q, 0.2f, 16, 8);							// Draw A Little Yellow Sphere (Represents Light)
-  glEnable(GL_LIGHTING);								// Enable Lighting
-  glDepthMask(GL_TRUE);								// Enable Depth Mask
-
-  xrot += xspeed;	
-  yrot += yspeed;	
-
-  glFlush();
-  glutSwapBuffers();
-#else
   GLmatrix16f Minv, Inv;
   GLvector4f  lp;
 
@@ -283,7 +219,6 @@ void DrawGLScene()									// Main Drawing Routine
 
   glFlush();
   glutSwapBuffers();
-#endif
 }
 
 void SpecialFunc(int key, int x, int y)					// Process Key Presses

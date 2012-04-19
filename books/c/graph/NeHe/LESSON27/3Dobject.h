@@ -98,7 +98,7 @@ inline void SetConnectivity(glObject *o){
 						p2j=o->planes[j].p[p2j];
 
                         // 如果面A的边(p1i, p2i)和面B的边(p1j, p2j)为同一条边,
-                        // 则下面公式的 P1i=P1j, 且P2i=P2j .
+                        // 则有: P1i==P1j, 且 P2i==P2j .
 						P1i=((p1i+p2i)-abs(p1i-p2i))/2;
 						P2i=((p1i+p2i)+abs(p1i-p2i))/2;
 						P1j=((p1j+p2j)-abs(p1j-p2j))/2;
@@ -180,17 +180,74 @@ void DrawGLObject(glObject o){
 	glEnd();
 }
 
-// Shadow Volume(阴影锥)技术详解
-// http://www.yakergong.net/blog/archives/23
-// 用"阴影锥"算法渲染阴影(请保证场景在阴影之前被渲染)
-void  CastShadow(glObject *o, float *lp)
+void CastShadowVolume(glObject *o, float *lp)
 {
 	unsigned int	i, j, k, jj;
 	unsigned int	p1, p2;
 	sPoint			v1, v2;
+
+    for (i=0; i<o->nPlanes;i++){ // 对于模型中的每一个面A
+        if (o->planes[i].visible) // 在光源处观察, 如果面A可见(正面)
+        {
+            for (j=0;j<3;j++){ // 对于面A的每一个顶点
+                k = o->planes[i].neigh[j];
+                // 如果面A的该边(p1,p2)不存在邻面; 或邻面不可见, 则该边是
+                // "silhouette edge" 的边.
+                if ((!k) || (!o->planes[k-1].visible)){
+                    // here we have an edge, we must draw a polygon
+                    p1 = o->planes[i].p[j];
+                    jj = (j+1)%3;
+                    p2 = o->planes[i].p[jj];
+
+                    // 用面A的该条边和足够远处的与此边相平行的边去截"从光源到
+                    // 面A的该边的端点的两条射线", 把得到的四边形作为阴影锥体
+                    // 的一个面.
+                    //calculate the length of the vector
+                    v1.x = (o->points[p1].x - lp[0])*200;
+                    v1.y = (o->points[p1].y - lp[1])*200;
+                    v1.z = (o->points[p1].z - lp[2])*200;
+
+                    v2.x = (o->points[p2].x - lp[0])*200;
+                    v2.y = (o->points[p2].y - lp[1])*200;
+                    v2.z = (o->points[p2].z - lp[2])*200;
+#if 1
+                    //draw the polygon
+                    glBegin(GL_TRIANGLE_STRIP);
+                    glVertex3f(o->points[p1].x,
+                            o->points[p1].y,
+                            o->points[p1].z);
+                    glVertex3f(o->points[p1].x + v1.x,
+                            o->points[p1].y + v1.y,
+                            o->points[p1].z + v1.z);
+
+                    glVertex3f(o->points[p2].x,
+                            o->points[p2].y,
+                            o->points[p2].z);
+                    glVertex3f(o->points[p2].x + v2.x,
+                            o->points[p2].y + v2.y,
+                            o->points[p2].z + v2.z);
+#else
+                    glBegin(GL_TRIANGLES);
+                    glVertex3f(lp[0], lp[1], lp[2]);
+                    glVertex3f(o->points[p1].x + v1.x,
+                            o->points[p1].y + v1.y,
+                            o->points[p1].z + v1.z);
+                    glVertex3f(o->points[p2].x + v2.x,
+                            o->points[p2].y + v2.y,
+                            o->points[p2].z + v2.z);
+#endif
+                    glEnd();
+                }
+            }
+        }
+    }
+}
+
+void CastShadowCalVisual(glObject *o, float *lp)
+{
+    unsigned int    i;
 	float			side;
 
-	//set visual parameter
 	for (i=0;i<o->nPlanes;i++){
 		// chech to see if light is in front or behind the plane (face plane)
 		side =	o->planes[i].PlaneEq.a*lp[0]+
@@ -202,6 +259,29 @@ void  CastShadow(glObject *o, float *lp)
 		if (side >0) o->planes[i].visible = 1;
 				else o->planes[i].visible = 0;
 	}
+}
+
+void CastShadowDrawFullScreen()
+{
+	glPushMatrix();
+	glLoadIdentity();
+	glBegin(GL_TRIANGLE_STRIP);
+		glVertex3f(-1.1f, 1.1f,-0.10f);
+		glVertex3f(-1.1f,-1.1f,-0.10f);
+		glVertex3f( 1.1f, 1.1f,-0.10f);
+		glVertex3f( 1.1f,-1.1f,-0.10f);
+	glEnd();
+	glPopMatrix();
+}
+
+
+// Shadow Volume(阴影锥)技术详解
+// http://www.yakergong.net/blog/archives/23
+// 用"阴影锥"算法渲染阴影(请保证场景在阴影之前被渲染)
+void  CastShadow(glObject *o, float *lp)
+{
+	//set visual parameter
+    CastShadowCalVisual(o, lp);
 
     /*
      * rt-notes/linux/computor/grath/opengl/note/pipe-line.txt
@@ -211,7 +291,7 @@ void  CastShadow(glObject *o, float *lp)
      *   culling test >> scissoring >> alpha test >> stencil test >>
      *   depth-buffer test >> dithering >> blending
      *
-     *      其中, culling test 是发生是顶点着色时期, 而其它的都是发生在片段着
+     *      其中, culling test 是发生在顶点着色时期, 而其它的都是发生在片段着
      *      色时期.
      *
      * */
@@ -231,13 +311,14 @@ void  CastShadow(glObject *o, float *lp)
 #endif
 
     // 程序初始化时需要设置: glCullFace(GL_BACK), glEnable(GL_CULL_FACE) .
-    // 程序初始化时设置蒙板清除值为0: glClearStencil(0) ,
-    // 在渲染场景前执行 glClear(GL_STENCIL_BUFFER_BIT) 以把蒙板缓冲区清零.
+    // 程序初始化时设置蒙板清除值为0: glClearStencil(0) ; 然后在每一帧渲染场景
+    // 前执行 glClear(GL_STENCIL_BUFFER_BIT) 以把蒙板缓冲区清零.
 
 
     // 首先, 我们需要找出和画出阴影锥, 所以把蒙板测试函数设置为: "所有的片元都
     // 能通过蒙板测试(GL_ALWAYS)".
 	glStencilFunc(GL_ALWAYS, 1, 0xffffffff);
+
 
     // 设置顶点顺序为逆时针的面为正面, 所以当渲染阴影锥体的各个面时, 只有靠近
     // 视点这一侧的面会被渲染, 离视点较远的那一侧, 只能看到背面, 已被剔除.
@@ -245,103 +326,15 @@ void  CastShadow(glObject *o, float *lp)
     // 渲染靠近视点这一侧的面时, 对应蒙板值加一. <A1>
 	glStencilOp(GL_KEEP, GL_KEEP, GL_INCR);
     // 找出"silhouette edge"
-	for (i=0; i<o->nPlanes;i++){ // 对于模型中的每一个面A
-		if (o->planes[i].visible) // 在光源处观察, 如果面A可见(正面)
-			for (j=0;j<3;j++){ // 对于面A的每一个顶点
-				k = o->planes[i].neigh[j];
-                // 如果面A的该边(p1,p2)不存在邻面; 或邻面不可见, 则该边是
-                // "silhouette edge" 的边.
-				if ((!k) || (!o->planes[k-1].visible)){
-					// here we have an edge, we must draw a polygon
-					p1 = o->planes[i].p[j];
-					jj = (j+1)%3;
-					p2 = o->planes[i].p[jj];
-
-                    // 用面A的该条边和足够远处的与此边相平行的边去截"从光源到
-                    // 面A的该边的端点的两条射线", 把得到的四边形作为阴影锥体
-                    // 的一个面.
-					//calculate the length of the vector
-					v1.x = (o->points[p1].x - lp[0])*200;
-					v1.y = (o->points[p1].y - lp[1])*200;
-					v1.z = (o->points[p1].z - lp[2])*200;
-
-					v2.x = (o->points[p2].x - lp[0])*200;
-					v2.y = (o->points[p2].y - lp[1])*200;
-					v2.z = (o->points[p2].z - lp[2])*200;
-#if 1
-					//draw the polygon
-					glBegin(GL_TRIANGLE_STRIP);
-						glVertex3f(o->points[p1].x,
-									o->points[p1].y,
-									o->points[p1].z);
-						glVertex3f(o->points[p1].x + v1.x,
-									o->points[p1].y + v1.y,
-									o->points[p1].z + v1.z);
-
-						glVertex3f(o->points[p2].x,
-									o->points[p2].y,
-									o->points[p2].z);
-						glVertex3f(o->points[p2].x + v2.x,
-									o->points[p2].y + v2.y,
-									o->points[p2].z + v2.z);
-#else
-					glBegin(GL_TRIANGLES);
-						glVertex3f(lp[0], lp[1], lp[2]);
-						glVertex3f(o->points[p1].x + v1.x,
-									o->points[p1].y + v1.y,
-									o->points[p1].z + v1.z);
-						glVertex3f(o->points[p2].x + v2.x,
-									o->points[p2].y + v2.y,
-									o->points[p2].z + v2.z);
-#endif
-					glEnd();
-				}
-			}
-	}
+    CastShadowVolume(o, lp);
 
     // 设置顶点顺序为顺时针的面为正面, 所以当渲染阴影锥体的各个面时, 只有远离
     // 视点那一侧的面会被渲染, 离视点较近的这一侧, 只能看到背面, 已被剔除.
 	glFrontFace(GL_CW);
     // 渲染远离视点那一侧的面时, 对应蒙板值减一. <A2>
 	glStencilOp(GL_KEEP, GL_KEEP, GL_DECR);
-	for (i=0; i<o->nPlanes;i++){
-		if (o->planes[i].visible)
-			for (j=0;j<3;j++){
-				k = o->planes[i].neigh[j];
-				if ((!k) || (!o->planes[k-1].visible)){
-					// here we have an edge, we must draw a polygon
-					p1 = o->planes[i].p[j];
-					jj = (j+1)%3;
-					p2 = o->planes[i].p[jj];
+    CastShadowVolume(o, lp);
 
-					//calculate the length of the vector
-					v1.x = (o->points[p1].x - lp[0])*100;
-					v1.y = (o->points[p1].y - lp[1])*100;
-					v1.z = (o->points[p1].z - lp[2])*100;
-
-					v2.x = (o->points[p2].x - lp[0])*100;
-					v2.y = (o->points[p2].y - lp[1])*100;
-					v2.z = (o->points[p2].z - lp[2])*100;
-					
-					//draw the polygon
-					glBegin(GL_TRIANGLE_STRIP);
-						glVertex3f(o->points[p1].x,
-									o->points[p1].y,
-									o->points[p1].z);
-						glVertex3f(o->points[p1].x + v1.x,
-									o->points[p1].y + v1.y,
-									o->points[p1].z + v1.z);
-
-						glVertex3f(o->points[p2].x,
-									o->points[p2].y,
-									o->points[p2].z);
-						glVertex3f(o->points[p2].x + v2.x,
-									o->points[p2].y + v2.y,
-									o->points[p2].z + v2.z);
-					glEnd();
-				}
-			}
-	}
 
 	// 设置回顶点顺序为逆时针的面为正面.
 	glFrontFace(GL_CCW);
@@ -355,15 +348,7 @@ void  CastShadow(glObject *o, float *lp)
     // 所以, ...
 	glStencilFunc(GL_NOTEQUAL, 0, 0xffffffff);
 	glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
-	glPushMatrix();
-	glLoadIdentity();
-	glBegin(GL_TRIANGLE_STRIP);
-		glVertex3f(-0.1f, 0.1f,-0.10f);
-		glVertex3f(-0.1f,-0.1f,-0.10f);
-		glVertex3f( 0.1f, 0.1f,-0.10f);
-		glVertex3f( 0.1f,-0.1f,-0.10f);
-	glEnd();
-	glPopMatrix();
+    CastShadowDrawFullScreen();
 	glDisable(GL_BLEND);
 
 	glDepthFunc(GL_LEQUAL);
