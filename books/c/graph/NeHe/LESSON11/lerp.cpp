@@ -93,7 +93,7 @@ GodLightPosition godlightposition={
 
     5,
     1,
-    10,
+    20,
     10,
 
     1024,
@@ -369,6 +369,11 @@ void GodLight_DOWNTOUP()
         glDisable(GL_TEXTURE_2D);                           // Enable Texture Mapping
         glColor4f(1.0, 0.0, 1.0, 1.0);
 
+        glBegin(GL_LINES); {
+            for( int ii = 0; ii < 10; ii++ )
+
+        } glEnd();
+
         if(i <= godlightposition.DEFAULT_Y_SUBDIV)
         {
             // update_vertices_downtoup(vertices, tmp_vertices, i, &gpCurLightView->Rect, godlightposition);
@@ -384,9 +389,10 @@ void GodLight_DOWNTOUP()
         // glTexCoordPointer(2, GL_FLOAT, sizeof(GFX3D_Vertex), &(vertices[0].fS));
         glDrawElements(GL_TRIANGLES, vertex_index_len, GL_UNSIGNED_SHORT, indices);
 
-        usleep( 100 * 1000);
+        usleep( 1000 * 1000);
         glFlush();
         glutSwapBuffers();
+        // getchar();
     }
     printf("NALL ... \n");
 
@@ -496,8 +502,8 @@ bool init(void)
     glEnable(GL_DEPTH_TEST);						   // Enables Depth Testing
     glShadeModel(GL_SMOOTH);						   // Enable Smooth Shading
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-    glPolygonMode(GL_BACK, GL_FILL);                   // Back Face Is Solid (NEW)
-    glPolygonMode(GL_FRONT, GL_FILL);                  // Front Face Is Made Of Lines (NEW)
+    glPolygonMode(GL_BACK, GL_LINE);                   // Back Face Is Solid (NEW)
+    glPolygonMode(GL_FRONT, GL_LINE);                  // Front Face Is Made Of Lines (NEW)
     
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
