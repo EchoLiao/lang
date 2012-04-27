@@ -51,10 +51,10 @@ typedef struct tmGodLightPosition
     float m_TarZ;
     float m_TarWidth;
     float m_TarHeight;
+
     int m_FrameNum;//the speed from left to right
     int DEFAULT_X_SUBDIV;
     int DEFAULT_Y_SUBDIV;
-    int time;//how many FrameNum in 1 secs.
 
     int	  gh3Dimage_width;
     int	  gh3Dimage_height;
@@ -87,14 +87,12 @@ GodLightPosition godlightposition={
     0.0,//-0.7,//-1.5,
     -1.0,
     0.0,
+    0.0, 
+    0.0, 
 
-    0.2, 
-    0.3, 
-
-    5,
+    9,
     1,
     20,
-    10,
 
     1024,
     512
@@ -369,10 +367,6 @@ void GodLight_DOWNTOUP()
         glDisable(GL_TEXTURE_2D);                           // Enable Texture Mapping
         glColor4f(1.0, 0.0, 1.0, 1.0);
 
-        glBegin(GL_LINES); {
-            for( int ii = 0; ii < 10; ii++ )
-
-        } glEnd();
 
         if(i <= godlightposition.DEFAULT_Y_SUBDIV)
         {
@@ -385,11 +379,30 @@ void GodLight_DOWNTOUP()
             init_vertices(vertices, godlightposition.m_FrameNum-i+godlightposition.DEFAULT_Y_SUBDIV+1, &rect, godlightposition);
         }
 
+        glBegin(GL_LINES); {
+            int ii;
+            for( ii = 0; ii < 40; ii++ )
+            {
+                if ( ii == 20 ) glColor4f(1.0, 1.0, 1.0, 1.0);
+                else            glColor4f(1.0, 0.0, 1.0, 1.0);
+                glVertex3f(-1.0 + 0.05 * ii, -1.0, 0.0);
+                glVertex3f(-1.0 + 0.05 * ii,  1.0, 0.0);
+            }
+            for ( ii = 0; ii <= godlightposition.DEFAULT_Y_SUBDIV; ii++ )
+            {
+                glVertex3f(-1.0, vertices[ii*2].fY, 0.0);
+                glVertex3f( 1.0, vertices[ii*2+1].fY, 0.0);
+            }
+        } glEnd();
+        // glVertexPointer(3, GL_FLOAT, sizeof(GFX3D_Vertex), (float *)vertices);
+        // glDrawArrays(GL_LINES, 0, num_vertices);
+
+        glColor4f(0.0, 1.0, 0.0, 1.0);
         glVertexPointer(3, GL_FLOAT, sizeof(GFX3D_Vertex), (float *)vertices);
         // glTexCoordPointer(2, GL_FLOAT, sizeof(GFX3D_Vertex), &(vertices[0].fS));
-        glDrawElements(GL_TRIANGLES, vertex_index_len, GL_UNSIGNED_SHORT, indices);
+        glDrawElements(GL_LINE_STRIP, vertex_index_len, GL_UNSIGNED_SHORT, indices);
 
-        usleep( 1000 * 1000);
+        usleep( 30 * 1000);
         glFlush();
         glutSwapBuffers();
         // getchar();
