@@ -8,6 +8,7 @@ ENDIAN = endian_test
 BMPRW = bmprw_test
 FOLD_UP = fold_up
 LERP = lerp
+LERP2 = lerp2
 
 # aliases
 CC = gcc
@@ -31,8 +32,12 @@ BMPRW_OBJ = $(BMPRW).o
 SHARED = bmprw.o
 FOLD_UP_OBJ = $(FOLD_UP).o
 LERP_OBJ = $(LERP).o
+LERP_OBJ2 = $(LERP2).o
 
-all: $(PROJ).exe $(PROJ2).exe $(ENDIAN).exe $(BMPRW).exe $(FOLD_UP).exe $(LERP).exe
+all: $(PROJ).exe $(PROJ2).exe $(ENDIAN).exe $(BMPRW).exe $(FOLD_UP).exe $(LERP).exe $(LERP2).exe
+
+$(LERP2).exe: $(LERP_OBJ2) $(SHARED) M3D_math3d.o M3D_plane.o
+	$(CC) $(LIBPATH) -o $@ $^ $(LDFLAGS)
 
 $(LERP).exe: $(LERP_OBJ) $(SHARED) M3D_math3d.o M3D_plane.o
 	$(CC) $(LIBPATH) -o $@ $^ $(LDFLAGS)
