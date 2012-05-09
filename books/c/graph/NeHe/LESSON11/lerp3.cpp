@@ -115,7 +115,7 @@ int  N3D_lineInsertPos(float k1, float b1, float k2, float b2,
 
     return 1;
 }
-    
+
 int N3D_godCreate(N3D_GodPos *god)
 {
     assert(god != NULL);
@@ -210,6 +210,123 @@ void N3D_godDraw(N3D_GodPos *god)
         }
     } glEnd();
 }
+
+void N3D_godInitPosByLine(N3D_GodPos *god, int curLine)
+{
+    assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
+    assert(curLine >= 0 && curLine <= god->mnDivY);
+
+    // Normal Rect: [(-1.0, 1.0), (1.0, -1.0)], size is 2.0
+    const float     rectLTX = -1.0;
+    const float     rectLTY =  1.0;
+    const float     rectBRX =  1.0;
+    const float     rectBRY = -1.0;
+    int         i;
+    int         tmpCurL = (curLine == 0) ? 1 : curLine;
+    float       fCcen = god->mfTarH / (float)god->mnDivY;
+    float       fEcen = 2.0 / (float)god->mnDivY;
+    float       fTexCen = 1.0 / (float)tmpCurL;
+    N3D_Vertex  *pV = god->mvVex;
+
+    for ( i = 0; i <= god->mnDivY; i++ )
+    {
+        if ( i <= curLine )
+        {
+            float Cx1 = god->mfTarX;
+            float Cy1 = god->mfTarY + fCcen * i;
+            float CxL = rectLTX;
+            float CyL = rectLTY;
+            float CxR = rectBRX;
+            float CyR = rectLTY;
+            float Ex1 = -1.0;
+            float Ey1 = rectBRY + fEcen * i;
+            float Ex2 =  0.0;
+            float Ey2 = Ey1;
+            float Ck, Cb, Ek, Eb, insPosXL, insPosYL, insPosXR, insPosYR;
+
+            if ( Cx1 == CxL ) CxL += 0.00001;
+            N3D_lineConstruct(Cx1, Cy1, CxL, CyL, &Ck, &Cb);
+            N3D_lineConstruct(Ex1, Ey1, Ex2, Ey2, &Ek, &Eb);
+            if ( Ck == Ek ) Ek += 0.00001;
+            N3D_lineInsertPos(Ck, Cb, Ek, Eb, &insPosXL, &insPosYL);
+
+            Cx1 += god->mfTarW;
+            if ( Cx1 == CxR ) CxR += 0.00001;
+            N3D_lineConstruct(Cx1, Cy1, CxR, CyR, &Ck, &Cb);
+            if ( Ck == Ek ) Ek += 0.00001;
+            N3D_lineInsertPos(Ck, Cb, Ek, Eb, &insPosXR, &insPosYR);
+
+            pV[2*i].fX = insPosXL;
+            pV[2*i].fY = insPosYL;
+            pV[2*i].fZ = 0.0;
+            pV[2*i].fS = 0.0;
+            pV[2*i].fT = fTexCen * i;
+
+            pV[2*i+1].fX = insPosXR;
+            pV[2*i+1].fY = insPosYR;
+            pV[2*i+1].fZ = 0.0;
+            pV[2*i+1].fS = 1.0;
+            pV[2*i+1].fT = fTexCen * i;
+        }
+        else
+        {
+            pV[2*i].fX = pV[2*(i-1)].fX;
+            pV[2*i].fY = pV[2*(i-1)].fY;
+            pV[2*i].fZ = pV[2*(i-1)].fZ;
+            pV[2*i].fS = pV[2*(i-1)].fS;
+            pV[2*i].fT = pV[2*(i-1)].fT;
+
+            pV[2*i+1].fX = pV[2*(i-1)+1].fX;
+            pV[2*i+1].fY = pV[2*(i-1)+1].fY;
+            pV[2*i+1].fZ = pV[2*(i-1)+1].fZ;
+            pV[2*i+1].fS = pV[2*(i-1)+1].fS;
+            pV[2*i+1].fT = pV[2*(i-1)+1].fT;
+        }
+    }
+}
+
+void N3D_godDrawByLine(N3D_GodPos *god, int curLine)
+{
+    assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
+
+    int i;
+    N3D_Vertex *pV = god->mvVex;
+
+    glBegin(GL_TRIANGLE_STRIP); {
+        for ( i = 0; i <= god->mnDivY; i++ )
+        {
+            if ( i > curLine )
+                break;
+            glTexCoord2f(pV[2*i].fS, pV[2*i].fT);
+            glVertex3f(pV[2*i].fX, pV[2*i].fY, pV[2*i].fZ);
+            glTexCoord2f(pV[2*i+1].fS, pV[2*i+1].fT);
+            glVertex3f(pV[2*i+1].fX, pV[2*i+1].fY, pV[2*i+1].fZ);
+        }
+    } glEnd();
+}
+
+void N3D_godFlush()
+{
+    glFlush();
+    glutSwapBuffers();
+}
+
+void N3D_godDrawWithAmin(N3D_GodPos *god)
+{
+    assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
+
+    int j;
+
+    for ( j = 0; j <= god->mnDivY; j++ )
+    {
+        N3D_godInitPosByLine(&g_godPos, j);
+        N3D_godDrawByLine(&g_godPos, j);
+        N3D_godFlush();
+
+        usleep(50 * 1000);
+    }
+}
+
 // N3D_GodPos end //
 /*******************************************************************/
 
@@ -309,7 +426,6 @@ bool init(void)
 
     ret = N3D_godCreate(&g_godPos);
     assert( ret != 0 );
-    N3D_godInitPos(&g_godPos);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glEnable(GL_TEXTURE_2D);
@@ -350,7 +466,7 @@ void render(void)
         glPointSize(3);
         glColor4f(1.0, 1.0, 0.0, 1.0);
         glScalef(0.5, 0.5, 0.5);
-        N3D_godDraw(&g_godPos);
+        N3D_godDrawWithAmin(&g_godPos);
     } glPopMatrix();
 
     usleep(1000 * 200);
