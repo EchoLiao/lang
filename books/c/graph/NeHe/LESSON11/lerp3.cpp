@@ -37,6 +37,7 @@ typedef struct N3D_GodPos
     int   mnDivY;
 
     N3D_Vertex  *mvVex;
+    float       *mvHelpX;
 } N3D_GodPos;
 
 typedef struct _RGBIMG {
@@ -69,8 +70,16 @@ N3D_GodPos      g_godPos = {
     10,
     20,
 
-    NULL
+    NULL,
+    NULL,
 };
+
+
+
+
+static void drawRect();
+
+
 
 
 
@@ -127,10 +136,14 @@ int N3D_godCreate(N3D_GodPos *god)
 {
     assert(god != NULL);
     assert(god->mnDivY > 0);
-    assert(god->mvVex == NULL);
+    assert(god->mvVex == NULL && god->mvHelpX == NULL);
 
     god->mvVex = (N3D_Vertex *)calloc(2*(god->mnDivY+1), sizeof(N3D_Vertex));
     if ( god->mvVex == NULL )
+        return 0;
+
+    god->mvHelpX = (float *)calloc(2*(god->mnDivY+1), sizeof(float));
+    if ( god->mvHelpX == NULL )
         return 0;
 
     return 1;
@@ -138,10 +151,12 @@ int N3D_godCreate(N3D_GodPos *god)
 
 void N3D_godDestroy(N3D_GodPos *god)
 {
-    assert(god != NULL && god->mvVex != NULL);
+    assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL);
 
     free(god->mvVex);
     god->mvVex = NULL;
+    free(god->mvHelpX);
+    god->mvHelpX = NULL;
 }
 
 void N3D_godSTinitCurvePos(N3D_GodPos *god, int i, float fCcen,
@@ -193,6 +208,44 @@ void N3D_godSTinitCurvePos(N3D_GodPos *god, int i, float fCcen,
     pV[2*i+1].fT = fTexCen * i;
 }
 
+void N3D_godSTinitVexHelp(N3D_GodPos *god)
+{
+    assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
+            && god->mnDivY > 0 && god->mnFramExpend > 0);
+
+    // Normal Rect: [(-1.0, 1.0), (1.0, -1.0)], size is 2.0
+    const float     rectLTX = -1.0;
+    // const float     rectLTY =  1.0;
+    const float     rectBRX =  1.0;
+    // const float     rectBRY = -1.0;
+    int         i;
+    N3D_Vertex  *pV = god->mvVex;
+    float       *pH = god->mvHelpX;
+
+    for ( i = 0; i <= god->mnDivY; i++ )
+    {
+        pH[2*i]   = (rectLTX - pV[2*i].fX) / god->mnFramExpend;
+        pH[2*i+1] = (rectBRX - pV[2*i+1].fX) / god->mnFramExpend;
+    }
+}
+
+void N3D_godSTinitFramExpendPos(N3D_GodPos *god, int j)
+{
+    assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
+            && god->mnDivY > 0 && god->mnFramExpend > 0);
+    assert(j > god->mnDivY && j <= god->mnDivY + god->mnFramExpend);
+
+    int         i;
+    N3D_Vertex  *pV = god->mvVex;
+    float       *pH = god->mvHelpX;
+
+    for ( i = 0; i <= god->mnDivY; i++ )
+    {
+        pV[2*i].fX   += pH[2*i];
+        pV[2*i+1].fX += pH[2*i+1];
+    }
+}
+
 void N3D_godInitPos(N3D_GodPos *god)
 {
     assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
@@ -210,7 +263,8 @@ void N3D_godInitPos(N3D_GodPos *god)
 
 void N3D_godDraw(N3D_GodPos *god)
 {
-    assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
+    assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
+            && god->mnDivY > 0);
 
     int i;
     N3D_Vertex *pV = god->mvVex;
@@ -245,29 +299,26 @@ void N3D_godInitPosByLine(N3D_GodPos *god, int curLine)
         {
             N3D_godSTinitCurvePos(god, i, fCcen, fEcen, fTexCen);
         }
-        else if ( i <= god->mnDivY )
+        else
         {
             pV[2*i].fX = pV[2*(i-1)].fX;
             pV[2*i].fY = pV[2*(i-1)].fY;
             pV[2*i].fZ = pV[2*(i-1)].fZ;
             pV[2*i].fS = pV[2*(i-1)].fS;
             pV[2*i].fT = pV[2*(i-1)].fT;
-
             pV[2*i+1].fX = pV[2*(i-1)+1].fX;
             pV[2*i+1].fY = pV[2*(i-1)+1].fY;
             pV[2*i+1].fZ = pV[2*(i-1)+1].fZ;
             pV[2*i+1].fS = pV[2*(i-1)+1].fS;
             pV[2*i+1].fT = pV[2*(i-1)+1].fT;
         }
-        else /* i is [god->mnDivY + 1, god->mnDivY + god->mnFramExpend] */
-        {
-        }
     }
 }
 
 void N3D_godDrawByLine(N3D_GodPos *god, int curLine)
 {
-    assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
+    assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
+            && god->mnDivY > 0);
 
     int i;
     N3D_Vertex *pV = god->mvVex;
@@ -281,8 +332,18 @@ void N3D_godDrawByLine(N3D_GodPos *god, int curLine)
             glVertex3f(pV[2*i].fX, pV[2*i].fY, pV[2*i].fZ);
             glTexCoord2f(pV[2*i+1].fS, pV[2*i+1].fT);
             glVertex3f(pV[2*i+1].fX, pV[2*i+1].fY, pV[2*i+1].fZ);
+#if 0
+            if ( i == 19 )
+                printf("NAL OPOP %f,%f,%f,%f\n",
+                        pV[2*i].fX, pV[2*i].fY, pV[2*i+1].fX, pV[2*i+1].fY);
+#endif
         }
     } glEnd();
+}
+
+void N3D_godClear()
+{
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 }
 
 void N3D_godFlush()
@@ -291,19 +352,55 @@ void N3D_godFlush()
     glutSwapBuffers();
 }
 
-void N3D_godDrawWithAmin(N3D_GodPos *god)
+void N3D_godDrawAminByLine(N3D_GodPos *god, int curLine)
 {
-    assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
+    assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
+            && god->mnDivY > 0 && god->mnFramExpend > 0);
+    assert(curLine >= 0 && curLine <= god->mnDivY + god->mnFramExpend);
+
+    if ( curLine <= god->mnDivY )
+    {
+        N3D_godInitPosByLine(god, curLine);
+        if ( curLine == god->mnDivY )
+            N3D_godSTinitVexHelp(god);
+    }
+    else
+    {
+        N3D_godSTinitFramExpendPos(god, curLine);
+    }
+    N3D_godDrawByLine(god, curLine);
+}
+
+void N3D_godDrawAminDemo(N3D_GodPos *god)
+{
+    assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
+            && god->mnDivY > 0 && god->mnFramExpend > 0);
 
     int j;
 
-    for ( j = 0; j <= god->mnDivY; j++ )
+    for ( j = 0; j <= god->mnDivY + god->mnFramExpend; j++ )
     {
-        N3D_godInitPosByLine(god, j);
-        N3D_godDrawByLine(god, j);
-        N3D_godFlush();
+        N3D_godClear();
 
-        usleep(50 * 1000);
+        glPushMatrix(); {
+            glDisable(GL_TEXTURE_2D);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            glColor4f(1.0, 0.0, 1.0, 1.0);
+            glScalef(0.5, 0.5, 0.5);
+            drawRect();
+        } glPopMatrix();
+
+        glPushMatrix(); {
+            glEnable(GL_TEXTURE_2D);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glPointSize(3);
+            glColor4f(1.0, 1.0, 0.0, 1.0);
+            glScalef(0.5, 0.5, 0.5);
+            N3D_godDrawAminByLine(god, j);
+        } glPopMatrix();
+
+        N3D_godFlush();
+        usleep(20 * 1000);
     }
 }
 
@@ -422,6 +519,12 @@ bool init(void)
     return true;
 }
 
+static void drawRect()
+{
+    glRectf(-0.01, -0.01, 0.01, 0.01);
+    glRectf(-1.0, -1.0, 1.0, 1.0);
+}
+
 // Our Rendering Is Done Here
 void render(void)
 {
@@ -430,6 +533,8 @@ void render(void)
     glTranslatef(0.0f,0.0f,-2.0f);
 
     glBindTexture(GL_TEXTURE_2D, g_texid[0]);
+
+#if 0
     glDisable(GL_TEXTURE_2D);
     glPushMatrix(); {
         glDisable(GL_TEXTURE_2D);
@@ -446,13 +551,13 @@ void render(void)
         glPointSize(3);
         glColor4f(1.0, 1.0, 0.0, 1.0);
         glScalef(0.5, 0.5, 0.5);
-#if 0
         N3D_godInitPos(&g_godPos);
         N3D_godDraw(&g_godPos);
-#else
-        N3D_godDrawWithAmin(&g_godPos);
-#endif
     } glPopMatrix();
+#else
+    N3D_godDrawAminDemo(&g_godPos);
+#endif
+
 
     usleep(1000 * 200);
 
