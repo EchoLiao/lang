@@ -118,7 +118,8 @@ int  N3D_lineInsertPos(float k1, float b1, float k2, float b2,
     
 int N3D_godCreate(N3D_GodPos *god)
 {
-    assert(god->mfTarH > 0.0 && god->mnDivY > 0);
+    assert(god != NULL);
+    assert(god->mnDivY > 0);
     assert(god->mvVex == NULL);
 
     god->mvVex = (N3D_Vertex *)calloc(2*(god->mnDivY+1), sizeof(N3D_Vertex));
@@ -193,6 +194,8 @@ void N3D_godInitPos(N3D_GodPos *god)
 
 void N3D_godDraw(N3D_GodPos *god)
 {
+    assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
+
     int i;
     N3D_Vertex *pV = god->mvVex;
 
