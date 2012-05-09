@@ -148,6 +148,7 @@ void N3D_godInitPos(N3D_GodPos *god)
     int     i;
     float   fCcen = god->mfTarH / (float)god->mnDivY;
     float   fEcen = 2.0 / (float)god->mnDivY;
+    float   fTexCen = 1.0 / (float)god->mnDivY;
     N3D_Vertex *pV = god->mvVex;
 
     for ( i = 0; i <= god->mnDivY; i++ )
@@ -179,10 +180,14 @@ void N3D_godInitPos(N3D_GodPos *god)
         pV[2*i].fX = insPosXL;
         pV[2*i].fY = insPosYL;
         pV[2*i].fZ = 0.0;
+        pV[2*i].fS = 0.0;
+        pV[2*i].fT = fTexCen * i;
 
         pV[2*i+1].fX = insPosXR;
         pV[2*i+1].fY = insPosYR;
         pV[2*i+1].fZ = 0.0;
+        pV[2*i+1].fS = 1.0;
+        pV[2*i+1].fT = fTexCen * i;
     }
 }
 
@@ -191,10 +196,12 @@ void N3D_godDraw(N3D_GodPos *god)
     int i;
     N3D_Vertex *pV = god->mvVex;
 
-    glBegin(GL_POINTS); {
+    glBegin(GL_TRIANGLE_STRIP); {
         for ( i = 0; i <= god->mnDivY; i++ )
         {
+            glTexCoord2f(pV[2*i].fS, pV[2*i].fT);
             glVertex3f(pV[2*i].fX, pV[2*i].fY, pV[2*i].fZ);
+            glTexCoord2f(pV[2*i+1].fS, pV[2*i+1].fT);
             glVertex3f(pV[2*i+1].fX, pV[2*i+1].fY, pV[2*i+1].fZ);
             // printf("NAL && (%f,%f,%f)\n", pV[i].fX, pV[i].fY, pV[i].fZ);
         }
@@ -283,6 +290,7 @@ bool setup_textures()
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
     glTexImage2D(GL_TEXTURE_2D, 0, 3, img.w, img.h, 0, GL_RGB, GL_UNSIGNED_BYTE, img.data);
+    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
 
     delete img.data;
 
@@ -308,8 +316,6 @@ bool init(void)
     glEnable(GL_DEPTH_TEST);
     glShadeModel(GL_SMOOTH);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-    glPolygonMode(GL_BACK, GL_LINE);
-    glPolygonMode(GL_FRONT, GL_LINE);
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
@@ -327,6 +333,8 @@ void render(void)
     glBindTexture(GL_TEXTURE_2D, g_texid[0]);
     glDisable(GL_TEXTURE_2D);
     glPushMatrix(); {
+        glDisable(GL_TEXTURE_2D);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glColor4f(1.0, 0.0, 1.0, 1.0);
         glScalef(0.5, 0.5, 0.5);
         glRectf(-0.01, -0.01, 0.01, 0.01);
@@ -334,8 +342,10 @@ void render(void)
     } glPopMatrix();
 
     glPushMatrix(); {
+        glEnable(GL_TEXTURE_2D);
+        glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
         glPointSize(3);
-        glColor4f(0.0, 1.0, 0.0, 1.0);
+        glColor4f(1.0, 1.0, 0.0, 1.0);
         glScalef(0.5, 0.5, 0.5);
         N3D_godDraw(&g_godPos);
     } glPopMatrix();
