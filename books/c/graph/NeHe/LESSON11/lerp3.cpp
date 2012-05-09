@@ -299,8 +299,8 @@ void N3D_godDrawWithAmin(N3D_GodPos *god)
 
     for ( j = 0; j <= god->mnDivY; j++ )
     {
-        N3D_godInitPosByLine(&g_godPos, j);
-        N3D_godDrawByLine(&g_godPos, j);
+        N3D_godInitPosByLine(god, j);
+        N3D_godDrawByLine(god, j);
         N3D_godFlush();
 
         usleep(50 * 1000);
@@ -446,7 +446,7 @@ void render(void)
         glPointSize(3);
         glColor4f(1.0, 1.0, 0.0, 1.0);
         glScalef(0.5, 0.5, 0.5);
-#if 1
+#if 0
         N3D_godInitPos(&g_godPos);
         N3D_godDraw(&g_godPos);
 #else
