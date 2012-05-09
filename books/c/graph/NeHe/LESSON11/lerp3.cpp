@@ -53,6 +53,13 @@ bool    g_gamemode;
 bool    g_fullscreen;
 GLuint	g_texid[TEXTURES_NUM];
 
+/* 
+   {  0.0, -1.0,  0.3,  1.0,   10, 20, NULL }   // 树型
+   {  0.0, -0.4,  0.3,  1.0,   10, 20, NULL }   // 交叉型
+
+   {  0.0, -1.0,  0.3, -3.0,   10, 20, NULL }   // 碗型
+   {  0.0, -0.1,  0.1, -3.0,   10, 20, NULL }   // 酒杯型
+*/
 N3D_GodPos      g_godPos = {
     0.0,
     -1.0,
@@ -335,7 +342,7 @@ void N3D_godDrawWithAmin(N3D_GodPos *god)
 
 bool load_rgb_image(const char* file_name, int w, int h, RGBIMG* refimg)
 {
-#if 0
+#if 1
     GLuint   sz;    // Our Image's Data Field Length In Bytes
     FILE*    file;  // The Image's File On Disk
     long     fsize; // File Size In Bytes
