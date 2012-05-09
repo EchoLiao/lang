@@ -30,7 +30,6 @@ typedef struct N3D_GodPos
 {
     float mfTarX;
     float mfTarY;
-    float mfTarZ;
     float mfTarW;
     float mfTarH;
 
@@ -57,8 +56,7 @@ GLuint	g_texid[TEXTURES_NUM];
 N3D_GodPos      g_godPos = {
     0.0,
     -1.0,
-    0.0,
-    0.0,
+    0.3,
     1.0,
 
     10,
@@ -108,7 +106,9 @@ int  N3D_lineInsertPos(float k1, float b1, float k2, float b2,
         float *x, float *y)
 {
     if ( k1 == k2 )
+    {
         return 0;
+    }
 
     *x = (b2 - b1) / (k1 - k2);
     *y = k1 * (*x) + b1;
@@ -128,37 +128,60 @@ int N3D_godCreate(N3D_GodPos *god)
     return 1;
 }
 
+void N3D_godDestroy(N3D_GodPos *god)
+{
+    assert(god != NULL && god->mvVex != NULL);
+
+    free(god->mvVex);
+    god->mvVex = NULL;
+}
+
 void N3D_godInitPos(N3D_GodPos *god)
 {
     assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
 
+    // Normal Rect: [(-1.0, 1.0), (1.0, -1.0)], size is 2.0
+    const float     rectLTX = -1.0;
+    const float     rectLTY =  1.0;
+    const float     rectBRX =  1.0;
+    const float     rectBRY = -1.0;
     int     i;
-    float   fCcen = god->mfTarH / god->mnDivY;
-    float   fEcen = 2.0 / god->mnDivY;
+    float   fCcen = god->mfTarH / (float)god->mnDivY;
+    float   fEcen = 2.0 / (float)god->mnDivY;
     N3D_Vertex *pV = god->mvVex;
 
     for ( i = 0; i <= god->mnDivY; i++ )
     {
         float Cx1 = god->mfTarX;
         float Cy1 = god->mfTarY + fCcen * i;
-        float Cx2 = -1.0;
-        float Cy2 =  1.0;
+        float CxL = rectLTX;
+        float CyL = rectLTY;
+        float CxR = rectBRX;
+        float CyR = rectLTY;
         float Ex1 = -1.0;
-        float Ey1 = -1.0 + fEcen * i;
+        float Ey1 = rectBRY + fEcen * i;
         float Ex2 =  0.0;
         float Ey2 = Ey1;
-        float Ck, Cb, Ek, Eb, insPosX, insPosY;
+        float Ck, Cb, Ek, Eb, insPosXL, insPosYL, insPosXR, insPosYR;
 
-        N3D_lineConstruct(Cx1, Cy1, Cx2, Cy2, &Ck, &Cb);
+        if ( Cx1 == CxL ) CxL += 0.00001;
+        N3D_lineConstruct(Cx1, Cy1, CxL, CyL, &Ck, &Cb);
         N3D_lineConstruct(Ex1, Ey1, Ex2, Ey2, &Ek, &Eb);
-        N3D_lineInsertPos(Ck, Cb, Ek, Eb, &insPosX, &insPosY);
+        if ( Ck == Ek ) Ek += 0.00001;
+        N3D_lineInsertPos(Ck, Cb, Ek, Eb, &insPosXL, &insPosYL);
 
-        pV[2*i].fX = insPosX;
-        pV[2*i].fY = insPosY;
+        Cx1 += god->mfTarW;
+        if ( Cx1 == CxR ) CxR += 0.00001;
+        N3D_lineConstruct(Cx1, Cy1, CxR, CyR, &Ck, &Cb);
+        if ( Ck == Ek ) Ek += 0.00001;
+        N3D_lineInsertPos(Ck, Cb, Ek, Eb, &insPosXR, &insPosYR);
+
+        pV[2*i].fX = insPosXL;
+        pV[2*i].fY = insPosYL;
         pV[2*i].fZ = 0.0;
 
-        pV[2*i+1].fX = -insPosX;
-        pV[2*i+1].fY = insPosY;
+        pV[2*i+1].fX = insPosXR;
+        pV[2*i+1].fY = insPosYR;
         pV[2*i+1].fZ = 0.0;
     }
 }
