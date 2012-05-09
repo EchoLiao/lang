@@ -144,58 +144,67 @@ void N3D_godDestroy(N3D_GodPos *god)
     god->mvVex = NULL;
 }
 
-void N3D_godInitPos(N3D_GodPos *god)
+void N3D_godSTinitCurvePos(N3D_GodPos *god, int i, float fCcen,
+        float fEcen, float fTexCen)
 {
     assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
+    assert(i >= 0 && i <= god->mnDivY);
 
     // Normal Rect: [(-1.0, 1.0), (1.0, -1.0)], size is 2.0
     const float     rectLTX = -1.0;
     const float     rectLTY =  1.0;
     const float     rectBRX =  1.0;
     const float     rectBRY = -1.0;
+    float Cx1 = god->mfTarX;
+    float Cy1 = god->mfTarY + fCcen * i;
+    float CxL = rectLTX;
+    float CyL = rectLTY;
+    float CxR = rectBRX;
+    float CyR = rectLTY;
+    float Ex1 = -1.0;
+    float Ey1 = rectBRY + fEcen * i;
+    float Ex2 =  0.0;
+    float Ey2 = Ey1;
+    float Ck, Cb, Ek, Eb, insPosXL, insPosYL, insPosXR, insPosYR;
+    N3D_Vertex  *pV = god->mvVex;
+
+    if ( Cx1 == CxL ) CxL += 0.00001;
+    N3D_lineConstruct(Cx1, Cy1, CxL, CyL, &Ck, &Cb);
+    N3D_lineConstruct(Ex1, Ey1, Ex2, Ey2, &Ek, &Eb);
+    if ( Ck == Ek ) Ek += 0.00001;
+    N3D_lineInsertPos(Ck, Cb, Ek, Eb, &insPosXL, &insPosYL);
+
+    Cx1 += god->mfTarW;
+    if ( Cx1 == CxR ) CxR += 0.00001;
+    N3D_lineConstruct(Cx1, Cy1, CxR, CyR, &Ck, &Cb);
+    if ( Ck == Ek ) Ek += 0.00001;
+    N3D_lineInsertPos(Ck, Cb, Ek, Eb, &insPosXR, &insPosYR);
+
+    pV[2*i].fX = insPosXL;
+    pV[2*i].fY = insPosYL;
+    pV[2*i].fZ = 0.0;
+    pV[2*i].fS = 0.0;
+    pV[2*i].fT = fTexCen * i;
+
+    pV[2*i+1].fX = insPosXR;
+    pV[2*i+1].fY = insPosYR;
+    pV[2*i+1].fZ = 0.0;
+    pV[2*i+1].fS = 1.0;
+    pV[2*i+1].fT = fTexCen * i;
+}
+
+void N3D_godInitPos(N3D_GodPos *god)
+{
+    assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
+
     int     i;
     float   fCcen = god->mfTarH / (float)god->mnDivY;
     float   fEcen = 2.0 / (float)god->mnDivY;
     float   fTexCen = 1.0 / (float)god->mnDivY;
-    N3D_Vertex *pV = god->mvVex;
 
     for ( i = 0; i <= god->mnDivY; i++ )
     {
-        float Cx1 = god->mfTarX;
-        float Cy1 = god->mfTarY + fCcen * i;
-        float CxL = rectLTX;
-        float CyL = rectLTY;
-        float CxR = rectBRX;
-        float CyR = rectLTY;
-        float Ex1 = -1.0;
-        float Ey1 = rectBRY + fEcen * i;
-        float Ex2 =  0.0;
-        float Ey2 = Ey1;
-        float Ck, Cb, Ek, Eb, insPosXL, insPosYL, insPosXR, insPosYR;
-
-        if ( Cx1 == CxL ) CxL += 0.00001;
-        N3D_lineConstruct(Cx1, Cy1, CxL, CyL, &Ck, &Cb);
-        N3D_lineConstruct(Ex1, Ey1, Ex2, Ey2, &Ek, &Eb);
-        if ( Ck == Ek ) Ek += 0.00001;
-        N3D_lineInsertPos(Ck, Cb, Ek, Eb, &insPosXL, &insPosYL);
-
-        Cx1 += god->mfTarW;
-        if ( Cx1 == CxR ) CxR += 0.00001;
-        N3D_lineConstruct(Cx1, Cy1, CxR, CyR, &Ck, &Cb);
-        if ( Ck == Ek ) Ek += 0.00001;
-        N3D_lineInsertPos(Ck, Cb, Ek, Eb, &insPosXR, &insPosYR);
-
-        pV[2*i].fX = insPosXL;
-        pV[2*i].fY = insPosYL;
-        pV[2*i].fZ = 0.0;
-        pV[2*i].fS = 0.0;
-        pV[2*i].fT = fTexCen * i;
-
-        pV[2*i+1].fX = insPosXR;
-        pV[2*i+1].fY = insPosYR;
-        pV[2*i+1].fZ = 0.0;
-        pV[2*i+1].fS = 1.0;
-        pV[2*i+1].fT = fTexCen * i;
+        N3D_godSTinitCurvePos(god, i, fCcen, fEcen, fTexCen);
     }
 }
 
@@ -223,11 +232,6 @@ void N3D_godInitPosByLine(N3D_GodPos *god, int curLine)
     assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
     assert(curLine >= 0 && curLine <= god->mnDivY);
 
-    // Normal Rect: [(-1.0, 1.0), (1.0, -1.0)], size is 2.0
-    const float     rectLTX = -1.0;
-    const float     rectLTY =  1.0;
-    const float     rectBRX =  1.0;
-    const float     rectBRY = -1.0;
     int         i;
     int         tmpCurL = (curLine == 0) ? 1 : curLine;
     float       fCcen = god->mfTarH / (float)god->mnDivY;
@@ -239,43 +243,9 @@ void N3D_godInitPosByLine(N3D_GodPos *god, int curLine)
     {
         if ( i <= curLine )
         {
-            float Cx1 = god->mfTarX;
-            float Cy1 = god->mfTarY + fCcen * i;
-            float CxL = rectLTX;
-            float CyL = rectLTY;
-            float CxR = rectBRX;
-            float CyR = rectLTY;
-            float Ex1 = -1.0;
-            float Ey1 = rectBRY + fEcen * i;
-            float Ex2 =  0.0;
-            float Ey2 = Ey1;
-            float Ck, Cb, Ek, Eb, insPosXL, insPosYL, insPosXR, insPosYR;
-
-            if ( Cx1 == CxL ) CxL += 0.00001;
-            N3D_lineConstruct(Cx1, Cy1, CxL, CyL, &Ck, &Cb);
-            N3D_lineConstruct(Ex1, Ey1, Ex2, Ey2, &Ek, &Eb);
-            if ( Ck == Ek ) Ek += 0.00001;
-            N3D_lineInsertPos(Ck, Cb, Ek, Eb, &insPosXL, &insPosYL);
-
-            Cx1 += god->mfTarW;
-            if ( Cx1 == CxR ) CxR += 0.00001;
-            N3D_lineConstruct(Cx1, Cy1, CxR, CyR, &Ck, &Cb);
-            if ( Ck == Ek ) Ek += 0.00001;
-            N3D_lineInsertPos(Ck, Cb, Ek, Eb, &insPosXR, &insPosYR);
-
-            pV[2*i].fX = insPosXL;
-            pV[2*i].fY = insPosYL;
-            pV[2*i].fZ = 0.0;
-            pV[2*i].fS = 0.0;
-            pV[2*i].fT = fTexCen * i;
-
-            pV[2*i+1].fX = insPosXR;
-            pV[2*i+1].fY = insPosYR;
-            pV[2*i+1].fZ = 0.0;
-            pV[2*i+1].fS = 1.0;
-            pV[2*i+1].fT = fTexCen * i;
+            N3D_godSTinitCurvePos(god, i, fCcen, fEcen, fTexCen);
         }
-        else
+        else if ( i <= god->mnDivY )
         {
             pV[2*i].fX = pV[2*(i-1)].fX;
             pV[2*i].fY = pV[2*(i-1)].fY;
@@ -288,6 +258,9 @@ void N3D_godInitPosByLine(N3D_GodPos *god, int curLine)
             pV[2*i+1].fZ = pV[2*(i-1)+1].fZ;
             pV[2*i+1].fS = pV[2*(i-1)+1].fS;
             pV[2*i+1].fT = pV[2*(i-1)+1].fT;
+        }
+        else /* i is [god->mnDivY + 1, god->mnDivY + god->mnFramExpend] */
+        {
         }
     }
 }
@@ -473,7 +446,12 @@ void render(void)
         glPointSize(3);
         glColor4f(1.0, 1.0, 0.0, 1.0);
         glScalef(0.5, 0.5, 0.5);
+#if 1
+        N3D_godInitPos(&g_godPos);
+        N3D_godDraw(&g_godPos);
+#else
         N3D_godDrawWithAmin(&g_godPos);
+#endif
     } glPopMatrix();
 
     usleep(1000 * 200);
