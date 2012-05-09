@@ -5,6 +5,8 @@
 #include <math.h>
 #include <GL/glut.h>
 
+#include "lerp3.h"
+
 
 typedef struct N3D_Vertex
 {
@@ -25,7 +27,6 @@ typedef struct N3D_Vertex
     float fNZ;
 } N3D_Vertex;
 
-
 typedef struct N3D_GodPos
 {
     float mfTarX;
@@ -39,6 +40,7 @@ typedef struct N3D_GodPos
     N3D_Vertex  *mvVex;
     float       *mvHelpX;
 } N3D_GodPos;
+
 
 typedef struct _RGBIMG {
     GLuint   w;
@@ -78,6 +80,11 @@ N3D_GodPos      g_godPos = {
 
 
 static void drawRect();
+static void N3D_godSTinitCurvePos(N3D_GodPos *god, int i, float fCcen,
+        float fEcen, float fTexCen);
+static void N3D_godSTinitVexHelp(N3D_GodPos *god);
+static void N3D_godSTinitFramExpendPos(N3D_GodPos *god, int j);
+static void N3D_godSTDrawAminDemo(N3D_GodPos *god);
 
 
 
@@ -159,7 +166,7 @@ void N3D_godDestroy(N3D_GodPos *god)
     god->mvHelpX = NULL;
 }
 
-void N3D_godSTinitCurvePos(N3D_GodPos *god, int i, float fCcen,
+static void N3D_godSTinitCurvePos(N3D_GodPos *god, int i, float fCcen,
         float fEcen, float fTexCen)
 {
     assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
@@ -208,7 +215,7 @@ void N3D_godSTinitCurvePos(N3D_GodPos *god, int i, float fCcen,
     pV[2*i+1].fT = fTexCen * i;
 }
 
-void N3D_godSTinitVexHelp(N3D_GodPos *god)
+static void N3D_godSTinitVexHelp(N3D_GodPos *god)
 {
     assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
             && god->mnDivY > 0 && god->mnFramExpend > 0);
@@ -229,7 +236,7 @@ void N3D_godSTinitVexHelp(N3D_GodPos *god)
     }
 }
 
-void N3D_godSTinitFramExpendPos(N3D_GodPos *god, int j)
+static void N3D_godSTinitFramExpendPos(N3D_GodPos *god, int j)
 {
     assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
             && god->mnDivY > 0 && god->mnFramExpend > 0);
@@ -371,7 +378,7 @@ void N3D_godDrawAminByLine(N3D_GodPos *god, int curLine)
     N3D_godDrawByLine(god, curLine);
 }
 
-void N3D_godDrawAminDemo(N3D_GodPos *god)
+static void N3D_godSTDrawAminDemo(N3D_GodPos *god)
 {
     assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
             && god->mnDivY > 0 && god->mnFramExpend > 0);
@@ -555,7 +562,7 @@ void render(void)
         N3D_godDraw(&g_godPos);
     } glPopMatrix();
 #else
-    N3D_godDrawAminDemo(&g_godPos);
+    N3D_godSTDrawAminDemo(&g_godPos);
 #endif
 
 

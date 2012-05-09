@@ -39,7 +39,7 @@ LERP_OBJ3 = $(LERP3).o
 all: $(PROJ).exe $(PROJ2).exe $(ENDIAN).exe $(BMPRW).exe $(FOLD_UP).exe \
 	$(LERP).exe $(LERP2).exe $(LERP3).exe
 
-$(LERP3).exe: $(LERP_OBJ3) $(SHARED) M3D_math3d.o M3D_plane.o
+$(LERP3).exe: $(LERP_OBJ3) $(SHARED) M3D_math3d.o M3D_plane.o $(LERP3).h
 	$(CC) $(LIBPATH) -o $@ $^ $(LDFLAGS)
 
 $(LERP2).exe: $(LERP_OBJ2) $(SHARED) M3D_math3d.o M3D_plane.o
