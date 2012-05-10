@@ -32,17 +32,19 @@ int  N3D_lineInsertPos(float k1, float b1, float k2, float b2,
 int  N3D_lineConstruct(float x1, float y1, float x2, float y2,
         float *k, float *b);
 
+
 int  N3D_godCreate(N3D_GodPos *god);
+void N3D_godinit(N3D_GodPos *god);
 void N3D_godDestroy(N3D_GodPos *god);
 
 void N3D_godClear();
 void N3D_godFlush();
 
-void N3D_godInitPos(N3D_GodPos *god);
+
+void N3D_godUpdatePos(N3D_GodPos *god);
 void N3D_godDraw(N3D_GodPos *god);
 
-
-void N3D_godInitPosByLine(N3D_GodPos *god, int curLine);
+void N3D_godUpdatePosByLine(N3D_GodPos *god, int curLine);
 void N3D_godDrawByLine(N3D_GodPos *god, int curLine);
 void N3D_godDrawAminByLine(N3D_GodPos *god, int curLine);
 

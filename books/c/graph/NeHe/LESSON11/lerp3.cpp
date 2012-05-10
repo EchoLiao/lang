@@ -80,11 +80,13 @@ N3D_GodPos      g_godPos = {
 
 
 static void drawRect();
-static void N3D_godSTinitCurvePos(N3D_GodPos *god, int i, float fCcen,
-        float fEcen, float fTexCen);
+
 static void N3D_godSTinitVexHelp(N3D_GodPos *god);
-static void N3D_godSTinitFramExpendPos(N3D_GodPos *god, int j);
-static void N3D_godSTDrawAminDemo(N3D_GodPos *god);
+
+static void N3D_godSTcalCurvePos(N3D_GodPos *god, int i, float fCcen,
+        float fEcen, float fTexCen);
+static void N3D_godSTupdateFramExpendPos(N3D_GodPos *god, int j);
+static void N3D_godSTdrawAminDemo(N3D_GodPos *god);
 
 
 
@@ -166,7 +168,7 @@ void N3D_godDestroy(N3D_GodPos *god)
     god->mvHelpX = NULL;
 }
 
-static void N3D_godSTinitCurvePos(N3D_GodPos *god, int i, float fCcen,
+static void N3D_godSTcalCurvePos(N3D_GodPos *god, int i, float fCcen,
         float fEcen, float fTexCen)
 {
     assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
@@ -215,6 +217,14 @@ static void N3D_godSTinitCurvePos(N3D_GodPos *god, int i, float fCcen,
     pV[2*i+1].fT = fTexCen * i;
 }
 
+void N3D_godinit(N3D_GodPos *god)
+{
+    assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
+            && god->mnDivY > 0 && god->mnFramExpend > 0);
+
+    N3D_godSTinitVexHelp(god);
+}
+
 static void N3D_godSTinitVexHelp(N3D_GodPos *god)
 {
     assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
@@ -229,6 +239,7 @@ static void N3D_godSTinitVexHelp(N3D_GodPos *god)
     N3D_Vertex  *pV = god->mvVex;
     float       *pH = god->mvHelpX;
 
+    N3D_godUpdatePosByLine(god, god->mnDivY);
     for ( i = 0; i <= god->mnDivY; i++ )
     {
         pH[2*i]   = (rectLTX - pV[2*i].fX) / god->mnFramExpend;
@@ -236,7 +247,7 @@ static void N3D_godSTinitVexHelp(N3D_GodPos *god)
     }
 }
 
-static void N3D_godSTinitFramExpendPos(N3D_GodPos *god, int j)
+static void N3D_godSTupdateFramExpendPos(N3D_GodPos *god, int j)
 {
     assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
             && god->mnDivY > 0 && god->mnFramExpend > 0);
@@ -253,7 +264,7 @@ static void N3D_godSTinitFramExpendPos(N3D_GodPos *god, int j)
     }
 }
 
-void N3D_godInitPos(N3D_GodPos *god)
+void N3D_godUpdatePos(N3D_GodPos *god)
 {
     assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
 
@@ -264,7 +275,7 @@ void N3D_godInitPos(N3D_GodPos *god)
 
     for ( i = 0; i <= god->mnDivY; i++ )
     {
-        N3D_godSTinitCurvePos(god, i, fCcen, fEcen, fTexCen);
+        N3D_godSTcalCurvePos(god, i, fCcen, fEcen, fTexCen);
     }
 }
 
@@ -288,7 +299,7 @@ void N3D_godDraw(N3D_GodPos *god)
     } glEnd();
 }
 
-void N3D_godInitPosByLine(N3D_GodPos *god, int curLine)
+void N3D_godUpdatePosByLine(N3D_GodPos *god, int curLine)
 {
     assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
     assert(curLine >= 0 && curLine <= god->mnDivY);
@@ -304,7 +315,7 @@ void N3D_godInitPosByLine(N3D_GodPos *god, int curLine)
     {
         if ( i <= curLine )
         {
-            N3D_godSTinitCurvePos(god, i, fCcen, fEcen, fTexCen);
+            N3D_godSTcalCurvePos(god, i, fCcen, fEcen, fTexCen);
         }
         else
         {
@@ -367,18 +378,16 @@ void N3D_godDrawAminByLine(N3D_GodPos *god, int curLine)
 
     if ( curLine <= god->mnDivY )
     {
-        N3D_godInitPosByLine(god, curLine);
-        if ( curLine == god->mnDivY )
-            N3D_godSTinitVexHelp(god);
+        N3D_godUpdatePosByLine(god, curLine);
     }
     else
     {
-        N3D_godSTinitFramExpendPos(god, curLine);
+        N3D_godSTupdateFramExpendPos(god, curLine);
     }
     N3D_godDrawByLine(god, curLine);
 }
 
-static void N3D_godSTDrawAminDemo(N3D_GodPos *god)
+static void N3D_godSTdrawAminDemo(N3D_GodPos *god)
 {
     assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
             && god->mnDivY > 0 && god->mnFramExpend > 0);
@@ -510,6 +519,7 @@ bool init(void)
 
     ret = N3D_godCreate(&g_godPos);
     assert( ret != 0 );
+    N3D_godinit(&g_godPos);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glEnable(GL_TEXTURE_2D);
@@ -558,11 +568,11 @@ void render(void)
         glPointSize(3);
         glColor4f(1.0, 1.0, 0.0, 1.0);
         glScalef(0.5, 0.5, 0.5);
-        N3D_godInitPos(&g_godPos);
+        N3D_godUpdatePos(&g_godPos);
         N3D_godDraw(&g_godPos);
     } glPopMatrix();
 #else
-    N3D_godSTDrawAminDemo(&g_godPos);
+    N3D_godSTdrawAminDemo(&g_godPos);
 #endif
 
 
