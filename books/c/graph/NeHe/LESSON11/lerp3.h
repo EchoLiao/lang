@@ -34,7 +34,7 @@ int  N3D_lineConstruct(float x1, float y1, float x2, float y2,
 
 
 int  N3D_godCreate(N3D_GodPos *god);
-void N3D_godinit(N3D_GodPos *god);
+void N3D_godinit(N3D_GodPos *god, int dir);
 void N3D_godDestroy(N3D_GodPos *god);
 
 void N3D_godClear();

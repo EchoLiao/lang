@@ -81,12 +81,13 @@ N3D_GodPos      g_godPos = {
 
 static void drawRect();
 
-static void N3D_godSTinitVexHelp(N3D_GodPos *god);
+static void N3D_godSTinitVexHelp(N3D_GodPos *god, int dir);
 
 static void N3D_godSTcalCurvePos(N3D_GodPos *god, int i, float fCcen,
         float fEcen, float fTexCen);
 static void N3D_godSTupdateFramExpendPos(N3D_GodPos *god, int j);
 static void N3D_godSTdrawAminDemo(N3D_GodPos *god);
+static void N3D_godSTdrawAminDemoRollBack(N3D_GodPos *god);
 
 
 
@@ -217,15 +218,10 @@ static void N3D_godSTcalCurvePos(N3D_GodPos *god, int i, float fCcen,
     pV[2*i+1].fT = fTexCen * i;
 }
 
-void N3D_godinit(N3D_GodPos *god)
-{
-    assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
-            && god->mnDivY > 0 && god->mnFramExpend > 0);
-
-    N3D_godSTinitVexHelp(god);
-}
-
-static void N3D_godSTinitVexHelp(N3D_GodPos *god)
+/* 
+ *  dir :  0 is foldup, 1 is rollback.
+ */
+void N3D_godinit(N3D_GodPos *god, int dir)
 {
     assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
             && god->mnDivY > 0 && god->mnFramExpend > 0);
@@ -235,15 +231,48 @@ static void N3D_godSTinitVexHelp(N3D_GodPos *god)
     // const float     rectLTY =  1.0;
     const float     rectBRX =  1.0;
     // const float     rectBRY = -1.0;
-    int         i;
+    int             i;
+    N3D_Vertex      *pV = god->mvVex;
+
+    N3D_godUpdatePosByLine(god, god->mnDivY);
+    N3D_godSTinitVexHelp(god, dir);
+
+    if ( dir == 0 )
+    {
+        // N3D_godUpdatePosByLine(god, god->mnDivY);
+    }
+    else
+    {
+        for ( i = 0; i <= god->mnDivY; i++ )
+        {
+            pV[2*i].fX   = rectLTX;
+            pV[2*i+1].fX = rectBRX;
+        }
+    }
+}
+
+/* 
+ *  dir :  0 is foldup, 1 is rollback.
+ */
+static void N3D_godSTinitVexHelp(N3D_GodPos *god, int dir)
+{
+    assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
+            && god->mnDivY > 0 && god->mnFramExpend > 0);
+
+    // Normal Rect: [(-1.0, 1.0), (1.0, -1.0)], size is 2.0
+    const float     rectLTX = -1.0;
+    // const float     rectLTY =  1.0;
+    const float     rectBRX =  1.0;
+    // const float     rectBRY = -1.0;
+    int         i, nF;
     N3D_Vertex  *pV = god->mvVex;
     float       *pH = god->mvHelpX;
 
-    N3D_godUpdatePosByLine(god, god->mnDivY);
+    nF = (dir == 0) ? god->mnFramExpend : -god->mnFramExpend;
     for ( i = 0; i <= god->mnDivY; i++ )
     {
-        pH[2*i]   = (rectLTX - pV[2*i].fX) / god->mnFramExpend;
-        pH[2*i+1] = (rectBRX - pV[2*i+1].fX) / god->mnFramExpend;
+        pH[2*i]   = (rectLTX - pV[2*i].fX) / (float)nF;
+        pH[2*i+1] = (rectBRX - pV[2*i+1].fX) / (float)nF;
     }
 }
 
@@ -394,6 +423,7 @@ static void N3D_godSTdrawAminDemo(N3D_GodPos *god)
 
     int j;
 
+    N3D_godinit(&g_godPos, 0);
     for ( j = 0; j <= god->mnDivY + god->mnFramExpend; j++ )
     {
         N3D_godClear();
@@ -415,6 +445,39 @@ static void N3D_godSTdrawAminDemo(N3D_GodPos *god)
             N3D_godDrawAminByLine(god, j);
         } glPopMatrix();
 
+        N3D_godFlush();
+        usleep(20 * 1000);
+    }
+}
+
+static void N3D_godSTdrawAminDemoRollBack(N3D_GodPos *god)
+{
+    assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
+            && god->mnDivY > 0 && god->mnFramExpend > 0);
+
+    int j;
+
+    N3D_godinit(&g_godPos, 1);
+    for ( j = god->mnDivY + god->mnFramExpend; j >= 0; j-- )
+    {
+        N3D_godClear();
+
+        glPushMatrix(); {
+            glDisable(GL_TEXTURE_2D);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            glColor4f(1.0, 0.0, 1.0, 1.0);
+            glScalef(0.5, 0.5, 0.5);
+            drawRect();
+        } glPopMatrix();
+
+        glPushMatrix(); {
+            glEnable(GL_TEXTURE_2D);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glPointSize(3);
+            glColor4f(1.0, 1.0, 0.0, 1.0);
+            glScalef(0.5, 0.5, 0.5);
+            N3D_godDrawAminByLine(god, j);
+        } glPopMatrix();
         N3D_godFlush();
         usleep(20 * 1000);
     }
@@ -519,7 +582,6 @@ bool init(void)
 
     ret = N3D_godCreate(&g_godPos);
     assert( ret != 0 );
-    N3D_godinit(&g_godPos);
 
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glEnable(GL_TEXTURE_2D);
@@ -572,7 +634,8 @@ void render(void)
         N3D_godDraw(&g_godPos);
     } glPopMatrix();
 #else
-    N3D_godSTdrawAminDemo(&g_godPos);
+    // N3D_godSTdrawAminDemo(&g_godPos);
+    N3D_godSTdrawAminDemoRollBack(&g_godPos);
 #endif
 
 
