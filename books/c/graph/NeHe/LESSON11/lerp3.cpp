@@ -5,8 +5,10 @@
 #include <math.h>
 #include <GL/glut.h>
 
+#include "bmprw.h"
 #include "lerp3.h"
 
+// #define SAVE_TO_BMP
 
 typedef struct N3D_Vertex
 {
@@ -422,6 +424,18 @@ static void N3D_godSTdrawAminDemo(N3D_GodPos *god)
             && god->mnDivY > 0 && god->mnFramExpend > 0);
 
     int j;
+#ifdef SAVE_TO_BMP
+    unsigned char   *buffer = NULL;
+    sbitData        *bmpw;
+    char            dstfile[128];
+    int             w = 256;
+    int             h = 256;
+    buffer = (unsigned char *)calloc(w * h * 4, sizeof(unsigned char));
+    glReadBuffer(GL_BACK);
+    glPixelStorei(GL_PACK_ALIGNMENT,1);
+    bmpw = bmpCreateObjForWrite(EBMP_RGBA, 0, w, h, 32, buffer);
+    assert( bmpw != NULL );
+#endif
 
     N3D_godinit(&g_godPos, 0);
     for ( j = 0; j <= god->mnDivY + god->mnFramExpend; j++ )
@@ -445,9 +459,20 @@ static void N3D_godSTdrawAminDemo(N3D_GodPos *god)
             N3D_godDrawAminByLine(god, j);
         } glPopMatrix();
 
+#ifdef SAVE_TO_BMP
+        sprintf(dstfile, "sshot_%02d.bmp", j);
+        glReadPixels((342*2-w)/2, (256*2-h)/2, w, h, GL_RGBA, GL_UNSIGNED_BYTE ,buffer);
+        bmpWrite(dstfile, bmpw);
+#endif
+
         N3D_godFlush();
         usleep(20 * 1000);
     }
+
+#ifdef SAVE_TO_BMP
+    bmpDestroyObjForWrite(&bmpw);
+    free(buffer);
+#endif
 }
 
 static void N3D_godSTdrawAminDemoRollBack(N3D_GodPos *god)
@@ -634,8 +659,8 @@ void render(void)
         N3D_godDraw(&g_godPos);
     } glPopMatrix();
 #else
-    // N3D_godSTdrawAminDemo(&g_godPos);
-    N3D_godSTdrawAminDemoRollBack(&g_godPos);
+    N3D_godSTdrawAminDemo(&g_godPos);
+    // N3D_godSTdrawAminDemoRollBack(&g_godPos);
 #endif
 
 
