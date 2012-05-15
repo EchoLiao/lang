@@ -1,0 +1,304 @@
+                <<用简单线性插值实现有趣的曲线与动画>>
+                Tags: opengl, 3d, c, linux
+
+1. 要实现什么?
+
+    为了更好说明, 先看一下我们要实现的是什么, 既然是图形的效效果, 自然看图最能
+    说明问题, 清楚明了.
+
+    1)  要画出的曲线:
+        ./bmp_line/sshot_20.bmp
+
+    2)  要实现的动画:
+        ./bmp_line/animated.gif
+
+2. 几何分析
+
+    ./lerp.note.bmp
+
+    从图中我们可以看到, 我们最终要画出的是红色的曲线, 而该红色曲线是显然是由一
+    些线段连接而成的. 要确定一条线段不外乎于找出其两个端点. 好了, 我们现在的问
+    题已经很明确了: 找端点. 怎么找呢? 联系上图, 可知这些端点是各个斜线与横线的
+    交点. 所以这一问题被转化为: 求两直线的交点.
+
+
+3. 两个直线相关的函数
+
+3.1 已知两点 求经过这两点的直线
+
+    直线方程是:     y = k*x + b
+
+    现已知两点(x1, y1)和(x2, y2), 求k和b:
+
+        y1 = k*x1 + b \       / k = (y2 - y1) / (x2 - x1)
+                       | ==> |
+        y2 = k*x2 + b /       \ b = y1 - k*x1
+
+3.2 求两直线的交点
+
+    直线方程是:     y = k*x + b
+
+    现已知两条直线,
+        y = k1*x + b1
+        y = k2*x + b2
+    求它们的交点(x, y):
+
+        y = k1*x + b1 \      / x = (b2 -b1) / (k1 - k2)
+                       | ==> |
+        y = k2*x + b2 /      \ y = k1*x + b1
+
+3.3 代码实现
+
+/*
+ * y = k*x + b
+ *
+ * y1 = k*x1 + b \       / k = (y2 - y1) / (x2 - x1)
+ *                | ==> |
+ * y2 = k*x2 + b /       \ b = y1 - k*x1
+ *
+ * */
+int  N3D_lineConstruct(float x1, float y1, float x2, float y2,
+        float *k, float *b)
+{
+    assert( !(x1 == x2 && y1 == y2) );
+
+    if ( x1 == x2 )
+    {
+        return 0;
+    }
+
+    *k = (y2 - y1) / (x2 - x1);
+    *b = y1 - (*k) * x1;
+
+    return 1;
+}
+
+/*
+ * y = k*x + b
+ *
+ * y = k1*x + b1 \      / x = (b2 -b1) / (k1 - k2)
+ *                | ==> |
+ * y = k2*x + b2 /      \ y = k1*x + b1
+ *
+ * */
+int  N3D_lineInsertPos(float k1, float b1, float k2, float b2,
+        float *x, float *y)
+{
+    if ( k1 == k2 )
+    {
+        return 0;
+    }
+
+    *x = (b2 - b1) / (k1 - k2);
+    *y = k1 * (*x) + b1;
+
+    return 1;
+}
+
+
+4. 开始实现我们要实现的东东
+
+4.1 曲线(静态的)
+
+typedef struct N3D_Vertex
+{
+    float fX;
+    float fY;
+    float fZ;
+    float fS;
+    float fT;
+} N3D_Vertex;
+
+typedef struct N3D_GodPos
+{
+    float mfTarX;       // 控制轴(图中的黑实线)的底端端点的x坐标
+    float mfTarY;       // 控制轴(图中的黑实线)的底端端点的y坐标
+    float mfTarW;       // 控制轴宽
+    float mfTarH;       // 控制轴高
+
+    int   mnFramExpend; // 动画后半部分的帧数
+    int   mnDivY;       // 动画前半部分的帧数
+
+    N3D_Vertex  *mvVex;     // 顶点数据
+    float       *mvHelpX;   // 用于辅助动画的后半部分
+} N3D_GodPos;
+
+N3D_GodPos      g_godPos = {
+    0.0,
+    -1.0,
+    0.0,
+    1.0,
+
+    10,
+    20,
+
+    NULL,
+    NULL,
+};
+
+先定义并初始化一个我们要实现的曲线: g_godPos !
+
+
+
+void N3D_godUpdatePos(N3D_GodPos *god)
+{
+    assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
+
+    int     i;
+    float   fCcen = god->mfTarH / (float)god->mnDivY;
+    float   fEcen = 2.0 / (float)god->mnDivY;
+    float   fTexCen = 1.0 / (float)god->mnDivY;
+
+    for ( i = 0; i <= god->mnDivY; i++ )
+    {
+        N3D_godSTcalCurvePos(god, i, fCcen, fEcen, fTexCen);
+    }
+}
+
+    图: ./bmp_point/sshot_20.bmp
+
+我们先实现一个用于求画出最终曲线的顶点数据的一个函数: N3D_godUpdatePos,按行求,
+共(god->mnDivY + 1)行, 其最终调用的是 N3D_godSTcalCurvePos,
+
+static void N3D_godSTcalCurvePos(N3D_GodPos *god, int i, float fCcen,
+        float fEcen, float fTexCen)
+{
+    assert(god != NULL && god->mvVex != NULL && god->mnDivY > 0);
+    assert(i >= 0 && i <= god->mnDivY);
+
+    // Normal Rect: [(-1.0, 1.0), (1.0, -1.0)], size is 2.0
+    const float     rectLTX = -1.0;
+    const float     rectLTY =  1.0;
+    const float     rectBRX =  1.0;
+    const float     rectBRY = -1.0;
+    float Cx1 = god->mfTarX;
+    float Cy1 = god->mfTarY + fCcen * i;
+    float CxL = rectLTX;
+    float CyL = rectLTY;
+    float CxR = rectBRX;
+    float CyR = rectLTY;
+    float Ex1 = -1.0;
+    float Ey1 = rectBRY + fEcen * i;
+    float Ex2 =  0.0;
+    float Ey2 = Ey1;
+    float Ck, Cb, Ek, Eb, insPosXL, insPosYL, insPosXR, insPosYR;
+    N3D_Vertex  *pV = god->mvVex;
+
+    if ( Cx1 == CxL ) CxL += 0.00001;
+    N3D_lineConstruct(Cx1, Cy1, CxL, CyL, &Ck, &Cb);
+    N3D_lineConstruct(Ex1, Ey1, Ex2, Ey2, &Ek, &Eb);
+    if ( Ck == Ek ) Ek += 0.00001;
+    N3D_lineInsertPos(Ck, Cb, Ek, Eb, &insPosXL, &insPosYL);
+
+    Cx1 += god->mfTarW;
+    if ( Cx1 == CxR ) CxR += 0.00001;
+    N3D_lineConstruct(Cx1, Cy1, CxR, CyR, &Ck, &Cb);
+    if ( Ck == Ek ) Ek += 0.00001;
+    N3D_lineInsertPos(Ck, Cb, Ek, Eb, &insPosXR, &insPosYR);
+
+    pV[2*i].fX = insPosXL;
+    pV[2*i].fY = insPosYL;
+    pV[2*i].fZ = 0.0;
+    pV[2*i].fS = 0.0;
+    pV[2*i].fT = fTexCen * i;
+
+    pV[2*i+1].fX = insPosXR;
+    pV[2*i+1].fY = insPosYR;
+    pV[2*i+1].fZ = 0.0;
+    pV[2*i+1].fS = 1.0;
+    pV[2*i+1].fT = fTexCen * i;
+}
+
+用求两直线的交点的方法求出交点并保存到god->mvVex中.
+
+接下来, 就是渲染了, 有了顶点数据, 渲染就是很明了的事:
+
+void N3D_godDraw(N3D_GodPos *god)
+{
+    assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
+            && god->mnDivY > 0);
+
+    int i;
+    N3D_Vertex *pV = god->mvVex;
+
+    glBegin(GL_TRIANGLE_STRIP); {
+        for ( i = 0; i <= god->mnDivY; i++ )
+        {
+            glTexCoord2f(pV[2*i].fS, pV[2*i].fT);
+            glVertex3f(pV[2*i].fX, pV[2*i].fY, pV[2*i].fZ);
+            glTexCoord2f(pV[2*i+1].fS, pV[2*i+1].fT);
+            glVertex3f(pV[2*i+1].fX, pV[2*i+1].fY, pV[2*i+1].fZ);
+        }
+    } glEnd();
+}
+
+
+4.2 动画
+
+有了我们前面的分析与实现, 动画也就很容易地实现了. 先看一下原理:
+
+    对整个过程共分(god->mnDivY+1)帧渲染, 第一帧画最前面一行, 第二帧画最前面两
+    行, ...
+
+
+static void N3D_godSTdrawAminDemo(N3D_GodPos *god)
+{
+    assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
+            && god->mnDivY > 0 && god->mnFramExpend > 0);
+
+    int j;
+
+    N3D_godinit(&g_godPos, 0);
+    for ( j = 0; j <= god->mnDivY + god->mnFramExpend; j++ )
+    {
+        N3D_godClear();
+
+        glPushMatrix(); {
+            glEnable(GL_TEXTURE_2D);
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+            glPointSize(3);
+            glColor4f(1.0, 1.0, 0.0, 1.0);
+            glScalef(0.5, 0.5, 0.5);
+            N3D_godDrawAminByLine(god, j);
+        } glPopMatrix();
+
+        N3D_godFlush();
+        usleep(20 * 1000);
+    }
+}
+
+void N3D_godDrawAminByLine(N3D_GodPos *god, int curLine)
+{
+    assert(god != NULL && god->mvVex != NULL && god->mvHelpX != NULL
+            && god->mnDivY > 0 && god->mnFramExpend > 0);
+    assert(curLine >= 0 && curLine <= god->mnDivY + god->mnFramExpend);
+
+    if ( curLine <= god->mnDivY )
+    {
+        N3D_godUpdatePosByLine(god, curLine);
+    }
+    else
+    {
+        N3D_godSTupdateFramExpendPos(god, curLine);
+    }
+    N3D_godDrawByLine(god, curLine);
+}
+
+
+
+5. 其它曲线
+
+线性插值的好处就是, 不用先知道曲线的方程, 就能画出来, 并且其计算量也明显没有那
+么大.
+
+N3D_GodPos g_godPos = {  0.0, -1.0,  0.3,  1.0,   10, 20, NULL };  // 树型
+    图: ./animated-tree.gif
+
+N3D_GodPos g_godPos = {  0.0, -0.4,  0.3,  1.0,   10, 20, NULL };  // 交叉型
+    图: ./animated-cross.gif
+
+N3D_GodPos g_godPos = {  0.0, -1.0,  0.3, -3.0,   10, 20, NULL };  // 碗型
+    图: ./animated-bowl.gif
+
+N3D_GodPos g_godPos = {  0.0, -0.1,  0.1, -3.0,   10, 20, NULL };  // 酒杯型
+    图: ./animated-glass.gif
