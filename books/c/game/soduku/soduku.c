@@ -67,16 +67,10 @@ static unsigned int Rand_int(unsigned int a, unsigned int b)
     return a + rand() % (b + 1 - a);
 }
 
-
-int sodk_create(int *tab)
+int sodk_ST_verifySixs()
 {
-    assert(tab != NULL);
+    int i, j, m, n;
 
-    int i, j, k;
-    int count = 0;
-
-#ifdef NAL_DEBUG
-    int m, n;
     for ( i = 0; i < 9; i++ )
     {
         for ( j = 0; j < 9; j++ )
@@ -89,12 +83,24 @@ int sodk_create(int *tab)
                 for ( n = 0; n < 9; n++ )
                 {
                     int idx2 = m * 9 + n;
-                    if ( idx1 != idx2)
-                        assert(iTmp != g_sodkSixs[m][n]);
+                    if ( idx1 != idx2 && iTmp == g_sodkSixs[m][n] )
+                        return 0;
                 }
             }
         }
     }
+
+    return 1;
+}
+
+int sodk_create(int *tab)
+{
+    assert(tab != NULL);
+
+    int i, j, k;
+
+#if 0
+    assert(sodk_ST_verifySixs());
 #endif
 
     do {
@@ -113,15 +119,9 @@ int sodk_create(int *tab)
                 int rVal = Rand_int(1, 9);
                 tab[rIdx] = rVal;
             }
-
-            count++;
         } while ( ! sodk_ST_oriIsOK(tab) );
-#ifdef NAL_DEBUG
-        st_print(tab);
-        // assert(0);
-#endif
         g_curTabIdx++;
-        printf("HHHHHHHHHHHHHHHHHHHHHHHH g_curTabIdx=%d\n", g_curTabIdx);
+        // printf("HHHHHHHHHHHHHHHHHHHHHHHH g_curTabIdx=%d\n", g_curTabIdx);
     } while ( ! sodk_cal(tab) );
 
     return 1;
@@ -174,6 +174,8 @@ int sodk_verification(int *tab)
     int i;
     for ( i = 0; i < SODK_ROWS * SODK_COLS; i++ )
     {
+        if ( tab[i] < 1 || tab[i] > 9 )
+            return 0;
         if ( ! sodk_ST_isOK(tab, i) )
             return 0;
     }
@@ -204,15 +206,10 @@ _FINDED_FIRST_SPACE:
         {
             for ( k = g_sodkHerp[idx]; k <= 9; k++ )
             {
-                int m = g_sodkHerp[idx];
+                tab[idx] = k;
                 g_sodkHerp[idx] = k + 1;
-                tab[idx] = m;
                 if ( sodk_ST_isOK(tab, idx) )
                 {
-#ifdef NAL_DEBUG
-                    st_print(tab);
-                    printf("NAL &&**&& i=%d, k=%d, m=%d\n", i, k, m);
-#endif
                     break;
                 }
             }
@@ -227,14 +224,13 @@ _FINDED_FIRST_SPACE:
             {
 #ifdef NAL_DEBUG
                 printf("NAL && iF=%d, idx=%d\n", iFirstSpace, idx);
-                printf("NAL ######################333\n");
                 st_print(tab);
                 assert(0);
 #endif
                 return 0;
             }
         }
-        if ( g_calCount > 1000000 )
+        if ( g_calCount > 1000000 ) // MAGIC
             return 0;
     }
 
