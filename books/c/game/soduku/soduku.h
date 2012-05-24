@@ -27,6 +27,26 @@
 #define SODK_ROWS     9
 #define SODK_COLS     9
 
+#define SODK_DIGI_LOW           1
+#define SODK_DIGI_HIGH          9
+#define SODK_DIGI_ORI           0
+#define SODK_DIGI_DIG           -1
+#define SODK_DIGI_BANDIG        -2
+
+#define sodk_DE_isValidDigi(x)  ( (x) >= SODK_DIGI_LOW \
+        && (x) <= SODK_DIGI_HIGH )
+
+
+
+enum em_sodkGrade {
+    SODK_GRADE_LOW = 0,
+    SODK_GRADE_PRIMARY,
+    SODK_GRADE_MIDDLE,
+    SODK_GRADE_HIGH,
+    SODK_GRADE_ASHES,
+    SODK_GRADE_COUNT
+};
+
 
 
 extern int  sodk_create(int *tab);

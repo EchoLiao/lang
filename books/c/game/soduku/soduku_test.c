@@ -45,7 +45,7 @@ void st_print(int *tab)
                 printf("|");
             else
                 printf(" ");
-            if ( tab[i*SODK_ROWS+j] != 0 )
+            if ( tab[i*SODK_ROWS+j] >= 1 &&  tab[i*SODK_ROWS+j] <= 9 )
                 printf(" %d ", tab[i*SODK_ROWS+j]);
             else
                 printf("   ");
@@ -65,13 +65,12 @@ int  st_verification(int *tab)
 int main (int argc, char *argv[])
 {
     int i;
-    for ( i = 0; i <= 100000; i++ )
+    for ( i = 0; i < 10; i++ )
     {
         sodk_create(g_sodukuTab);
         if ( st_verification(g_sodukuTab) )
         {
-            printf("NAL **(())*** i=%d\n", i);
-            // st_print(g_sodukuTab);
+            st_print(g_sodukuTab);
         }
         else 
         {
@@ -79,6 +78,11 @@ int main (int argc, char *argv[])
             st_print(g_sodukuTab);
             assert(0);
         }
+
+        printf("NAL **(())*** i=%d\n", i);
+        // sodk_dig(g_sodukuTab, SODK_GRADE_LOW);
+        sodk_dig(g_sodukuTab, SODK_GRADE_PRIMARY);
+        st_print(g_sodukuTab);
     }
 
     return 0;
