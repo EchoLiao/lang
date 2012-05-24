@@ -31,7 +31,9 @@
 #define SODK_DIGI_HIGH          9
 #define SODK_DIGI_ORI           0
 #define SODK_DIGI_DIG           -1
-#define SODK_DIGI_BANDIG        -2
+
+#define SODK_DIGI_BANDIG        0
+#define SODK_DIGI_CANDIG        1
 
 #define sodk_DE_isValidDigi(x)  ( (x) >= SODK_DIGI_LOW \
         && (x) <= SODK_DIGI_HIGH )

@@ -55,7 +55,7 @@ static int  sodk_ST_isOK(const int *tab, int idx);
 static long long    g_calCount;
 static int          g_curTabIdx;
 static int          g_sodkHerp[SODK_ROWS * SODK_COLS];
-static int          g_sodkRecDig[SODK_ROWS * SODK_COLS];
+static int          g_sodkBanDig[SODK_ROWS * SODK_COLS];
 static const int    g_sodkSixs[9][9] = {
     { 0, 1, 2, 9, 10, 11, 18, 19, 20 },
     { 3, 4, 5, 12, 13, 14, 21, 22, 23 },
@@ -68,8 +68,8 @@ static const int    g_sodkSixs[9][9] = {
     { 60, 61, 62, 69, 70, 71, 78, 79, 80 },
 };
 static const SodkDigInfos g_sodkDigs[SODK_GRADE_COUNT] = {
-    { SODK_GRADE_LOW,     SODK_ALG_RANDOM,   80, 59, 9, 6, 9, 6 },
-    { SODK_GRADE_PRIMARY, SODK_ALG_RANDOM,   69, 48, 9, 4, 9, 4 },
+    { SODK_GRADE_LOW,     SODK_ALG_RANDOM,   80, 55, 9, 6, 9, 6 },
+    { SODK_GRADE_PRIMARY, SODK_ALG_RANDOM,   69, 45, 9, 4, 9, 4 },
     { SODK_GRADE_MIDDLE,  SODK_ALG_INTERVAL, 58, 47, 9, 3, 9, 3 },
     { SODK_GRADE_HIGH,    SODK_ALG_SNAKE,    36, 47, 9, 1, 9, 1 },
     { SODK_GRADE_ASHES,   SODK_ALG_ORDER,    25, 36, 9, 0, 9, 0 },
@@ -94,6 +94,32 @@ static unsigned int Rand_int(unsigned int a, unsigned int b)
     assert( a <= b);
 
     return a + rand() % (b + 1 - a);
+}
+
+/*==========================================================================*
+ * @Description:
+ *      返回一个整形随机数组, 大小为n, 元素是唯一的, 且其元素值介于0和n-1之间.
+ *
+ * @Param   n
+ *
+ *==========================================================================*/
+static void Rand_randXN(int *X, int n)
+{
+    assert(n >= 1);
+
+    int i, a, t;
+
+    for ( i = 0; i < n; i++ )
+        X[i] = i;
+
+    // srand((unsigned int)time(NULL));
+    for ( i = 0; i < n; i++ )
+    {
+        a = Rand_int(i, n - 1);
+        t = X[a];
+        X[a] = X[i];
+        X[i] = t;
+    }
 }
 
 #if 0
@@ -123,6 +149,13 @@ static int sodk_ST_verifySixs()
     return 1;
 }
 #endif
+
+static void sodk_ST_resetBanDig()
+{
+    int i;
+    for ( i = 0; i < SODK_ROWS * SODK_COLS; i++ )
+        g_sodkBanDig[i] = SODK_DIGI_CANDIG;
+}
 
 int sodk_create(int *tab)
 {
@@ -349,6 +382,9 @@ static int sodk_ST_constraintRowCol(int *tab, int idx,
     int col = idx % SODK_COLS;
     int nrRowOri = 0, nrColOri = 0;
 
+    if ( g_sodkBanDig[idx] == SODK_DIGI_BANDIG )
+        return 0;
+
     if ( !sodk_DE_isValidDigi(tab[idx]) )
         return 0;
 
@@ -395,17 +431,21 @@ static int sodk_ST_canDig(int *tab, int idx)
 
 static int sodk_ST_algRandom(int *tab, const SodkDigInfos *dig)
 {
-    int i, rIdx;
+    int i, k, rIdx;
+    int rA[SODK_ROWS*SODK_COLS];
     int nrKnown = SODK_ROWS * SODK_COLS;
 
-    for ( i = nrKnown; i > dig->mAreaLow; )
+    sodk_ST_resetBanDig();
+
+    Rand_randXN(rA, SODK_ROWS*SODK_COLS);
+    for ( i = nrKnown, k = 0; i > dig->mAreaLow; )
     {
-        // printf("NAL +===========+ i=%d\n", i);
-        do { 
-            rIdx = Rand_int(0, SODK_ROWS*SODK_COLS-1);
-            // printf("NAL 3 +===========+ i=%d, rIdx=%d\n", i, rIdx);
+        do {
+            if ( k >= SODK_ROWS * SODK_COLS )
+                return 0;
+            rIdx = rA[k++];
         } while ( !sodk_ST_constraintRowCol(tab, rIdx, dig) );
-        // printf("NAL 2 +===========+ i=%d\n", i);
+        // printf("NAL 2 +======+ i=%d\n", i);
 
         if ( sodk_ST_canDig(tab, rIdx) )
         {
@@ -416,7 +456,7 @@ static int sodk_ST_algRandom(int *tab, const SodkDigInfos *dig)
         else
         {
             // printf("NAL 5 +===========+ i=%d\n", i);
-            // tab[rIdx] = SODK_DIGI_BANDIG;
+            g_sodkBanDig[rIdx] = SODK_DIGI_BANDIG;
         }
     }
 
@@ -427,18 +467,19 @@ int sodk_dig(int *tab, enum em_sodkGrade egd)
 {
     assert(tab != NULL && egd >= 0 && egd < SODK_GRADE_COUNT);
 
+    int                ret;
     const SodkDigInfos *pDigInfo = &g_sodkDigs[egd];
 
     assert(pDigInfo->mGrade == egd);
     switch ( pDigInfo->mAlg )
     {
         case SODK_ALG_RANDOM:
-            sodk_ST_algRandom(tab, pDigInfo);
+            ret = sodk_ST_algRandom(tab, pDigInfo);
             break;
         default:
             assert(0);
             break;
     }
 
-    return 1;
+    return ret;
 }
