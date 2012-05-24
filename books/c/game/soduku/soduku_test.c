@@ -66,12 +66,12 @@ int main (int argc, char *argv[])
 {
     int i, ret;
 
-    for ( i = 0; i < 1000; i++ )
+    for ( i = 0; i < 1; i++ )
     {
         sodk_create(g_sodukuTab);
         if ( st_verification(g_sodukuTab) )
         {
-            st_print(g_sodukuTab);
+            // st_print(g_sodukuTab);
         }
         else 
         {
