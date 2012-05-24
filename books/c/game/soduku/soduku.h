@@ -52,8 +52,8 @@ enum em_sodkGrade {
 
 
 extern int  sodk_create(int *tab);
-extern int  sodk_cal(int *tab);
 extern int  sodk_verification(int *tab);
+extern int  sodk_dig(int *tab, enum em_sodkGrade egd);
 
 
 

@@ -47,9 +47,22 @@ typedef struct tagSodkDigInfos {
 
 
 
+static unsigned int Rand_int(unsigned int a, unsigned int b);
+static void Rand_randXN(int *X, int n);
 
+static void sodk_ST_resetBanDig();
+static void sodk_ST_initHerp();
+
+static int  sodk_ST_constraintRowCol(int *tab, int idx,
+        const SodkDigInfos *dig);
+static int  sodk_ST_canDig(int *tab, int idx);
+// static int  sodk_ST_verifySixs();
 static int  sodk_ST_oriIsOK(int *tab);
 static int  sodk_ST_isOK(const int *tab, int idx);
+
+static int  sodk_ST_cal(int *tab);
+static int  sodk_ST_algRandom(int *tab, const SodkDigInfos *dig);
+
 
 
 static long long    g_calCount;
@@ -157,40 +170,6 @@ static void sodk_ST_resetBanDig()
         g_sodkBanDig[i] = SODK_DIGI_CANDIG;
 }
 
-int sodk_create(int *tab)
-{
-    assert(tab != NULL);
-
-    int i, j, k;
-
-#if 0
-    assert(sodk_ST_verifySixs());
-#endif
-
-    do {
-        do { 
-            for ( i = 0; i < SODK_ROWS; i++ )
-            {
-                for ( j = 0; j < SODK_COLS; j++ )
-                {
-                    tab[i*SODK_ROWS+j] = 0;
-                    g_sodkHerp[i*SODK_ROWS+j] = 1;
-                }
-            }
-            for ( k = 0; k < 11; k++ )
-            {
-                int rIdx = Rand_int(0, SODK_ROWS*SODK_COLS-1);
-                int rVal = Rand_int(1, 9);
-                tab[rIdx] = rVal;
-            }
-        } while ( ! sodk_ST_oriIsOK(tab) );
-        g_curTabIdx++;
-        // printf("HHHHHHHHHHHHHHHHHHHHHHHH g_curTabIdx=%d\n", g_curTabIdx);
-    } while ( ! sodk_cal(tab) );
-
-    return 1;
-}
-
 static int sodk_ST_oriIsOK(int *tab)
 {
     int i;
@@ -233,19 +212,6 @@ _FINDED_IDX:
     return 1;
 }
 
-int sodk_verification(int *tab)
-{
-    int i;
-    for ( i = 0; i < SODK_ROWS * SODK_COLS; i++ )
-    {
-        if ( tab[i] < 1 || tab[i] > 9 )
-            return 0;
-        if ( ! sodk_ST_isOK(tab, i) )
-            return 0;
-    }
-    return 1;
-}
-
 static void sodk_ST_initHerp()
 {
     int i, j;
@@ -259,65 +225,7 @@ static void sodk_ST_initHerp()
     }
 }
 
-int sodk_calDig(int *tab, int nVal)
-{
-    assert(tab != NULL);
-    int i, j, k, idx;
-    int iFirstSpace = -1;
-
-    sodk_ST_initHerp();
-
-    g_calCount = 0;
-    for ( i = 0; i < SODK_ROWS; i++ )
-        for ( j = 0; j < SODK_COLS; j++ )
-            if ( tab[i*SODK_ROWS+j] == 0 )
-            {
-                iFirstSpace = i*SODK_ROWS+j;
-                goto _FINDED_FIRST_SPACE;
-            }
-_FINDED_FIRST_SPACE:
-    assert(iFirstSpace != -1);
-
-    for ( i = 0; i < SODK_ROWS * SODK_COLS; i++ )
-    {
-        idx = i;
-        if ( tab[idx] == SODK_DIGI_ORI || tab[idx] == SODK_DIGI_DIG )
-        {
-            for ( k = g_sodkHerp[idx]; k <= SODK_DIGI_HIGH; k++ )
-            {
-                if ( k == nVal )
-                    continue;
-                tab[idx] = k;
-                g_sodkHerp[idx] = k + 1;
-                if ( sodk_ST_isOK(tab, idx) )
-                {
-                    break;
-                }
-            }
-            if ( k > SODK_DIGI_HIGH && idx > iFirstSpace )
-            {
-                g_sodkHerp[idx] = SODK_DIGI_LOW;
-                tab[idx-1] = tab[idx] = SODK_DIGI_ORI;
-                i -= 2;
-            }
-            else if ( k > SODK_DIGI_HIGH && idx <= iFirstSpace )
-            {
-#ifdef NAL_DEBUG
-                printf("NAL && iF=%d, idx=%d\n", iFirstSpace, idx);
-                st_print(tab);
-                assert(0);
-#endif
-                return 0;
-            }
-        }
-        if ( g_calCount > 1000000 ) // MAGIC
-            return 0;
-    }
-
-    return 1;
-}
-
-int sodk_cal(int *tab)
+static int sodk_ST_cal(int *tab)
 {
     assert(tab != NULL);
     int i, j, k, idx;
@@ -420,7 +328,7 @@ static int sodk_ST_canDig(int *tab, int idx)
             tabTmp[idx] = i;
             if ( sodk_ST_isOK(tabTmp, idx) )
             {
-                if ( sodk_cal(tabTmp) )
+                if ( sodk_ST_cal(tabTmp) )
                     return 0;
             }
         }
@@ -460,6 +368,54 @@ static int sodk_ST_algRandom(int *tab, const SodkDigInfos *dig)
         }
     }
 
+    return 1;
+}
+
+
+int sodk_create(int *tab)
+{
+    assert(tab != NULL);
+
+    int i, j, k;
+
+#if 0
+    assert(sodk_ST_verifySixs());
+#endif
+
+    do {
+        do { 
+            for ( i = 0; i < SODK_ROWS; i++ )
+            {
+                for ( j = 0; j < SODK_COLS; j++ )
+                {
+                    tab[i*SODK_ROWS+j] = 0;
+                    g_sodkHerp[i*SODK_ROWS+j] = 1;
+                }
+            }
+            for ( k = 0; k < 11; k++ )
+            {
+                int rIdx = Rand_int(0, SODK_ROWS*SODK_COLS-1);
+                int rVal = Rand_int(1, 9);
+                tab[rIdx] = rVal;
+            }
+        } while ( ! sodk_ST_oriIsOK(tab) );
+        g_curTabIdx++;
+        // printf("HHHHHHHHHHHHHHHHHHHHHHHH g_curTabIdx=%d\n", g_curTabIdx);
+    } while ( ! sodk_ST_cal(tab) );
+
+    return 1;
+}
+
+int sodk_verification(int *tab)
+{
+    int i;
+    for ( i = 0; i < SODK_ROWS * SODK_COLS; i++ )
+    {
+        if ( tab[i] < 1 || tab[i] > 9 )
+            return 0;
+        if ( ! sodk_ST_isOK(tab, i) )
+            return 0;
+    }
     return 1;
 }
 
