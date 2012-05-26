@@ -82,7 +82,9 @@ int main (int argc, char *argv[])
 
         // ret = sodk_dig(g_sodukuTab, SODK_GRADE_LOW);
         // ret = sodk_dig(g_sodukuTab, SODK_GRADE_PRIMARY);
-        ret = sodk_dig(g_sodukuTab, SODK_GRADE_MIDDLE);
+        // ret = sodk_dig(g_sodukuTab, SODK_GRADE_MIDDLE);
+        // ret = sodk_dig(g_sodukuTab, SODK_GRADE_HIGH);
+        ret = sodk_dig(g_sodukuTab, SODK_GRADE_ASHES);
         st_print(g_sodukuTab);
         printf("NAL **(())*** i=%d, ret=0x%x\n", i, ret);
     }
