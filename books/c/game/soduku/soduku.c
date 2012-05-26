@@ -66,6 +66,7 @@ static int  sodk_ST_isOK(const int *tab, int idx);
 static int  sodk_ST_cal(int *tab);
 static int  sodk_ST_algRandom(int *tab, const SodkDigInfos *dig);
 static int  sodk_ST_algInterval(int *tab, const SodkDigInfos *dig);
+static int  sodk_ST_algSnake(int *tab, const SodkDigInfos *dig);
 
 
 
@@ -88,7 +89,7 @@ static const SodkDigInfos g_sodkDigs[SODK_GRADE_COUNT] = {
     { SODK_GRADE_LOW,     SODK_ALG_RANDOM,   80, 55, 9, 6, 9, 6 },
     { SODK_GRADE_PRIMARY, SODK_ALG_RANDOM,   69, 45, 9, 4, 9, 4 },
     { SODK_GRADE_MIDDLE,  SODK_ALG_INTERVAL, 58, 40, 9, 3, 9, 3 },
-    { SODK_GRADE_HIGH,    SODK_ALG_SNAKE,    36, 47, 9, 1, 9, 1 },
+    { SODK_GRADE_HIGH,    SODK_ALG_SNAKE,    36, 27, 9, 1, 9, 1 },
     { SODK_GRADE_ASHES,   SODK_ALG_ORDER,    25, 36, 9, 0, 9, 0 },
 };
 
@@ -427,7 +428,26 @@ static int sodk_ST_algInterval(int *tab, const SodkDigInfos *dig)
         55, 57, 59, 61, 71, 69, 67, 65, 63,
         73, 75, 77, 79
     };
+    assert(sizeof(iA) / sizeof(iA[0]) == SODK_ROWS*SODK_COLS);
 #endif
+
+    return sodk_ST_algVri(tab, iA, dig);
+}
+
+static int sodk_ST_algSnake(int *tab, const SodkDigInfos *dig)
+{
+    int iA[SODK_ROWS * SODK_COLS] = {
+        0, 1, 2, 3, 4, 5, 6, 7, 8,
+        17, 16, 15, 14, 13, 12, 11, 10, 9,
+        18, 19, 20, 21, 22, 23, 24, 25, 26,
+        35, 34, 33, 32, 31, 30, 29, 28, 27,
+        36, 37, 38, 39, 40, 41, 42, 43, 44,
+        53, 52, 51, 50, 49, 48, 47, 46, 45,
+        54, 55, 56, 57, 58, 59, 60, 61, 62,
+        63, 64, 65, 66, 67, 68, 69, 70, 71,
+        80, 79, 78, 77, 76, 75, 74, 73, 72
+    };
+    assert(sizeof(iA) / sizeof(iA[0]) == SODK_ROWS*SODK_COLS);
 
     return sodk_ST_algVri(tab, iA, dig);
 }
@@ -488,6 +508,9 @@ int sodk_dig(int *tab, enum em_sodkGrade egd)
             break;
         case SODK_ALG_INTERVAL:
             ret = sodk_ST_algInterval(tab, pDigInfo);
+            break;
+        case SODK_ALG_SNAKE:
+            ret = sodk_ST_algSnake(tab, pDigInfo);
             break;
         default:
             assert(0);
