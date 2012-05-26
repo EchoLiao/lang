@@ -64,6 +64,7 @@ static int  sodk_ST_isOK(const int *tab, int idx);
 
 static int  sodk_ST_cal(int *tab);
 static int  sodk_ST_algRandom(int *tab, const SodkDigInfos *dig);
+static int  sodk_ST_algInterval(int *tab, const SodkDigInfos *dig);
 
 
 
@@ -85,7 +86,7 @@ static const int    g_sodkSixs[9][9] = {
 static const SodkDigInfos g_sodkDigs[SODK_GRADE_COUNT] = {
     { SODK_GRADE_LOW,     SODK_ALG_RANDOM,   80, 55, 9, 6, 9, 6 },
     { SODK_GRADE_PRIMARY, SODK_ALG_RANDOM,   69, 45, 9, 4, 9, 4 },
-    { SODK_GRADE_MIDDLE,  SODK_ALG_INTERVAL, 58, 47, 9, 3, 9, 3 },
+    { SODK_GRADE_MIDDLE,  SODK_ALG_INTERVAL, 58, 40, 9, 3, 9, 3 },
     { SODK_GRADE_HIGH,    SODK_ALG_SNAKE,    36, 47, 9, 1, 9, 1 },
     { SODK_GRADE_ASHES,   SODK_ALG_ORDER,    25, 36, 9, 0, 9, 0 },
 };
@@ -333,8 +334,6 @@ static int sodk_ST_canDig(int *tab, int idx)
     for ( i = 0; i < SODK_ROWS * SODK_COLS; i++ )
         tabTmp[i] = tab[i];
 
-    // tabTmp[idx] = 0;
-
     for ( i = SODK_DIGI_LOW; i <= SODK_DIGI_HIGH; i++ )
     {
         if ( i != iTmp )
@@ -385,6 +384,58 @@ static int sodk_ST_algRandom(int *tab, const SodkDigInfos *dig)
     return 1;
 }
 
+static int sodk_ST_algInterval(int *tab, const SodkDigInfos *dig)
+{
+    int i, j, k, m, rIdx;
+    int nrKnown = SODK_ROWS * SODK_COLS;
+
+    int iA[SODK_ROWS * SODK_COLS];
+    for ( j = 0, m = 0; m < 2; m++ )
+    {
+        for ( i = 0; i < SODK_COLS; i++ )
+        {
+            if ( i % 2 == 0 )
+            {
+                for ( k = i*SODK_ROWS; k < i*SODK_ROWS+SODK_COLS; k++ )
+                    if ( k % 2 == m )
+                        iA[j++] = k;
+            }
+            else 
+            {
+                for ( k = i*SODK_ROWS+SODK_COLS - 1; k >= i*SODK_ROWS; k-- )
+                    if ( k % 2 == m )
+                        iA[j++] = k;
+            }
+        }
+    }
+    assert(j == SODK_ROWS * SODK_COLS);
+
+    sodk_ST_resetBanDig();
+    for ( i = nrKnown, k = 0; i > dig->mAreaLow; )
+    {
+        do {
+            if ( k >= SODK_ROWS * SODK_COLS )
+                return 0;
+            rIdx = iA[k++];
+        } while ( !sodk_ST_constraintRowCol(tab, rIdx, dig) );
+        // printf("NAL 2 +======+ i=%d\n", i);
+
+        if ( sodk_ST_canDig(tab, rIdx) )
+        {
+            // printf("NAL 4 +===========+ i=%d\n", i);
+            tab[rIdx] = SODK_DIGI_DIG;
+            i--;
+        }
+        else
+        {
+            // printf("NAL 5 +===========+ i=%d\n", i);
+            g_sodkBanDig[rIdx] = SODK_DIGI_BANDIG;
+        }
+    }
+
+    return 1;
+
+}
 
 int sodk_create(int *tab)
 {
@@ -439,6 +490,9 @@ int sodk_dig(int *tab, enum em_sodkGrade egd)
     {
         case SODK_ALG_RANDOM:
             ret = sodk_ST_algRandom(tab, pDigInfo);
+            break;
+        case SODK_ALG_INTERVAL:
+            ret = sodk_ST_algInterval(tab, pDigInfo);
             break;
         default:
             assert(0);

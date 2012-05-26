@@ -66,7 +66,7 @@ int main (int argc, char *argv[])
 {
     int i, ret;
 
-    for ( i = 0; i < 1; i++ )
+    for ( i = 0; i < 100; i++ )
     {
         sodk_create(g_sodukuTab);
         if ( st_verification(g_sodukuTab) )
@@ -80,8 +80,9 @@ int main (int argc, char *argv[])
             assert(0);
         }
 
-        ret = sodk_dig(g_sodukuTab, SODK_GRADE_LOW);
+        // ret = sodk_dig(g_sodukuTab, SODK_GRADE_LOW);
         // ret = sodk_dig(g_sodukuTab, SODK_GRADE_PRIMARY);
+        ret = sodk_dig(g_sodukuTab, SODK_GRADE_MIDDLE);
         st_print(g_sodukuTab);
         printf("NAL **(())*** i=%d, ret=0x%x\n", i, ret);
     }
