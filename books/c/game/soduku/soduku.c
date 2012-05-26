@@ -386,9 +386,11 @@ static int sodk_ST_algRandom(int *tab, const SodkDigInfos *dig)
 
 static int sodk_ST_algInterval(int *tab, const SodkDigInfos *dig)
 {
-    int i, j, k, m, rIdx;
+    int i, k, rIdx;
     int nrKnown = SODK_ROWS * SODK_COLS;
 
+#if 0
+    int j, m;
     int iA[SODK_ROWS * SODK_COLS];
     for ( j = 0, m = 0; m < 2; m++ )
     {
@@ -409,6 +411,20 @@ static int sodk_ST_algInterval(int *tab, const SodkDigInfos *dig)
         }
     }
     assert(j == SODK_ROWS * SODK_COLS);
+#else
+    int iA[SODK_ROWS * SODK_COLS] = {
+        0, 2, 4, 6, 8, 16, 14, 12, 10, 
+        18, 20, 22, 24, 26, 34, 32, 30, 28, 
+        36, 38, 40, 42, 44, 52, 50, 48, 46, 
+        54, 56, 58, 60, 62, 70, 68, 66, 64, 
+        72, 74, 76, 78, 80,
+        1, 3, 5, 7, 17, 15, 13, 11, 9,
+        19, 21, 23, 25, 35, 33, 31, 29, 27,
+        37, 39, 41, 43, 53, 51, 49, 47, 45,
+        55, 57, 59, 61, 71, 69, 67, 65, 63,
+        73, 75, 77, 79
+    };
+#endif
 
     sodk_ST_resetBanDig();
     for ( i = nrKnown, k = 0; i > dig->mAreaLow; )
