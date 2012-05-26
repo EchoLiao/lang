@@ -67,7 +67,7 @@ static int  sodk_ST_cal(int *tab);
 static int  sodk_ST_algRandom(int *tab, const SodkDigInfos *dig);
 static int  sodk_ST_algInterval(int *tab, const SodkDigInfos *dig);
 static int  sodk_ST_algSnake(int *tab, const SodkDigInfos *dig);
-
+static int  sodk_ST_algOrder(int *tab, const SodkDigInfos *dig);
 
 
 static long long    g_calCount;
@@ -90,7 +90,7 @@ static const SodkDigInfos g_sodkDigs[SODK_GRADE_COUNT] = {
     { SODK_GRADE_PRIMARY, SODK_ALG_RANDOM,   69, 45, 9, 4, 9, 4 },
     { SODK_GRADE_MIDDLE,  SODK_ALG_INTERVAL, 58, 40, 9, 3, 9, 3 },
     { SODK_GRADE_HIGH,    SODK_ALG_SNAKE,    36, 27, 9, 1, 9, 1 },
-    { SODK_GRADE_ASHES,   SODK_ALG_ORDER,    25, 36, 9, 0, 9, 0 },
+    { SODK_GRADE_ASHES,   SODK_ALG_ORDER,    25, 26, 9, 0, 9, 0 },
 };
 
 
@@ -368,13 +368,13 @@ static int sodk_ST_algVri(int *tab, const int *sq, const SodkDigInfos *dig)
 
         if ( sodk_ST_canDig(tab, idx) )
         {
-            printf("NAL 4 +===========+ i=%d\n", i);
+            // printf("NAL 4 +===========+ i=%d\n", i);
             tab[idx] = SODK_DIGI_DIG;
             i--;
         }
         else
         {
-            printf("NAL 5 +===========+ i=%d\n", i);
+            // printf("NAL 5 +===========+ i=%d\n", i);
             g_sodkBanDig[idx] = SODK_DIGI_BANDIG;
         }
     }
@@ -452,6 +452,18 @@ static int sodk_ST_algSnake(int *tab, const SodkDigInfos *dig)
     return sodk_ST_algVri(tab, iA, dig);
 }
 
+static int  sodk_ST_algOrder(int *tab, const SodkDigInfos *dig)
+{
+    int i, iA[SODK_ROWS * SODK_COLS];
+
+    for ( i = 0; i < SODK_ROWS * SODK_COLS; i++ )
+    {
+        iA[i] = i;
+    }
+
+    return sodk_ST_algVri(tab, iA, dig);
+}
+
 int sodk_create(int *tab)
 {
     assert(tab != NULL);
@@ -511,6 +523,9 @@ int sodk_dig(int *tab, enum em_sodkGrade egd)
             break;
         case SODK_ALG_SNAKE:
             ret = sodk_ST_algSnake(tab, pDigInfo);
+            break;
+        case SODK_ALG_ORDER:
+            ret = sodk_ST_algOrder(tab, pDigInfo);
             break;
         default:
             assert(0);
