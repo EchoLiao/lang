@@ -39,11 +39,8 @@ enum em_sodkAlg {
 typedef struct tagSodkDigInfos {
     enum em_sodkGrade   mGrade;
     enum em_sodkAlg     mAlg;
-    int                 mAreaHigh;
     int                 mAreaLow;
-    int                 mRowHigh;
     int                 mRowLow;
-    int                 mColHigh;
     int                 mColLow;
 } SodkDigInfos;
 
@@ -86,11 +83,11 @@ static const int    g_sodkSixs[9][9] = {
     { 60, 61, 62, 69, 70, 71, 78, 79, 80 },
 };
 static const SodkDigInfos g_sodkDigs[SODK_GRADE_COUNT] = {
-    { SODK_GRADE_LOW,     SODK_ALG_RANDOM,   80, 55, 9, 6, 9, 6 },
-    { SODK_GRADE_PRIMARY, SODK_ALG_RANDOM,   69, 45, 9, 4, 9, 4 },
-    { SODK_GRADE_MIDDLE,  SODK_ALG_INTERVAL, 58, 40, 9, 3, 9, 3 },
-    { SODK_GRADE_HIGH,    SODK_ALG_SNAKE,    36, 27, 9, 1, 9, 1 },
-    { SODK_GRADE_ASHES,   SODK_ALG_ORDER,    25, 26, 9, 0, 9, 0 },
+    { SODK_GRADE_LOW,     SODK_ALG_RANDOM,   55, 6, 6 },
+    { SODK_GRADE_PRIMARY, SODK_ALG_RANDOM,   45, 4, 4 },
+    { SODK_GRADE_MIDDLE,  SODK_ALG_INTERVAL, 40, 3, 3 },
+    { SODK_GRADE_HIGH,    SODK_ALG_SNAKE,    27, 1, 1 },
+    { SODK_GRADE_ASHES,   SODK_ALG_ORDER,    26, 0, 0 },
 };
 
 
