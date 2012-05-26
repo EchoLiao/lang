@@ -58,6 +58,7 @@ static void sodk_ST_initHerp();
 static int  sodk_ST_constraintRowCol(int *tab, int idx,
         const SodkDigInfos *dig);
 static int  sodk_ST_canDig(int *tab, int idx);
+static int  sodk_ST_algVri(int *tab, const int *sq, const SodkDigInfos *dig);
 // static int  sodk_ST_verifySixs();
 static int  sodk_ST_oriIsOK(int *tab);
 static int  sodk_ST_isOK(const int *tab, int idx);
@@ -350,45 +351,47 @@ static int sodk_ST_canDig(int *tab, int idx)
     return 1;
 }
 
-static int sodk_ST_algRandom(int *tab, const SodkDigInfos *dig)
+static int sodk_ST_algVri(int *tab, const int *sq, const SodkDigInfos *dig)
 {
-    int i, k, rIdx;
-    int rA[SODK_ROWS*SODK_COLS];
-    int nrKnown = SODK_ROWS * SODK_COLS;
+    int i, k, idx;
 
     sodk_ST_resetBanDig();
-
-    Rand_randXN(rA, SODK_ROWS*SODK_COLS);
-    for ( i = nrKnown, k = 0; i > dig->mAreaLow; )
+    for ( i = SODK_ROWS * SODK_COLS, k = 0; i > dig->mAreaLow; )
     {
         do {
             if ( k >= SODK_ROWS * SODK_COLS )
                 return 0;
-            rIdx = rA[k++];
-        } while ( !sodk_ST_constraintRowCol(tab, rIdx, dig) );
+            idx = sq[k++];
+        } while ( !sodk_ST_constraintRowCol(tab, idx, dig) );
         // printf("NAL 2 +======+ i=%d\n", i);
 
-        if ( sodk_ST_canDig(tab, rIdx) )
+        if ( sodk_ST_canDig(tab, idx) )
         {
             printf("NAL 4 +===========+ i=%d\n", i);
-            tab[rIdx] = SODK_DIGI_DIG;
+            tab[idx] = SODK_DIGI_DIG;
             i--;
         }
         else
         {
             printf("NAL 5 +===========+ i=%d\n", i);
-            g_sodkBanDig[rIdx] = SODK_DIGI_BANDIG;
+            g_sodkBanDig[idx] = SODK_DIGI_BANDIG;
         }
     }
 
     return 1;
 }
 
+static int sodk_ST_algRandom(int *tab, const SodkDigInfos *dig)
+{
+    int rA[SODK_ROWS*SODK_COLS];
+
+    Rand_randXN(rA, SODK_ROWS*SODK_COLS);
+
+    return sodk_ST_algVri(tab, rA, dig);
+}
+
 static int sodk_ST_algInterval(int *tab, const SodkDigInfos *dig)
 {
-    int i, k, rIdx;
-    int nrKnown = SODK_ROWS * SODK_COLS;
-
 #if 0
     int j, m;
     int iA[SODK_ROWS * SODK_COLS];
@@ -426,31 +429,7 @@ static int sodk_ST_algInterval(int *tab, const SodkDigInfos *dig)
     };
 #endif
 
-    sodk_ST_resetBanDig();
-    for ( i = nrKnown, k = 0; i > dig->mAreaLow; )
-    {
-        do {
-            if ( k >= SODK_ROWS * SODK_COLS )
-                return 0;
-            rIdx = iA[k++];
-        } while ( !sodk_ST_constraintRowCol(tab, rIdx, dig) );
-        // printf("NAL 2 +======+ i=%d\n", i);
-
-        if ( sodk_ST_canDig(tab, rIdx) )
-        {
-            // printf("NAL 4 +===========+ i=%d\n", i);
-            tab[rIdx] = SODK_DIGI_DIG;
-            i--;
-        }
-        else
-        {
-            // printf("NAL 5 +===========+ i=%d\n", i);
-            g_sodkBanDig[rIdx] = SODK_DIGI_BANDIG;
-        }
-    }
-
-    return 1;
-
+    return sodk_ST_algVri(tab, iA, dig);
 }
 
 int sodk_create(int *tab)
