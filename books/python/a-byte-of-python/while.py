@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Filename: while.py
 
 number=23
@@ -14,6 +15,7 @@ while running:
 		print 'No, it is a little higher than that'
 	else:
 		print 'No, it is a little lower than that'
+# 记住, 可以在while循环中使用一个else从句.
 else:
 	print 'The while loop is over.'
 	# Do anything else you want to do here
