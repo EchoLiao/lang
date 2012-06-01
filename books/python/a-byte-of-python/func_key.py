@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Filename: func_key.py
 
 # 如果你的某个函数有许多参数, 而你只想指定其中的一部分, 那么你可以通过命名来为
