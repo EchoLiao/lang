@@ -18,3 +18,19 @@ s='''This is a multi-line string.
 This is the second line.'''
 print s
 
+
+#################################################################
+
+
+# 在多个物理行中写一个逻辑行的例子. 它被称为明确的行连接.
+
+s = 'This is a string. \
+This continues the string.'
+print s
+
+print \
+i
+
+# 有时候, 有一种暗示的假设, 可以使你不需要使用反斜杠. 这种情况出现在逻辑行中使
+# 用了圆括号,方括号或波形括号的时候. 这被称为暗示的行连接.
+
