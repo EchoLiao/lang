@@ -1,21 +1,27 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Filename: backup_ver4.py
+
+
+# 版本四:
+# 修改版本三的错误.
+
 
 import os
 import time
 
 # 1. The files and directories to be backed up are specified in a list.
-source=['/home/swaroop/byte','/home/swaroop/bin']
+source=['/home/scr/audio','/home/scr/bin']
 # If you are using Windows, use source=[r'C:\Documents',r'D:\Work'] or something like that
 
 # 2. The backup must be stored in a main backup directory
-target_dir='/mnt/e/backup/' #Remember to change this to what you will be using
+target_dir='/home/scr/e/backup/' #Remember to change this to what you will be using
 
 # 3. The files are backed up into a zip file
 # 4. The current day is the name of the subdirectory in the main directory
-today=target_dir+time.strftime('%Y%m%d')
+today=target_dir+time.strftime('%Y-%m-%d')
 # The current time is the name of the zip archive
-now=time.strftime('%H%M%S')
+now=time.strftime('%H:%M:%S')
 
 # Take a comment from the user to create the name of the zip file
 comment=raw_input('Enter a comment --> ')
