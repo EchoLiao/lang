@@ -12,9 +12,14 @@
 # 须写成 singleton = (2, ); 写成 singleton = (2) 是错误的!!!!!
 
 
+
 age=22
 name='Swaroop'
 
+# 在第二个print语句中, 我们使用了一个定制, 后面跟着%符号后的单个项目--没有圆括
+# 号. 这只在字符串中只有一个定制的时候有效. 
 print '%s is %d years old' %(name,age)
 print 'Why is %s playing with that python?' %name
+
+
 
