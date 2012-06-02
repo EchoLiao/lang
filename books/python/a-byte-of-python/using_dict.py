@@ -1,5 +1,17 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Filename: using_dict.py
+
+
+# 字典:
+# 注意, 键必须是唯一的.
+# 注意, 你只能使用不可变的对象(比如字符串)来作为字典的键.
+
+# 键值对在字典中以这样的方式标记: d = {key1 : value1, key2 : value2 }.
+
+# 记住字典中的键/值对是没有顺序的. 如果你想要一个特定的顺序, 那么你应该在使用前自己对它们排序.
+
+
 
 # 'ab' is short for 'a'ddress'b'ook
 
