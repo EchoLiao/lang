@@ -1,5 +1,12 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Filename: using_list.py
+
+
+# 列表中的项目应该包括在方括号中, 这样Python就知道你是在指明一个列表. 一旦你创
+# 建了一个列表, 你可以添加,删除或是搜索列表中的项目. 由于你可以增加或删除项目,
+# 我们说列表是 可变的 数据类型, 即这种类型是可以被改变的. 
+
 
 # This is my shopping list
 shoplist=['apple','mango','carrot','banana']
