@@ -1,5 +1,10 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Filename: cat.py
+
+
+# 这个程序用来模范Linux/Unix用户熟悉的cat命令
+
 
 import sys
 
