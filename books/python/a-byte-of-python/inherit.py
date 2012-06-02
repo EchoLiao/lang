@@ -1,5 +1,10 @@
 #!/usr/bin/env python
+# -*- coding: utf-8 -*-
 # Filename: inherit.py
+
+
+# 继承
+
 
 class SchoolMember:
 	'''Represents any school member.'''
@@ -11,6 +16,7 @@ class SchoolMember:
 	def tell(self):
 		'''Tell my details.'''
 		print 'Name:"%s" Age:"%s"' %(self.name,self.age),
+		#print 'Name:"%s" Age:"%s"' %(self.name,self.age)
 
 class Teacher(SchoolMember):
 	'''Represents a teacher.'''
