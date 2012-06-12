@@ -1,0 +1,258 @@
+T04-ControlFun-2
+v7
+r0
+t361112603.244879
+cCheck dependencies
+cProcessInfoPlistFile /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/Info.plist _4_ControlFun_2-Info.plist
+cCompileXIB /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/MainWindow.xib
+cCompileXIB /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/_4_ControlFun_2ViewController.xib
+cProcessPCH /var/folders/GQ/GQg-EXXeE3eWGZXJMpLnzU+++TM/-Caches-/com.apple.Xcode.502/SharedPrecompiledHeaders/_4_ControlFun_2_Prefix-bwdradsuavzaruatvoemhcvkrpeu/_4_ControlFun_2_Prefix.pch.gch _4_ControlFun_2_Prefix.pch normal i386 objective-c com.apple.compilers.gcc.4_2
+cCompileC build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/main.o /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/main.m normal i386 objective-c com.apple.compilers.gcc.4_2
+cCompileC build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/_4_ControlFun_2AppDelegate.o /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/Classes/_4_ControlFun_2AppDelegate.m normal i386 objective-c com.apple.compilers.gcc.4_2
+cCompileC build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/_4_ControlFun_2ViewController.o /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/Classes/_4_ControlFun_2ViewController.m normal i386 objective-c com.apple.compilers.gcc.4_2
+cLd /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/04-ControlFun-2 normal i386
+cGenerateDSYMFile /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app.dSYM /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/04-ControlFun-2
+cTouch /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app
+
+N/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.2.sdk
+c000000004CC128950000000000000110
+t1287727253
+s272
+
+N/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.2.sdk/System/Library/Frameworks/CoreGraphics.framework/CoreGraphics
+c000000004CC12246000000000029B310
+t1287725638
+s2732816
+
+N/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.2.sdk/System/Library/Frameworks/Foundation.framework/Foundation
+c000000004CC1226D000000000029D5D0
+t1287725677
+s2741712
+
+N/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.2.sdk/System/Library/Frameworks/Foundation.framework/Headers/Foundation.h
+c000000004CC1225F0000000000001466
+t1287725663
+s5222
+
+N/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.2.sdk/System/Library/Frameworks/UIKit.framework/Headers/UIKit.h
+c000000004CC1281F0000000000000AA1
+t1287727135
+s2721
+
+N/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.2.sdk/System/Library/Frameworks/UIKit.framework/UIKit
+c000000004CC12883000000000074D7B0
+t1287727235
+s7657392
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/Classes/_4_ControlFun_2AppDelegate.h
+c000000004FD5EC29000000000000020C
+t1339419689
+s524
+i<UIKit/UIKit.h>
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/Classes/_4_ControlFun_2AppDelegate.m
+c000000004FD5EC290000000000000ABA
+t1339419689
+s2746
+i"_4_ControlFun_2AppDelegate.h"
+i"_4_ControlFun_2ViewController.h"
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/Classes/_4_ControlFun_2ViewController.h
+c000000004FD5EC6300000000000001BA
+t1339419747
+s442
+i<UIKit/UIKit.h>
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/Classes/_4_ControlFun_2ViewController.m
+c000000004FD5EC94000000000000063F
+t1339419796
+s1599
+i"_4_ControlFun_2ViewController.h"
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/MainWindow.xib
+c000000004FD5EC290000000000004E89
+t1339419689
+s20105
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/_4_ControlFun_2ViewController.xib
+c000000004FD5EC290000000000001A65
+t1339419689
+s6757
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/_4_ControlFun_2_Prefix.pch
+c000000004FD5EC2900000000000000C7
+t1339419689
+s199
+i<Foundation/Foundation.h>
+i<UIKit/UIKit.h>
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/04-ControlFun-2.LinkFileList
+c000000004FD5EC9500000000000001FA
+t1339419797
+s506
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/_4_ControlFun_2AppDelegate.o
+t1339419802
+s51464
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/_4_ControlFun_2ViewController.o
+t1339419802
+s40648
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/main.o
+t1339419802
+s6332
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app
+t1339419803
+s238
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app.dSYM
+t1339419803
+s102
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/04-ControlFun-2
+t1339419803
+s18444
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/Info.plist
+t1339419797
+s629
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/MainWindow.nib
+t1339419799
+s1139
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/PkgInfo
+t1339419797
+s8
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/_4_ControlFun_2ViewController.nib
+t1339419799
+s795
+
+N/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/main.m
+c000000004FD5EC29000000000000016E
+t1339419689
+s366
+i<UIKit/UIKit.h>
+
+N/var/folders/GQ/GQg-EXXeE3eWGZXJMpLnzU+++TM/-Caches-/com.apple.Xcode.502/SharedPrecompiledHeaders/_4_ControlFun_2_Prefix-bwdradsuavzaruatvoemhcvkrpeu/_4_ControlFun_2_Prefix.pch.gch
+t1339419801
+s15453392
+
+N_4_ControlFun_2-Info.plist
+c000000004FD5EC29000000000000038D
+t1339419689
+s909
+
+CCheck dependencies
+r0
+lSLF07#2@18"Check dependencies361112597#361112597#0(0"0(0#1#0"8626174528#0"0#
+
+CCompileC build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/_4_ControlFun_2AppDelegate.o /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/Classes/_4_ControlFun_2AppDelegate.m normal i386 objective-c com.apple.compilers.gcc.4_2
+s361112602.309128
+e361112602.512636
+r1
+xCompileC
+xbuild/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/_4_ControlFun_2AppDelegate.o
+x/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/Classes/_4_ControlFun_2AppDelegate.m
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@98"Compile /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/Classes/_4_ControlFun_2AppDelegate.m361112602#361112602#0(0"0(0#0#90"/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/Classes/_4_ControlFun_2AppDelegate.m8617816032#2291"    cd /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2    setenv LANG en_US.US-ASCII    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/gcc-4.2 -x objective-c -arch i386 -fmessage-length=0 -pipe -std=c99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.2.sdk -fexceptions -fvisibility=hidden -mmacosx-version-min=10.6 -gdwarf-2 -fobjc-abi-version=2 -fobjc-legacy-dispatch -D__IPHONE_OS_VERSION_MIN_REQUIRED=40200 -iquote /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/04-ControlFun-2-generated-files.hmap -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/04-ControlFun-2-own-target-headers.hmap -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/04-ControlFun-2-all-target-headers.hmap -iquote /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/04-ControlFun-2-project-headers.hmap -F/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/include -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/DerivedSources/i386 -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/DerivedSources -include /var/folders/GQ/GQg-EXXeE3eWGZXJMpLnzU+++TM/-Caches-/com.apple.Xcode.502/SharedPrecompiledHeaders/_4_ControlFun_2_Prefix-bwdradsuavzaruatvoemhcvkrpeu/_4_ControlFun_2_Prefix.pch -c /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/Classes/_4_ControlFun_2AppDelegate.m -o /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/_4_ControlFun_2AppDelegate.o0#
+
+CCompileC build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/_4_ControlFun_2ViewController.o /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/Classes/_4_ControlFun_2ViewController.m normal i386 objective-c com.apple.compilers.gcc.4_2
+s361112602.512748
+e361112602.709467
+r1
+xCompileC
+xbuild/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/_4_ControlFun_2ViewController.o
+x/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/Classes/_4_ControlFun_2ViewController.m
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@101"Compile /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/Classes/_4_ControlFun_2ViewController.m361112602#361112602#0(0"0(0#0#93"/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/Classes/_4_ControlFun_2ViewController.m8626630080#2297"    cd /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2    setenv LANG en_US.US-ASCII    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/gcc-4.2 -x objective-c -arch i386 -fmessage-length=0 -pipe -std=c99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.2.sdk -fexceptions -fvisibility=hidden -mmacosx-version-min=10.6 -gdwarf-2 -fobjc-abi-version=2 -fobjc-legacy-dispatch -D__IPHONE_OS_VERSION_MIN_REQUIRED=40200 -iquote /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/04-ControlFun-2-generated-files.hmap -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/04-ControlFun-2-own-target-headers.hmap -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/04-ControlFun-2-all-target-headers.hmap -iquote /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/04-ControlFun-2-project-headers.hmap -F/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/include -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/DerivedSources/i386 -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/DerivedSources -include /var/folders/GQ/GQg-EXXeE3eWGZXJMpLnzU+++TM/-Caches-/com.apple.Xcode.502/SharedPrecompiledHeaders/_4_ControlFun_2_Prefix-bwdradsuavzaruatvoemhcvkrpeu/_4_ControlFun_2_Prefix.pch -c /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/Classes/_4_ControlFun_2ViewController.m -o /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/_4_ControlFun_2ViewController.o0#
+
+CCompileC build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/main.o /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/main.m normal i386 objective-c com.apple.compilers.gcc.4_2
+s361112602.138450
+e361112602.308913
+r1
+xCompileC
+xbuild/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/main.o
+x/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/main.m
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@68"Compile /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/main.m361112602#361112602#0(0"0(0#0#60"/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/main.m8626115040#2239"    cd /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2    setenv LANG en_US.US-ASCII    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/gcc-4.2 -x objective-c -arch i386 -fmessage-length=0 -pipe -std=c99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.2.sdk -fexceptions -fvisibility=hidden -mmacosx-version-min=10.6 -gdwarf-2 -fobjc-abi-version=2 -fobjc-legacy-dispatch -D__IPHONE_OS_VERSION_MIN_REQUIRED=40200 -iquote /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/04-ControlFun-2-generated-files.hmap -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/04-ControlFun-2-own-target-headers.hmap -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/04-ControlFun-2-all-target-headers.hmap -iquote /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/04-ControlFun-2-project-headers.hmap -F/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/include -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/DerivedSources/i386 -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/DerivedSources -include /var/folders/GQ/GQg-EXXeE3eWGZXJMpLnzU+++TM/-Caches-/com.apple.Xcode.502/SharedPrecompiledHeaders/_4_ControlFun_2_Prefix-bwdradsuavzaruatvoemhcvkrpeu/_4_ControlFun_2_Prefix.pch -c /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/main.m -o /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/main.o0#
+
+CCompileXIB /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/MainWindow.xib
+s361112597.754402
+e361112599.846012
+r1
+xCompileXIB
+x/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/MainWindow.xib
+o2012-06-11 21:03:19.668 Interface Builder Cocoa Touch Tool[728:903] CFPreferences: user home directory at file://localhost/Users/suichangming/Library/Application%20Support/iPhone%20Simulator/User/ is unavailable. User domains will be volatile.
+lSLF07#2@25"CompileXIB MainWindow.xib361112597#361112599#0(244"2012-06-11 21:03:19.668 Interface Builder Cocoa Touch Tool[728:903] CFPreferences: user home directory at file://localhost/Users/suichangming/Library/Application%20Support/iPhone%20Simulator/User/ is unavailable. User domains will be volatile.0(0#0#68"/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/MainWindow.xib8621921728#623"    cd /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2    setenv IBC_MINIMUM_COMPATIBILITY_VERSION 4.2    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/usr/bin/ibtool --errors --warnings --notices --output-format human-readable-text --compile /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/MainWindow.nib /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/MainWindow.xib --sdk /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.2.sdk0#
+
+CCompileXIB /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/_4_ControlFun_2ViewController.xib
+s361112597.755664
+e361112599.838806
+r1
+xCompileXIB
+x/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/_4_ControlFun_2ViewController.xib
+o2012-06-11 21:03:19.670 Interface Builder Cocoa Touch Tool[727:1903] CFPreferences: user home directory at file://localhost/Users/suichangming/Library/Application%20Support/iPhone%20Simulator/User/ is unavailable. User domains will be volatile.
+lSLF07#2@44"CompileXIB _4_ControlFun_2ViewController.xib361112597#361112599#0(245"2012-06-11 21:03:19.670 Interface Builder Cocoa Touch Tool[727:1903] CFPreferences: user home directory at file://localhost/Users/suichangming/Library/Application%20Support/iPhone%20Simulator/User/ is unavailable. User domains will be volatile.0(0#0#87"/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/_4_ControlFun_2ViewController.xib8621836000#661"    cd /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2    setenv IBC_MINIMUM_COMPATIBILITY_VERSION 4.2    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/usr/bin/ibtool --errors --warnings --notices --output-format human-readable-text --compile /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/_4_ControlFun_2ViewController.nib /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/_4_ControlFun_2ViewController.xib --sdk /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.2.sdk0#
+
+CGenerateDSYMFile /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app.dSYM /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/04-ControlFun-2
+s361112603.087370
+e361112603.225345
+r1
+xGenerateDSYMFile
+x/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app.dSYM
+x/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/04-ControlFun-2
+lSLF07#2@133"GenerateDSYMFile build/Debug-iphonesimulator/04-ControlFun-2.app.dSYM build/Debug-iphonesimulator/04-ControlFun-2.app/04-ControlFun-2361112603#361112603#0(0"0(0#0#117"/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/04-ControlFun-28621910208#452"    cd /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/usr/bin/dsymutil /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/04-ControlFun-2 -o /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app.dSYM0#
+
+CLd /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/04-ControlFun-2 normal i386
+s361112602.709574
+e361112603.087046
+r1
+xLd
+x/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/04-ControlFun-2
+xnormal
+xi386
+lSLF07#2@122"Link /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/04-ControlFun-2361112602#361112603#0(0"0(0#0#0"8625866336#1015"    cd /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2    setenv MACOSX_DEPLOYMENT_TARGET 10.6    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/gcc-4.2 -arch i386 -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.2.sdk -L/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator -F/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator -filelist /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/Objects-normal/i386/04-ControlFun-2.LinkFileList -mmacosx-version-min=10.6 -Xlinker -objc_abi_version -Xlinker 2 -framework Foundation -framework UIKit -framework CoreGraphics -o /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/04-ControlFun-20#
+
+CProcessInfoPlistFile /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/Info.plist _4_ControlFun_2-Info.plist
+s361112597.716049
+e361112597.754189
+r1
+xProcessInfoPlistFile
+x/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/Info.plist
+x_4_ControlFun_2-Info.plist
+lSLF07#2@34"Process _4_ControlFun_2-Info.plist361112597#361112597#0(0"0(0#0#80"/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/_4_ControlFun_2-Info.plist8625755552#548"    cd /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    builtin-infoPlistUtility _4_ControlFun_2-Info.plist -genpkginfo /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -o /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app/Info.plist0#
+
+CProcessPCH /var/folders/GQ/GQg-EXXeE3eWGZXJMpLnzU+++TM/-Caches-/com.apple.Xcode.502/SharedPrecompiledHeaders/_4_ControlFun_2_Prefix-bwdradsuavzaruatvoemhcvkrpeu/_4_ControlFun_2_Prefix.pch.gch _4_ControlFun_2_Prefix.pch normal i386 objective-c com.apple.compilers.gcc.4_2
+s361112599.846214
+e361112602.138146
+r1
+xProcessPCH
+x/var/folders/GQ/GQg-EXXeE3eWGZXJMpLnzU+++TM/-Caches-/com.apple.Xcode.502/SharedPrecompiledHeaders/_4_ControlFun_2_Prefix-bwdradsuavzaruatvoemhcvkrpeu/_4_ControlFun_2_Prefix.pch.gch
+x_4_ControlFun_2_Prefix.pch
+xnormal
+xi386
+xobjective-c
+xcom.apple.compilers.gcc.4_2
+lSLF07#2@37"Precompile _4_ControlFun_2_Prefix.pch361112599#361112602#0(0"0(0#0#80"/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/_4_ControlFun_2_Prefix.pch8621925728#2108"    cd /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2    setenv LANG en_US.US-ASCII    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin/gcc-4.2 -x objective-c-header -arch i386 -fmessage-length=0 -pipe -std=c99 -Wno-trigraphs -fpascal-strings -fasm-blocks -O0 -Wreturn-type -Wunused-variable -isysroot /Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator4.2.sdk -fexceptions -fvisibility=hidden -mmacosx-version-min=10.6 -gdwarf-2 -fobjc-abi-version=2 -fobjc-legacy-dispatch -D__IPHONE_OS_VERSION_MIN_REQUIRED=40200 -iquote /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/04-ControlFun-2-generated-files.hmap -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/04-ControlFun-2-own-target-headers.hmap -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/04-ControlFun-2-all-target-headers.hmap -iquote /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/04-ControlFun-2-project-headers.hmap -F/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/include -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/DerivedSources/i386 -I/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/04-ControlFun-2.build/Debug-iphonesimulator/04-ControlFun-2.build/DerivedSources -c /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/_4_ControlFun_2_Prefix.pch -o /var/folders/GQ/GQg-EXXeE3eWGZXJMpLnzU+++TM/-Caches-/com.apple.Xcode.502/SharedPrecompiledHeaders/_4_ControlFun_2_Prefix-bwdradsuavzaruatvoemhcvkrpeu/_4_ControlFun_2_Prefix.pch.gch0#
+
+CTouch /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app
+s361112603.225444
+e361112603.244818
+r1
+xTouch
+x/Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app
+lSLF07#2@107"Touch /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app361112603#361112603#0(0"0(0#0#0"8621581536#316"    cd /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2    setenv PATH "/Developer/Platforms/iPhoneSimulator.platform/Developer/usr/bin:/Developer/usr/bin:/usr/bin:/bin:/usr/sbin:/sbin"    /usr/bin/touch -c /Users/suichangming/Desktop/ios-dev-1/04-ControlFun-2/build/Debug-iphonesimulator/04-ControlFun-2.app0#
+
