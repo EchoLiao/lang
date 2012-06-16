@@ -67,7 +67,12 @@
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
-    [super viewDidLoad];
+	BlueViewController *blueController = [[BlueViewController alloc] initWithNibName:@"BlueView" bundle:nil];
+	self.blueViewController = blueController;
+	[self.view insertSubview:blueController.view atIndex:0];
+	[blueController release];
+	
+//    [super viewDidLoad];
 }
 
 
