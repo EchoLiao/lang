@@ -10,7 +10,9 @@
 
 
 @interface YellowViewController : UIViewController {
-
+ 
 }
+
+- (IBAction)yellowButtonPressed:(id)sender;
 
 @end

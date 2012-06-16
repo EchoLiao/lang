@@ -7,22 +7,28 @@
 //
 
 #import "_6_ViewSwitchAppDelegate.h"
+#import "SwitchViewController.h"
+
 
 @implementation _6_ViewSwitchAppDelegate
 
 @synthesize window;
+@synthesize switchViewController;
 
 
 #pragma mark -
 #pragma mark Application lifecycle
 
-- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
+-(BOOL)application:(UIApplication *)application 
+		didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
     
     // Override point for customization after application launch.
-    
-    [self.window makeKeyAndVisible];
-    
-    return YES;
+//	[self.window addSubview:switchViewController.view];    
+	[window addSubview:switchViewController.view];
+
+	[self.window makeKeyAndVisible];
+
+    return YES; 
 }
 
 
@@ -76,6 +82,7 @@
 
 - (void)dealloc {
     [window release];
+	[switchViewController release];
     [super dealloc];
 }
 

@@ -7,9 +7,45 @@
 //
 
 #import "SwitchViewController.h"
+#import "BlueViewController.h"
+#import "YellowViewController.h"
 
 
 @implementation SwitchViewController
+
+@synthesize blueViewController;
+@synthesize yellowViewController;
+
+
+- (IBAction)switchViews:(id)sender
+{
+    if (self.yellowViewController.view.superview == nil)
+    {
+        if (self.yellowViewController == nil)
+        {
+            YellowViewController *yellowController = 
+            [[YellowViewController alloc] initWithNibName:@"YellowView" 
+                                                   bundle:nil];
+            self.yellowViewController = yellowController;
+            [yellowController release];
+        }
+		[blueViewController.view removeFromSuperview];
+        [self.view insertSubview:yellowViewController.view atIndex:0];
+    }
+    else
+    {
+        if (self.blueViewController == nil)
+        {
+            BlueViewController *blueController = 
+            [[BlueViewController alloc] initWithNibName:@"BlueView" 
+                                                 bundle:nil];
+            self.blueViewController = blueController;
+            [blueController release];
+        }
+        [yellowViewController.view removeFromSuperview];
+        [self.view insertSubview:blueViewController.view atIndex:0];
+    }
+}
 
  // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
 /*
@@ -28,12 +64,12 @@
 }
 */
 
-/*
+
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
     [super viewDidLoad];
 }
-*/
+
 
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation {
@@ -58,6 +94,8 @@
 
 
 - (void)dealloc {
+	[yellowViewController release];
+	[blueViewController release];
     [super dealloc];
 }
 
