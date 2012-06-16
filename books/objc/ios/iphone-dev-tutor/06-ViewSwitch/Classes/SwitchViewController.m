@@ -19,6 +19,10 @@
 
 - (IBAction)switchViews:(id)sender
 {
+	[UIView beginAnimations:@"View Flip" context:nil];
+    [UIView setAnimationDuration:1.25];
+    [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
+    
     if (self.yellowViewController.view.superview == nil)
     {
         if (self.yellowViewController == nil)
@@ -29,8 +33,15 @@
             self.yellowViewController = yellowController;
             [yellowController release];
         }
-		[blueViewController.view removeFromSuperview];
+		[UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight
+                               forView:self.view cache:YES];
+        
+        [blueViewController viewWillAppear:YES];
+        [yellowViewController viewWillDisappear:YES];
+        [blueViewController.view removeFromSuperview];
         [self.view insertSubview:yellowViewController.view atIndex:0];
+        [yellowViewController viewDidDisappear:YES];
+        [blueViewController viewDidAppear:YES];
     }
     else
     {
@@ -42,9 +53,17 @@
             self.blueViewController = blueController;
             [blueController release];
         }
+		[UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft
+                               forView:self.view cache:YES];
+        
+        [yellowViewController viewWillAppear:YES];
+        [blueViewController viewWillDisappear:YES];
         [yellowViewController.view removeFromSuperview];
         [self.view insertSubview:blueViewController.view atIndex:0];
+        [blueViewController viewDidDisappear:YES];
+        [yellowViewController viewDidAppear:YES];
     }
+	[UIView commitAnimations];
 }
 
  // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.
