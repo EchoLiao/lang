@@ -19,6 +19,10 @@
 
 - (IBAction)switchViews:(id)sender
 {
+	UIViewController *coming = nil;
+	UIViewController *going = nil;
+	UIViewAnimationTransition transition;
+	
 	[UIView beginAnimations:@"View Flip" context:nil];
     [UIView setAnimationDuration:1.25];
     [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
@@ -33,15 +37,9 @@
             self.yellowViewController = yellowController;
             [yellowController release];
         }
-		[UIView setAnimationTransition:UIViewAnimationTransitionFlipFromRight
-                               forView:self.view cache:YES];
-        
-        [blueViewController viewWillAppear:YES];
-        [yellowViewController viewWillDisappear:YES];
-        [blueViewController.view removeFromSuperview];
-        [self.view insertSubview:yellowViewController.view atIndex:0];
-        [yellowViewController viewDidDisappear:YES];
-        [blueViewController viewDidAppear:YES];
+		coming = self.yellowViewController;
+		going = self.blueViewController;
+		transition = UIViewAnimationTransitionFlipFromRight;
     }
     else
     {
@@ -52,17 +50,24 @@
                                                  bundle:nil];
             self.blueViewController = blueController;
             [blueController release];
+
         }
-		[UIView setAnimationTransition:UIViewAnimationTransitionFlipFromLeft
-                               forView:self.view cache:YES];
-        
-        [yellowViewController viewWillAppear:YES];
-        [blueViewController viewWillDisappear:YES];
-        [yellowViewController.view removeFromSuperview];
-        [self.view insertSubview:blueViewController.view atIndex:0];
-        [blueViewController viewDidDisappear:YES];
-        [yellowViewController viewDidAppear:YES];
+		coming = self.blueViewController;
+		going = self.yellowViewController;
+		transition = UIViewAnimationTransitionFlipFromLeft;
     }
+
+	[UIView setAnimationTransition:transition
+						   forView:self.view cache:YES];
+	
+	[coming viewWillAppear:YES];
+	[going viewWillDisappear:YES];
+	[going.view removeFromSuperview];
+	[self.view insertSubview:coming.view atIndex:0];
+	[going viewDidDisappear:YES];
+	[coming viewDidAppear:YES];
+	
+	
 	[UIView commitAnimations];
 }
 
