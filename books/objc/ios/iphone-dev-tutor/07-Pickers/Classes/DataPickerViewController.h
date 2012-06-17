@@ -10,7 +10,10 @@
 
 
 @interface DataPickerViewController : UIViewController {
-
+	IBOutlet	UIDatePicker	*datePicker;
 }
+
+@property (nonatomic, retain) UIDatePicker *datePicker;
+-(IBAction)buttonPressed:(id)sender;
 
 @end
