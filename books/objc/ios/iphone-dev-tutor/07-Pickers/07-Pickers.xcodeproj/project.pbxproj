@@ -36,6 +36,7 @@
 		88912779158D6D1A00A3313D /* dependenticon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8891276C158D6D1A00A3313D /* dependenticon.png */; };
 		8891277A158D6D1A00A3313D /* clockicon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8891276D158D6D1A00A3313D /* clockicon.png */; };
 		8891277B158D6D1A00A3313D /* singleicon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8891276E158D6D1A00A3313D /* singleicon.png */; };
+		8891282E158D87C200A3313D /* statedictionary.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8891282D158D87C200A3313D /* statedictionary.plist */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -76,6 +77,7 @@
 		8891276C158D6D1A00A3313D /* dependenticon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = dependenticon.png; sourceTree = "<group>"; };
 		8891276D158D6D1A00A3313D /* clockicon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = clockicon.png; sourceTree = "<group>"; };
 		8891276E158D6D1A00A3313D /* singleicon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = singleicon.png; sourceTree = "<group>"; };
+		8891282D158D87C200A3313D /* statedictionary.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = statedictionary.plist; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* _7_Pickers-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "_7_Pickers-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -144,6 +146,7 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
+				8891282D158D87C200A3313D /* statedictionary.plist */,
 				8891275F158D6D1800A3313D /* Custom Picker Images */,
 				88912766158D6D1900A3313D /* Custom Picker Sounds */,
 				88912769158D6D1900A3313D /* Tab Bar Icons */,
@@ -270,6 +273,7 @@
 				88912779158D6D1A00A3313D /* dependenticon.png in Resources */,
 				8891277A158D6D1A00A3313D /* clockicon.png in Resources */,
 				8891277B158D6D1A00A3313D /* singleicon.png in Resources */,
+				8891282E158D87C200A3313D /* statedictionary.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
