@@ -157,6 +157,7 @@ numberOfRowsInComponent:(NSInteger)component
 	}
 }
 
+// 设置组件的宽度.
 - (CGFloat)pickerView:(UIPickerView *)pickerView
 	widthForComponent:(NSInteger)component
 {
