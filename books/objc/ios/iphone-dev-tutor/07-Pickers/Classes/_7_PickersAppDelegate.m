@@ -11,6 +11,7 @@
 @implementation _7_PickersAppDelegate
 
 @synthesize window;
+@synthesize rootController;
 
 
 #pragma mark -
@@ -19,7 +20,8 @@
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
     
     // Override point for customization after application launch.
-    
+
+	[window addSubview:rootController.view];
     [self.window makeKeyAndVisible];
     
     return YES;
@@ -75,6 +77,7 @@
 
 
 - (void)dealloc {
+	[rootController release];
     [window release];
     [super dealloc];
 }
