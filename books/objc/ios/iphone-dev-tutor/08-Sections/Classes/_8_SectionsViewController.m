@@ -131,10 +131,10 @@ titleForHeaderInSection:(NSInteger)section
     return key;
 }
 
-//- (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView
-//{
-//    return keys;
-//}
+- (NSArray *)sectionIndexTitlesForTableView:(UITableView *)tableView
+{
+    return keys;
+}
 
 
 @end
