@@ -50,14 +50,14 @@ int main (int argc, char *argv[])
 
     for ( i = 0; i < nline; i++ )
     {
-        printf("ncell=%d, bt=%d, s=%s\n",
-                lyrics[i].ncell, lyrics[i].begintime, lyrics[i].content);
+        printf("id=%d: ncell=%d, bt=%d, s=%s\n",
+                i+1, lyrics[i].ncell, lyrics[i].begintime, lyrics[i].content);
         for ( j = 0; j < lyrics[i].ncell; j++ )
         {
-            printf(" (%.4f,%d)", lyrics[i].cells[j].percent / 10000.0,
-                    lyrics[i].cells[j].totaltimes);
+            // printf(" (%.4f,%d)", lyrics[i].cells[j].percent / 10000.0,
+            //         lyrics[i].cells[j].totaltimes);
         }
-        printf("\n");
+        // printf("\n");
     }
 
     return 0;
