@@ -1,0 +1,8 @@
+//
+// Prefix header for all source files of the '08-SimpleTable' target in the '08-SimpleTable' project
+//
+
+#ifdef __OBJC__
+    #import <Foundation/Foundation.h>
+    #import <UIKit/UIKit.h>
+#endif
