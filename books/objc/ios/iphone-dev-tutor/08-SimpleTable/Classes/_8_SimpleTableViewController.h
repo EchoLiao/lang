@@ -8,9 +8,13 @@
 
 #import <UIKit/UIKit.h>
 
-@interface _8_SimpleTableViewController : UIViewController {
-
+@interface _8_SimpleTableViewController : UIViewController 
+		<UITableViewDelegate, UITableViewDataSource>         
+{
+    NSArray *listData;
 }
+
+@property (nonatomic, retain) NSArray *listData;
 
 @end
 
