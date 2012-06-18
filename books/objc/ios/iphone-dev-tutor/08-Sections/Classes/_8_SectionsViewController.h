@@ -12,12 +12,23 @@
 @interface _8_SectionsViewController : UIViewController
 		<UITableViewDataSource, UITableViewDelegate>
 {
-    NSDictionary *names;
-    NSArray     *keys;
+	UITableView *table;
+    UISearchBar *search;
+    NSDictionary *allNames;
+    NSMutableDictionary *names;
+    NSMutableArray  *keys;    
+    
+    BOOL    isSearching;
 }
 
-@property (nonatomic, retain) NSDictionary *names;
-@property (nonatomic, retain) NSArray *keys;
+@property (nonatomic, retain) IBOutlet UITableView *table;
+@property (nonatomic, retain) IBOutlet UISearchBar *search;
+@property (nonatomic, retain) NSDictionary *allNames;
+@property (nonatomic, retain) NSMutableDictionary *names;
+@property (nonatomic, retain) NSMutableArray *keys;
+
+- (void)resetSearch;
+- (void)handleSearchForTerm:(NSString *)searchTerm;
 
 @end
 
