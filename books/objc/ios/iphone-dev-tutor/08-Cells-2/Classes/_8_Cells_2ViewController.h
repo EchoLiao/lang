@@ -8,9 +8,16 @@
 
 #import <UIKit/UIKit.h>
 
-@interface _8_Cells_2ViewController : UIViewController {
+#define    kTableViewRowHeight    (65 + 1)
 
+@interface _8_Cells_2ViewController : UIViewController 
+		<UITableViewDataSource, UITableViewDelegate>
+{
+    NSArray    *computers;
 }
+
+@property (nonatomic, retain) NSArray *computers;
+
 
 @end
 

@@ -15,6 +15,8 @@
 		2899E5220DE3E06400AC0155 /* _8_Cells_2ViewController.xib in Resources */ = {isa = PBXBuildFile; fileRef = 2899E5210DE3E06400AC0155 /* _8_Cells_2ViewController.xib */; };
 		28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 28AD733E0D9D9553002E5188 /* MainWindow.xib */; };
 		28D7ACF80DDB3853001CB0EB /* _8_Cells_2ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D7ACF70DDB3853001CB0EB /* _8_Cells_2ViewController.m */; };
+		889936C8158F65AF000687C4 /* CustomCell.m in Sources */ = {isa = PBXBuildFile; fileRef = 889936C7158F65AF000687C4 /* CustomCell.m */; };
+		889936CC158F65ED000687C4 /* CustomCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 889936CB158F65ED000687C4 /* CustomCell.xib */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -30,6 +32,9 @@
 		28D7ACF70DDB3853001CB0EB /* _8_Cells_2ViewController.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = _8_Cells_2ViewController.m; sourceTree = "<group>"; };
 		29B97316FDCFA39411CA2CEA /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		32CA4F630368D1EE00C91783 /* _8_Cells_2_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _8_Cells_2_Prefix.pch; sourceTree = "<group>"; };
+		889936C6158F65AF000687C4 /* CustomCell.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomCell.h; sourceTree = "<group>"; };
+		889936C7158F65AF000687C4 /* CustomCell.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomCell.m; sourceTree = "<group>"; };
+		889936CB158F65ED000687C4 /* CustomCell.xib */ = {isa = PBXFileReference; lastKnownFileType = file.xib; path = CustomCell.xib; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* _8_Cells_2-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "_8_Cells_2-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -54,6 +59,8 @@
 				1D3623250D0F684500981E51 /* _8_Cells_2AppDelegate.m */,
 				28D7ACF60DDB3853001CB0EB /* _8_Cells_2ViewController.h */,
 				28D7ACF70DDB3853001CB0EB /* _8_Cells_2ViewController.m */,
+				889936C6158F65AF000687C4 /* CustomCell.h */,
+				889936C7158F65AF000687C4 /* CustomCell.m */,
 			);
 			path = Classes;
 			sourceTree = "<group>";
@@ -93,6 +100,7 @@
 				2899E5210DE3E06400AC0155 /* _8_Cells_2ViewController.xib */,
 				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
 				8D1107310486CEB800E47090 /* _8_Cells_2-Info.plist */,
+				889936CB158F65ED000687C4 /* CustomCell.xib */,
 			);
 			name = Resources;
 			sourceTree = "<group>";
@@ -158,6 +166,7 @@
 			files = (
 				28AD733F0D9D9553002E5188 /* MainWindow.xib in Resources */,
 				2899E5220DE3E06400AC0155 /* _8_Cells_2ViewController.xib in Resources */,
+				889936CC158F65ED000687C4 /* CustomCell.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -171,6 +180,7 @@
 				1D60589B0D05DD56006BFB54 /* main.m in Sources */,
 				1D3623260D0F684500981E51 /* _8_Cells_2AppDelegate.m in Sources */,
 				28D7ACF80DDB3853001CB0EB /* _8_Cells_2ViewController.m in Sources */,
+				889936C8158F65AF000687C4 /* CustomCell.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
