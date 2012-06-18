@@ -33,6 +33,7 @@
 #define TSL_TYPE_LYRICS     16
 
 
+static int tslSTreadTitle(TSLMediaHead *title, FILE *fp);
 static int tslSTreadContent(TSLLyrics *plyr, FILE *fp);
 
 
@@ -65,10 +66,11 @@ int  tslReadHead(TSLFileHead *tslHead, FILE *fp)
     return 1;
 }
 
-int  tslRead(TSLLyrics **lyrics, int *nline, FILE *fp)
+int  tslRead(TSLLyrics **lyrics, int *nline, TSLMediaHead *title, FILE *fp)
 {
     assert(lyrics != NULL && *lyrics == NULL
             && nline != NULL && fp != NULL);
+    assert(title != NULL);
 
     int  ret, len, curline;
     char buff[512];
@@ -102,7 +104,8 @@ int  tslRead(TSLLyrics **lyrics, int *nline, FILE *fp)
             fseek(fp, 1+1+1+1+2+2-1, SEEK_CUR);
 			break;
 		case TSL_TYPE_TITLE:    // 片头结构
-            fseek(fp, 1+1+1+1+4+(1+1+30)*8-1, SEEK_CUR);
+            // fseek(fp, 1+1+1+1+4+(1+1+30)*8-1, SEEK_CUR);
+            tslSTreadTitle(title, fp);
 			break;
 		case TSL_TYPE_LYRICS:   // 歌词结构
             if ( ! tslSTreadContent(plyr, fp) )
@@ -127,6 +130,28 @@ _NO_MEMORY_CELL:
 _NO_MEMORY_LYRICS:
     *lyrics = NULL;
     return 0;
+}
+
+static int tslSTreadTitle(TSLMediaHead *title, FILE *fp)
+{
+    assert(title != NULL && fp != NULL);
+
+    int i;
+
+    title->type = TSL_TYPE_TITLE;
+    fread(&title->effect, 1, 1, fp);
+    fread(&title->showtime, 1, 1, fp);
+    fread(&title->reserved, 1, 1, fp);
+    fread(&title->begintime, 1, 4, fp);
+
+    for ( i = 0; i < NMEDIASMAX; i++ )
+    {
+        fread(&(title->contents[i].fontid),   1, 1, fp);
+        fread(&(title->contents[i].posid),    1, 1, fp);
+        fread(&(title->contents[i].content),  1, CONTENTLENMAX, fp);
+    }
+
+    return 1;
 }
 
 static int tslSTreadContent(TSLLyrics *plyr, FILE *fp)

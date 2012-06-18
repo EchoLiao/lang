@@ -32,7 +32,8 @@ int main (int argc, char *argv[])
     int         i, j, ret;
     FILE        *fp = NULL;
 
-    TSLFileHead head;
+    TSLFileHead  head;
+    TSLMediaHead title;
     TSLLyrics   *lyrics = NULL;
     int         nline = 0;
 
@@ -40,13 +41,19 @@ int main (int argc, char *argv[])
     assert(ret == 1);
     ret = tslReadHead(&head, fp);
     assert(ret == 1);
-    ret = tslRead(&lyrics, &nline, fp);
+    ret = tslRead(&lyrics, &nline, &title, fp);
     assert(ret == 1);
 
     printf("head=%s, Version=%d, crc=%d, fonts=%d, pos=%d,"
             "nlyrics=%d, ctype=%d\n",
             head.head, head.version, head.crc, head.fonts,
             head.positions, head.nlyrics ,head.codetype);
+
+    printf("title: type=%d, eff=%d, times=%d, btime=%d\n",
+            title.type, title.effect, title.showtime, title.begintime);
+    for ( i = 0; i < NMEDIASMAX; i++ )
+        printf("     font=%d, pos=%d, %s\n", title.contents[i].fontid,
+                title.contents[i].posid, title.contents[i].content);
 
     for ( i = 0; i < nline; i++ )
     {

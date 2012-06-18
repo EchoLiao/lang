@@ -104,7 +104,7 @@ typedef struct tagLYRICSSHOW
 
 int  tslOpen(FILE **fp, const char *file);
 int  tslReadHead(TSLFileHead *tslHead, FILE *fp);
-int  tslRead(TSLLyrics **lyrics, int *nline, FILE *fp);
+int  tslRead(TSLLyrics **lyrics, int *nline, TSLMediaHead *title, FILE *fp);
 
 
 
