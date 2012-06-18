@@ -121,7 +121,7 @@
 	
     NSUInteger row = [indexPath row];
     cell.textLabel.text = [listData objectAtIndex:row];
-//    cell.textLabel.font = [UIFont boldSystemFontOfSize:50];
+    cell.textLabel.font = [UIFont boldSystemFontOfSize:50];
 	
 #ifdef __IPHONE_3_0    
     if (row < 7)
@@ -178,10 +178,10 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 }
 
 // 设置行高。
-//- (CGFloat)tableView:(UITableView *)tableView 
-//heightForRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    return 70;
-//}
+- (CGFloat)tableView:(UITableView *)tableView 
+heightForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    return 70;
+}
 
 @end
