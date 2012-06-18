@@ -137,12 +137,12 @@
 #pragma mark Table Delegate Methods 
 
 // 设置每行的缩进
-//- (NSInteger)tableView:(UITableView *)tableView 
-//indentationLevelForRowAtIndexPath:(NSIndexPath *)indexPath
-//{
-//    NSUInteger row = [indexPath row];
-//    return row;
-//}
+- (NSInteger)tableView:(UITableView *)tableView 
+indentationLevelForRowAtIndexPath:(NSIndexPath *)indexPath
+{
+    NSUInteger row = [indexPath row];
+    return row;
+}
 
 // 相应点击操作，在高亮被点击行前，该方法被调用。
 -(NSIndexPath *)tableView:(UITableView *)tableView 
