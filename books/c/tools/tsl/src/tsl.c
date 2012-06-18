@@ -33,30 +33,126 @@
 #define TSL_TYPE_LYRICS     16
 
 
+static int tslSTreadHead(TSLFileHead *tslHead, FILE *fp);
 static int tslSTreadTitle(TSLMediaHead *title, FILE *fp);
 static int tslSTreadContent(TSLLyrics *plyr, FILE *fp);
 
 
 
-int  tslOpen(FILE **fp, const char *file)
+int  tslOpen(TSLFile *tslFile, const char *file)
 {
-    assert(fp != NULL && *fp == NULL && file != NULL);
+    assert(tslFile != NULL && tslFile->fp == NULL &&
+            tslFile->lyrics == NULL && file != NULL);
 
     char buf[NMAGIC];
 
-    if ( (*fp=fopen(file, "rb+")) == NULL )
+    if ( NULL == (tslFile->fp = fopen(file, "rb+")) )
         goto _CANNOT_OPEN;
-    
-    fread(buf, 1, NMAGIC, *fp);
+
+    fread(buf, 1, NMAGIC, tslFile->fp);
     if ( strncmp(buf, FILE_MAGIC, NMAGIC) == 0 )
+    {
+        fseek(tslFile->fp, 0, SEEK_SET);
         return 1;
+    }
 
 _CANNOT_OPEN:
-    *fp = NULL;
     return 0;
 }
 
-int  tslReadHead(TSLFileHead *tslHead, FILE *fp)
+int  tslRead(TSLFile *tslFile)
+{
+    assert(tslFile != NULL && tslFile->fp != NULL &&
+            tslFile->lyrics == NULL);
+
+    int  ret, len;
+    char buff[512];
+    TSLLyrics   *plyr;
+    FILE        *fp = tslFile->fp;
+
+    fseek(fp, 0, SEEK_END);
+    len = ftell(fp);
+    fseek(fp, 0, SEEK_SET);
+    ret = tslSTreadHead(&tslFile->head, fp);
+
+    tslFile->lyrics = (TSLLyrics *)malloc(
+            sizeof(*(tslFile->lyrics)) * tslFile->head.nlyrics);
+    if ( tslFile->lyrics == NULL )
+        goto _NO_MEMORY_LYRICS;
+    memset(tslFile->lyrics, 0,
+            sizeof(*(tslFile->lyrics)) * tslFile->head.nlyrics);
+
+    plyr = tslFile->lyrics;
+    while ( 1 )
+    {
+        if ( ftell(fp) >= len )
+            break;
+        fread(buff, 1, 1, fp);
+        switch ( buff[0] )
+        {
+            case TSL_TYPE_FONT:     // 字体结构
+                fseek(fp, 1+1+14+2+1+1+4+4+4+4-1, SEEK_CUR);
+                break;
+            case TSL_TYPE_POS:      // 位置结构
+                fseek(fp, 1+1+1+1+2+2-1, SEEK_CUR);
+                break;
+            case TSL_TYPE_TITLE:    // 片头结构
+                tslSTreadTitle(&tslFile->title, fp);
+                break;
+            case TSL_TYPE_LYRICS:   // 歌词结构
+                if ( ! tslSTreadContent(plyr, fp) )
+                    goto _NO_MEMORY_CELL;
+                plyr++;
+                break;
+            default:
+                assert(0);
+                break;
+        }
+    }
+
+    return 1;
+
+_NO_MEMORY_CELL:
+    plyr = tslFile->lyrics;
+    TSLLyrics *plyrEnd = plyr + tslFile->head.nlyrics;
+    for ( ; plyr < plyrEnd; plyr++ )
+    {
+        free(plyr->cells);
+        plyr->cells = NULL;
+    }
+    free(plyr->cells);
+_NO_MEMORY_LYRICS:
+    tslFile->lyrics = NULL;
+    return 0;
+}
+
+int  tslClose(TSLFile *tslFile)
+{
+    assert(tslFile != NULL);
+
+    if ( tslFile->fp != NULL )
+    {
+        fclose(tslFile->fp);
+        tslFile->fp = NULL;
+    }
+
+    if ( tslFile->lyrics != NULL )
+    {
+        TSLLyrics *plyr = tslFile->lyrics;
+        TSLLyrics *plyrEnd = plyr + tslFile->head.nlyrics;
+        for ( ; plyr < plyrEnd; plyr++ )
+        {
+            free(plyr->cells);
+            plyr->cells = NULL;
+        }
+        free(tslFile->lyrics);
+        tslFile->lyrics = NULL;
+    }
+
+    return 1;
+}
+
+static int tslSTreadHead(TSLFileHead *tslHead, FILE *fp)
 {
     assert(tslHead != NULL && fp != NULL);
 
@@ -64,72 +160,6 @@ int  tslReadHead(TSLFileHead *tslHead, FILE *fp)
     fread(tslHead, 1, sizeof(*tslHead), fp);
 
     return 1;
-}
-
-int  tslRead(TSLLyrics **lyrics, int *nline, TSLMediaHead *title, FILE *fp)
-{
-    assert(lyrics != NULL && *lyrics == NULL
-            && nline != NULL && fp != NULL);
-    assert(title != NULL);
-
-    int  ret, len, curline;
-    char buff[512];
-    TSLFileHead head;
-    TSLLyrics   *plyr;
-
-    fseek(fp, 0, SEEK_END);
-    len = ftell(fp);
-    fseek(fp, 0, SEEK_SET);
-    ret = tslReadHead(&head, fp);
-    *nline = head.nlyrics;
-
-    curline = 0;
-    *lyrics = (TSLLyrics *)malloc(sizeof(**lyrics) * head.nlyrics);
-    if ( *lyrics == NULL )
-        goto _NO_MEMORY_LYRICS;
-    memset(*lyrics, 0, sizeof(**lyrics) * head.nlyrics);
-
-    plyr = *lyrics;
-    while ( 1 )
-    {
-        if ( ftell(fp) >= len ) 
-            break;
-        fread(buff, 1, 1, fp);
-		switch ( buff[0] )
-		{
-		case TSL_TYPE_FONT:     // 字体结构
-            fseek(fp, 1+1+14+2+1+1+4+4+4+4-1, SEEK_CUR);
-			break;
-		case TSL_TYPE_POS:      // 位置结构
-            fseek(fp, 1+1+1+1+2+2-1, SEEK_CUR);
-			break;
-		case TSL_TYPE_TITLE:    // 片头结构
-            // fseek(fp, 1+1+1+1+4+(1+1+30)*8-1, SEEK_CUR);
-            tslSTreadTitle(title, fp);
-			break;
-		case TSL_TYPE_LYRICS:   // 歌词结构
-            if ( ! tslSTreadContent(plyr, fp) )
-                goto _NO_MEMORY_CELL;
-            plyr++;
-			break;
-        default:
-            assert(0);
-            break;
-		}
-    }
-
-    return 1;
-
-_NO_MEMORY_CELL:
-    for ( plyr = *lyrics; plyr != NULL; plyr++ )
-    {
-        free(plyr->cells);
-        plyr->cells = NULL;
-    }
-    free(*lyrics);
-_NO_MEMORY_LYRICS:
-    *lyrics = NULL;
-    return 0;
 }
 
 static int tslSTreadTitle(TSLMediaHead *title, FILE *fp)
@@ -177,7 +207,7 @@ static int tslSTreadContent(TSLLyrics *plyr, FILE *fp)
         plyr->content[k] = '\0';
 
     plyr->cells = malloc(sizeof(TSLCell) * plyr->ncell);
-    if ( plyr->cells == NULL ) 
+    if ( plyr->cells == NULL )
         return 0;
     memset(plyr->cells, 0, sizeof(TSLCell) * plyr->ncell);
     for ( i = 0; i < plyr->ncell; i++ )

@@ -77,35 +77,20 @@ typedef struct tagLYRICS
     lpTSLCell cells;	//分割单元数组
 }TSLLyrics, *lpTSLLyrics;
 
-/* 
-typedef struct tagLYRICSSHOW
+
+typedef struct tagTSLFILE
 {
-    CFont Font;				//歌词使用的字体
-    int CurrLine;			//当前正在显示的第几行
-    int CurrLineBeginTimes;	//当前行的开始显示时间
-    int CurrCell;			//当前分割单元序号
-    int CurrCellBeginPos;	//当前分割单元序号填充听改应该开始的位置
-    int CurrCellBeginTimes;	//当前分割单元在本行开始填充的开始时间
-    double CurrFillSpeed;	//当前分割单元填充速度
-
-    //
-    int Fonts;			//字体定义数
-    int Positions;		//位置定义数
-    int LyricLines;		//歌词行数
-    LPTSLFONTDEF FontDefs;	//
-    LPTSLPOSTIONDEF	PostionDefs;
-
-    lpLyrics Lyrics;	//每行歌词结构对应的 数组
-
-}LYRICSSHOW, *LPLYRICSSHOW;
- */
+    FILE            *fp;
+    TSLFileHead     head;
+    TSLMediaHead    title;
+    TSLLyrics       *lyrics;
+} TSLFile, *lpTSLFile;
 
 
 
-int  tslOpen(FILE **fp, const char *file);
-int  tslReadHead(TSLFileHead *tslHead, FILE *fp);
-int  tslRead(TSLLyrics **lyrics, int *nline, TSLMediaHead *title, FILE *fp);
-
+int  tslOpen(TSLFile *tslFile, const char *file);
+int  tslRead(TSLFile *tslFile);
+int  tslClose(TSLFile *tslFile);
 
 
 #endif

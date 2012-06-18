@@ -29,43 +29,34 @@
 int main (int argc, char *argv[])
 {
     const char  *file = "./000020.tsl";
-    int         i, j, ret;
-    FILE        *fp = NULL;
+    int         i, ret;
+    TSLFile     tslFile;
 
-    TSLFileHead  head;
-    TSLMediaHead title;
-    TSLLyrics   *lyrics = NULL;
-    int         nline = 0;
-
-    ret = tslOpen(&fp, file);
+    memset(&tslFile, 0, sizeof(tslFile));
+    ret = tslOpen(&tslFile, file);
     assert(ret == 1);
-    ret = tslReadHead(&head, fp);
+    ret = tslRead(&tslFile);
     assert(ret == 1);
-    ret = tslRead(&lyrics, &nline, &title, fp);
-    assert(ret == 1);
-
-    printf("head=%s, Version=%d, crc=%d, fonts=%d, pos=%d,"
-            "nlyrics=%d, ctype=%d\n",
-            head.head, head.version, head.crc, head.fonts,
-            head.positions, head.nlyrics ,head.codetype);
 
     printf("title: type=%d, eff=%d, times=%d, btime=%d\n",
-            title.type, title.effect, title.showtime, title.begintime);
+            tslFile.title.type, tslFile.title.effect,
+            tslFile.title.showtime, tslFile.title.begintime);
     for ( i = 0; i < NMEDIASMAX; i++ )
-        printf("     font=%d, pos=%d, %s\n", title.contents[i].fontid,
-                title.contents[i].posid, title.contents[i].content);
+    {
+        printf("       font=%d, pos=%d, %s\n", tslFile.title.contents[i].fontid,
+                tslFile.title.contents[i].posid,
+                tslFile.title.contents[i].content);
+    }
 
-    for ( i = 0; i < nline; i++ )
+    for ( i = 0; i < tslFile.head.nlyrics; i++ )
     {
         printf("id=%d: ncell=%d, bt=%d, s=%s\n",
-                i+1, lyrics[i].ncell, lyrics[i].begintime, lyrics[i].content);
-        for ( j = 0; j < lyrics[i].ncell; j++ )
-        {
-            // printf(" (%.4f,%d)", lyrics[i].cells[j].percent / 10000.0,
-            //         lyrics[i].cells[j].totaltimes);
-        }
-        // printf("\n");
+                i+1, tslFile.lyrics[i].ncell, tslFile.lyrics[i].begintime,
+                tslFile.lyrics[i].content);
     }
+
+    ret = tslClose(&tslFile);
+    assert(ret == 1);
 
     return 0;
 }
