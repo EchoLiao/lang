@@ -1,0 +1,980 @@
+<html>
+
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=gb2312">
+<meta name=Generator content="Microsoft Word 12 (filtered)">
+<style>
+<!--
+ /* Font Definitions */
+ @font-face
+	{font-family:宋体;
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+@font-face
+	{font-family:"Cambria Math";
+	panose-1:0 0 0 0 0 0 0 0 0 0;}
+@font-face
+	{font-family:"\@宋体";
+	panose-1:2 1 6 0 3 1 1 1 1 1;}
+ /* Style Definitions */
+ p.MsoNormal, li.MsoNormal, div.MsoNormal
+	{margin:0cm;
+	margin-bottom:.0001pt;
+	text-align:justify;
+	text-justify:inter-ideograph;
+	font-size:10.5pt;
+	font-family:"Times New Roman","serif";}
+p.MsoHeader, li.MsoHeader, div.MsoHeader
+	{mso-style-link:"页眉 Char";
+	margin:0cm;
+	margin-bottom:.0001pt;
+	text-align:center;
+	layout-grid-mode:char;
+	border:none;
+	padding:0cm;
+	font-size:9.0pt;
+	font-family:"Calibri","sans-serif";}
+p.MsoFooter, li.MsoFooter, div.MsoFooter
+	{mso-style-link:"页脚 Char";
+	margin:0cm;
+	margin-bottom:.0001pt;
+	layout-grid-mode:char;
+	font-size:9.0pt;
+	font-family:"Calibri","sans-serif";}
+span.Char
+	{mso-style-name:"页眉 Char";
+	mso-style-link:页眉;}
+span.Char0
+	{mso-style-name:"页脚 Char";
+	mso-style-link:页脚;}
+ /* Page Definitions */
+ @page Section1
+	{size:595.3pt 841.9pt;
+	margin:72.0pt 90.0pt 72.0pt 90.0pt;
+	layout-grid:15.6pt;}
+div.Section1
+	{page:Section1;}
+-->
+</style>
+
+</head>
+
+<body lang=ZH-CN style='text-justify-trim:punctuation'>
+
+<div class=Section1 style='layout-grid:15.6pt'>
+
+<p class=MsoNormal align=center style='text-align:center'><b><span lang=EN-US
+style='font-size:22.0pt'>TSL</span></b><b><span style='font-size:22.0pt;
+font-family:宋体'>歌词文件格式</span></b></p>
+
+<p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal><span style='font-family:宋体'>一</span> <span
+style='font-family:宋体'>歌词文件结构</span></p>
+
+<table class=MsoNormalTable border=1 cellspacing=0 cellpadding=0
+ style='border-collapse:collapse;border:none'>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><b><span
+  style='font-family:宋体'>名</span><span lang=EN-US>&nbsp; </span></b><b><span
+  style='font-family:宋体'>称</span></b></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><b><span
+  style='font-family:宋体'>字节数</span></b></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border:solid windowtext 1.0pt;
+  border-left:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><b><span
+  style='font-family:宋体'>说</span><span lang=EN-US>&nbsp;&nbsp; </span></b><b><span
+  style='font-family:宋体'>明</span></b></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>ID</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>4</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>“TSL” + </span><span style='font-family:
+  宋体'>版本号，从</span><span lang=EN-US>0X00</span><span style='font-family:宋体'>开始，最大</span><span
+  lang=EN-US>255</span><span style='font-family:宋体'>版本。本结构版本号为</span><span
+  lang=EN-US>0</span><span style='font-family:宋体'>。</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>CRC</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>4</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>文件</span><span lang=EN-US>CRC</span><span
+  style='font-family:宋体'>校验（如果使用）</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>使用的字体数</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>歌词使用的字体定义数量。</span><span
+  lang=EN-US>0</span><span style='font-family:宋体'>表示无字体定义</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>使用的位置数</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>歌词使用的位置定义。</span><span
+  lang=EN-US>0</span><span style='font-family:宋体'>表示无位置定义</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>歌词总行数</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>2</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>低位在前，高位在后</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>文字编码类别</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>4</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>GB2312</span><span style='font-family:
+  宋体'>、</span><span lang=EN-US>UTF-8</span><span style='font-family:宋体'>、</span><span
+  lang=EN-US>unicode16</span><span style='font-family:宋体'>等。默认不使用此数据而默认为</span><span
+  lang=EN-US>GB2312</span><span style='font-family:宋体'>。</span></p>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=557 colspan=3 valign=top style='width:418.1pt;border:solid windowtext 1.0pt;
+  border-top:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='font-family:宋体'>字体结构</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>类型</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>= 1</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>字体编号</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>用于索引歌词使用的字体。</span><span
+  lang=EN-US>0~31</span><span style='font-family:宋体'>定义显示歌名、词、曲、演唱者等所使用的字体，</span><span
+  lang=EN-US>0</span><span style='font-family:宋体'>默认歌名字体，</span><span
+  lang=EN-US>1</span><span style='font-family:宋体'>默认词、曲、演唱者字体。</span><span
+  lang=EN-US>32</span><span style='font-family:宋体'>：通用字体，单唱及对唱时的合唱使用。</span><span
+  lang=EN-US>33</span><span style='font-family:宋体'>：女声；</span><span lang=EN-US>34</span><span
+  style='font-family:宋体'>：男声。使用</span><span lang=EN-US>0</span><span
+  style='font-family:宋体'>，</span><span lang=EN-US>1</span><span
+  style='font-family:宋体'>，</span><span lang=EN-US>32</span><span
+  style='font-family:宋体'>，</span><span lang=EN-US>33</span><span
+  style='font-family:宋体'>，</span><span lang=EN-US>34</span><span
+  style='font-family:宋体'>时，可以不进行定义。其他值时必须定义。</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>字体名称</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>14</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>字体名称，保留</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>字号</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>2</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>有符号数，正数表示使用的字号，负数的绝对值表示字体使用的字号应占屏幕的百分比</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>字符间距</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>每个字符间使用的间距</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>描边宽度</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>0</span><span style='font-family:宋体'>表示不描边，其他值表示描边宽度</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>未唱时字体颜色</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>4</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>未唱时描边颜色</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>4</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>已唱时字体颜色</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>4</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>已唱时描边颜色</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>4</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=557 colspan=3 valign=top style='width:418.1pt;border:solid windowtext 1.0pt;
+  border-top:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='font-family:宋体'>位置结构</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>类型</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>=2</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>位置编号</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>用于定义歌词数据应出现的位置。</span><span
+  lang=EN-US>0~31</span><span style='font-family:宋体'>用于标题等定义</span><span
+  lang=EN-US>0</span><span style='font-family:宋体'>默认歌名位置，</span><span
+  lang=EN-US>1</span><span style='font-family:宋体'>默认词位置，</span><span
+  lang=EN-US>2</span><span style='font-family:宋体'>默认曲位置，</span><span
+  lang=EN-US>3</span><span style='font-family:宋体'>默认演唱者位置，</span><span
+  lang=EN-US>4</span><span style='font-family:宋体'>默认导演位置，</span><span
+  lang=EN-US>5</span><span style='font-family:宋体'>默认位置。</span><span lang=EN-US>32</span><span
+  style='font-family:宋体'>为默认歌词位置，双行显示，左右对齐。从</span><span lang=EN-US>33</span><span
+  style='font-family:宋体'>开始定义自定义歌词显示位置。</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>对齐方式</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>0</span><span style='font-family:宋体'>左对齐，</span><span
+  lang=EN-US>1</span><span style='font-family:宋体'>右对齐，</span><span lang=EN-US>2</span><span
+  style='font-family:宋体'>居中对齐</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>保留</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>水平方向边界</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>2</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>即在当前屏幕分辨率下，距离左右屏幕边缘使用的像素数，负数表示百分比。左对齐时为左距离，右对齐时为右距离，居中对齐时不使用此数据</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>顶端位置</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>2</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>即在当前屏幕分辨率下，距离屏幕上边缘使用的像素数，负数表示百分比。</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=557 colspan=3 valign=top style='width:418.1pt;border:solid windowtext 1.0pt;
+  border-top:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='font-family:宋体'>片头数据结构（</span><span lang=EN-US>264</span><span
+  style='font-family:宋体'>字节）</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>类型</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>=3</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>显示特效</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>特效</span><span lang=EN-US>ID</span><span
+  style='font-family:宋体'>，特效分</span><span lang=EN-US>16</span><span
+  style='font-family:宋体'>大类（高</span><span lang=EN-US>4</span><span
+  style='font-family:宋体'>位），</span><span lang=EN-US>16</span><span
+  style='font-family:宋体'>小类（低</span><span lang=EN-US>4</span><span
+  style='font-family:宋体'>位），</span><span lang=EN-US>=0</span><span
+  style='font-family:宋体'>时为基本特效，即当某大类下的小类没有定义或实现时，使用此大类下的基本特效。大类没有定义时，不使用特效。</span><span
+  lang=EN-US>0x00</span><span style='font-family:宋体'>表示不使用特效。</span><span
+  lang=EN-US>0x10</span><span style='font-family:宋体'>：淡入淡出特效。</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>显示时长</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>单位秒</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>保留</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>整行歌词开始显示时间</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>4</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>单位毫秒</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>数据</span><span lang=EN-US>1</span><span
+  style='font-family:宋体'>位置</span><span lang=EN-US>ID</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>数据</span><span lang=EN-US>1</span><span
+  style='font-family:宋体'>字体</span><span lang=EN-US>ID</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>数据</span><span lang=EN-US>1</span><span
+  style='font-family:宋体'>内容内容</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>30</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>……</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='font-family:宋体'>……</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>……</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>数据</span><span lang=EN-US>8</span><span
+  style='font-family:宋体'>位置</span><span lang=EN-US>ID</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>数据</span><span lang=EN-US>8</span><span
+  style='font-family:宋体'>字体</span><span lang=EN-US>ID</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>数据</span><span lang=EN-US>8</span><span
+  style='font-family:宋体'>内容内容</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>30</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=557 colspan=3 valign=top style='width:418.1pt;border:solid windowtext 1.0pt;
+  border-top:none;background:silver;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='font-family:宋体'>歌词结构</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>类型</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>=16</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>标志</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>位</span><span lang=EN-US>0=1</span><span
+  style='font-family:宋体'>表示为倒计时标志</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>字体编号</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>32</span><span style='font-family:宋体'>：通用字体，单唱及对唱时的合唱使用。</span><span
+  lang=EN-US>33</span><span style='font-family:宋体'>：女声；</span><span lang=EN-US>34</span><span
+  style='font-family:宋体'>：男声。</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>位置编号</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>32</span><span style='font-family:宋体'>：默认位置</span>
+  </p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>整行歌词开始显示时间</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>4</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>单位毫秒</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>歌词显示分割的段数</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>歌词字节长度</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>1</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>歌词占用的字节数</span><span
+  lang=EN-US>,4</span><span style='font-family:宋体'>的整数倍</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>保留</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>2</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>歌词内容</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>n</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>占用空间为</span><span lang=EN-US>4</span><span
+  style='font-family:宋体'>的倍数('\0'后的数据为无效数据)</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>歌词段</span><span lang=EN-US>1</span><span
+  style='font-family:宋体'>填充比例</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>2</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>万分比。</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>歌词段</span><span lang=EN-US>1</span><span
+  style='font-family:宋体'>填充时间</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>2</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>毫秒，最多填充</span><span
+  lang=EN-US>1</span><span style='font-family:宋体'>分钟。</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>……</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span
+  style='font-family:宋体'>……</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>……</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>歌词段</span><span lang=EN-US>n</span><span
+  style='font-family:宋体'>填充比例</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>2</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>万分比。</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>歌词段</span><span lang=EN-US>n</span><span
+  style='font-family:宋体'>填充时间</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>2</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span style='font-family:宋体'>毫秒，最多填充</span><span
+  lang=EN-US>1</span><span style='font-family:宋体'>分钟。</span></p>
+  </td>
+ </tr>
+ <tr>
+  <td width=186 valign=top style='width:139.35pt;border:solid windowtext 1.0pt;
+  border-top:none;padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+  <td width=85 valign=top style='width:64.05pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal align=center style='text-align:center'><span lang=EN-US>&nbsp;</span></p>
+  </td>
+  <td width=286 valign=top style='width:214.7pt;border-top:none;border-left:
+  none;border-bottom:solid windowtext 1.0pt;border-right:solid windowtext 1.0pt;
+  padding:0cm 5.4pt 0cm 5.4pt'>
+  <p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+  </td>
+ </tr>
+</table>
+
+<p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+
+<p class=MsoNormal><span style='font-family:宋体'>当时间超过首行显示时间时，显示两行歌词，当超过倒计时框时，显示倒计时，然后填充歌词，由于同时显示两行，因此，不能将下一行的开始时间作为本行的结束，因此，将本行画完后，才能画下一行。</span></p>
+
+<p class=MsoNormal><span lang=EN-US>&nbsp;</span></p>
+
+</div>
+
+</body>
+
+</html>
