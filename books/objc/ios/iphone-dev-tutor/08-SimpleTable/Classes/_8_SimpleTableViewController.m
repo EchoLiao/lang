@@ -114,10 +114,10 @@
         
     }
     
-//    UIImage *image = [UIImage imageNamed:@"star.png"];
-//    UIImage *image2 = [UIImage imageNamed:@"star2.png"];
-//    cell.imageView.image = image;
-//    cell.imageView.highlightedImage = image2;
+    UIImage *image = [UIImage imageNamed:@"star.png"];
+    UIImage *image2 = [UIImage imageNamed:@"star2.png"];
+    cell.imageView.image = image;
+    cell.imageView.highlightedImage = image2;
 	
     NSUInteger row = [indexPath row];
     cell.textLabel.text = [listData objectAtIndex:row];
