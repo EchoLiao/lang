@@ -105,7 +105,7 @@
         // UITableViewCellStyleValue1
         // UITableViewCellStyleValue2
 		
-        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault
+        cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
                                        reuseIdentifier: SimpleTableIdentifier] autorelease];
 #else
         cell = [[[UITableViewCell alloc] initWithFrame::CGRectZero
@@ -121,7 +121,7 @@
 	
     NSUInteger row = [indexPath row];
     cell.textLabel.text = [listData objectAtIndex:row];
-    cell.textLabel.font = [UIFont boldSystemFontOfSize:50];
+    cell.textLabel.font = [UIFont boldSystemFontOfSize:40];
 	
 #ifdef __IPHONE_3_0    
     if (row < 7)
