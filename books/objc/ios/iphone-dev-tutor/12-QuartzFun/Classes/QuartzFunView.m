@@ -39,7 +39,7 @@
         self.currentColor = [UIColor redColor];
         self.useRandomColor = NO;
         if (drawImage == nil)
-            self.drawImage = [UIImage imageNamed:@"iphone.png"];
+            self.drawImage = [UIImage imageNamed:@"iphone.png"];  // load .png
     }
     return self;
 }
