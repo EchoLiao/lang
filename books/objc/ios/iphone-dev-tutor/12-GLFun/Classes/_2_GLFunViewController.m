@@ -7,8 +7,53 @@
 //
 
 #import "_2_GLFunViewController.h"
+#import "GLFunView.h"
+#import "UIColor-Random.h"
+
 
 @implementation _2_GLFunViewController
+
+@synthesize colorControl;
+
+- (IBAction)changeColor:(id)sender {
+    UISegmentedControl *control = sender;
+    NSInteger index = [control selectedSegmentIndex];
+    
+    GLFunView *glView = (GLFunView *)self.view;
+    
+    switch (index) {
+        case kRedColorTab:
+            glView.currentColor = [UIColor redColor];
+            glView.useRandomColor = NO;
+            break;
+        case kBlueColorTab:
+            glView.currentColor = [UIColor blueColor];
+            glView.useRandomColor = NO;
+            break;
+        case kYellowColorTab:
+            glView.currentColor = [UIColor yellowColor];
+            glView.useRandomColor = NO;
+            break;
+        case kGreenColorTab:
+            glView.currentColor = [UIColor greenColor];
+            glView.useRandomColor = NO;
+            break;
+        case kRandomColorTab:
+            glView.useRandomColor = YES;
+            break;
+        default:
+            break;
+    }
+}
+- (IBAction)changeShape:(id)sender {
+    UISegmentedControl *control = sender;
+    [(GLFunView *)self.view setShapeType:[control selectedSegmentIndex]];
+
+	NSLog(@"NAL %d, %d", [control selectedSegmentIndex], kImageShape);
+    if ([control selectedSegmentIndex] == kImageShape)
+        [colorControl setHidden:YES];
+    else [colorControl setHidden:NO];
+}
 
 
 
@@ -30,12 +75,11 @@
 */
 
 
-/*
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
 - (void)viewDidLoad {
+    self.colorControl = nil;
     [super viewDidLoad];
 }
-*/
 
 
 /*
@@ -60,6 +104,7 @@
 
 
 - (void)dealloc {
+    [colorControl release];
     [super dealloc];
 }
 

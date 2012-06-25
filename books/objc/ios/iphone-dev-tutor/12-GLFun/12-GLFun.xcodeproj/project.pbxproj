@@ -17,6 +17,11 @@
 		28D7ACF80DDB3853001CB0EB /* _2_GLFunViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = 28D7ACF70DDB3853001CB0EB /* _2_GLFunViewController.m */; };
 		889EE38F1598978B002BC434 /* UIColor-Random.m in Sources */ = {isa = PBXBuildFile; fileRef = 889EE38E1598978B002BC434 /* UIColor-Random.m */; };
 		889EE39115989794002BC434 /* iphone.png in Resources */ = {isa = PBXBuildFile; fileRef = 889EE39015989794002BC434 /* iphone.png */; };
+		889EE39E1598992F002BC434 /* OpenGLES2DView.m in Sources */ = {isa = PBXBuildFile; fileRef = 889EE39B1598992E002BC434 /* OpenGLES2DView.m */; };
+		889EE39F1598992F002BC434 /* Texture2D.m in Sources */ = {isa = PBXBuildFile; fileRef = 889EE39D1598992F002BC434 /* Texture2D.m */; };
+		889EE3A415989972002BC434 /* GLFunView.m in Sources */ = {isa = PBXBuildFile; fileRef = 889EE3A315989972002BC434 /* GLFunView.m */; };
+		889EE3BA15989AE8002BC434 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 889EE3B915989AE8002BC434 /* OpenGLES.framework */; };
+		889EE3BF15989B20002BC434 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 889EE3BE15989B20002BC434 /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -36,6 +41,14 @@
 		889EE38D1598978B002BC434 /* UIColor-Random.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIColor-Random.h"; sourceTree = "<group>"; };
 		889EE38E1598978B002BC434 /* UIColor-Random.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIColor-Random.m"; sourceTree = "<group>"; };
 		889EE39015989794002BC434 /* iphone.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = iphone.png; sourceTree = "<group>"; };
+		889EE39A1598992E002BC434 /* OpenGLES2DView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLES2DView.h; sourceTree = "<group>"; };
+		889EE39B1598992E002BC434 /* OpenGLES2DView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OpenGLES2DView.m; sourceTree = "<group>"; };
+		889EE39C1598992E002BC434 /* Texture2D.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Texture2D.h; sourceTree = "<group>"; };
+		889EE39D1598992F002BC434 /* Texture2D.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = Texture2D.m; sourceTree = "<group>"; };
+		889EE3A215989972002BC434 /* GLFunView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GLFunView.h; sourceTree = "<group>"; };
+		889EE3A315989972002BC434 /* GLFunView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GLFunView.m; sourceTree = "<group>"; };
+		889EE3B915989AE8002BC434 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
+		889EE3BE15989B20002BC434 /* QuartzCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuartzCore.framework; path = System/Library/Frameworks/QuartzCore.framework; sourceTree = SDKROOT; };
 		8D1107310486CEB800E47090 /* _2_GLFun-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "_2_GLFun-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -47,6 +60,8 @@
 				1D60589F0D05DD5A006BFB54 /* Foundation.framework in Frameworks */,
 				1DF5F4E00D08C38300B7A737 /* UIKit.framework in Frameworks */,
 				288765A50DF7441C002DB57D /* CoreGraphics.framework in Frameworks */,
+				889EE3BA15989AE8002BC434 /* OpenGLES.framework in Frameworks */,
+				889EE3BF15989B20002BC434 /* QuartzCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -56,6 +71,12 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				889EE3A215989972002BC434 /* GLFunView.h */,
+				889EE3A315989972002BC434 /* GLFunView.m */,
+				889EE39A1598992E002BC434 /* OpenGLES2DView.h */,
+				889EE39B1598992E002BC434 /* OpenGLES2DView.m */,
+				889EE39C1598992E002BC434 /* Texture2D.h */,
+				889EE39D1598992F002BC434 /* Texture2D.m */,
 				889EE38C1598978B002BC434 /* Constants.h */,
 				889EE38D1598978B002BC434 /* UIColor-Random.h */,
 				889EE38E1598978B002BC434 /* UIColor-Random.m */,
@@ -83,6 +104,7 @@
 				29B97317FDCFA39411CA2CEA /* Resources */,
 				29B97323FDCFA39411CA2CEA /* Frameworks */,
 				19C28FACFE9D520D11CA2CBB /* Products */,
+				889EE3BE15989B20002BC434 /* QuartzCore.framework */,
 			);
 			name = CustomTemplate;
 			sourceTree = "<group>";
@@ -113,6 +135,7 @@
 				1DF5F4DF0D08C38300B7A737 /* UIKit.framework */,
 				1D30AB110D05D00D00671497 /* Foundation.framework */,
 				288765A40DF7441C002DB57D /* CoreGraphics.framework */,
+				889EE3B915989AE8002BC434 /* OpenGLES.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -183,6 +206,9 @@
 				1D3623260D0F684500981E51 /* _2_GLFunAppDelegate.m in Sources */,
 				28D7ACF80DDB3853001CB0EB /* _2_GLFunViewController.m in Sources */,
 				889EE38F1598978B002BC434 /* UIColor-Random.m in Sources */,
+				889EE39E1598992F002BC434 /* OpenGLES2DView.m in Sources */,
+				889EE39F1598992F002BC434 /* Texture2D.m in Sources */,
+				889EE3A415989972002BC434 /* GLFunView.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
