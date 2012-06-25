@@ -51,7 +51,7 @@
 
 	NSLog(@"NAL %d, %d", [control selectedSegmentIndex], kImageShape);
     if ([control selectedSegmentIndex] == kImageShape)
-        [colorControl setHidden:YES];
+        [colorControl setHidden:YES]; // 为什么不起作用？ QQQQQ
     else [colorControl setHidden:NO];
 }
 
