@@ -76,11 +76,11 @@
             CGContextStrokePath(context);
             break;
         case kRectShape:
-            CGContextAddRect(context, currentRect);
+            CGContextAddRect(context, self.currentRect);
             CGContextDrawPath(context, kCGPathFillStroke);
             break;
         case kEllipseShape:
-            CGContextAddEllipseInRect(context, currentRect);
+            CGContextAddEllipseInRect(context, self.currentRect);
             CGContextDrawPath(context, kCGPathFillStroke);
             break;
         case kImageShape: 
@@ -119,7 +119,7 @@
                                                         drawImage.size.height));
     }
     else
-        redrawRect = CGRectUnion(redrawRect, self.currentRect); // 求交集
+        redrawRect = CGRectUnion(redrawRect, self.currentRect); // 求并集
     
     redrawRect = CGRectInset(redrawRect, -2.0, -2.0);
     [self setNeedsDisplayInRect:redrawRect]; // 只重画指定的区域。

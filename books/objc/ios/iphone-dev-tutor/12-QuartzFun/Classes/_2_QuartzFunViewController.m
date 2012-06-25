@@ -51,6 +51,7 @@
     UISegmentedControl *control = sender;
     [(QuartzFunView *)self.view setShapeType:[control
                                               selectedSegmentIndex]];
+	NSLog(@"NAL %d", [control selectedSegmentIndex]);
     
     if ([control selectedSegmentIndex] == kImageShape)
         colorControl.hidden = YES;
