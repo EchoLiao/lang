@@ -8,3 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
+// 对UIColor类追加新方法。
+@interface UIColor(Random)
+
++(UIColor *)randomColor;
+
+@end

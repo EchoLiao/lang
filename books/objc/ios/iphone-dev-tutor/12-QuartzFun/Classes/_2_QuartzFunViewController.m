@@ -7,8 +7,56 @@
 //
 
 #import "_2_QuartzFunViewController.h"
+#import "QuartzFunView.h"
+#import "UIColor-Random.h"
+#import "Constants.h"
+
 
 @implementation _2_QuartzFunViewController
+
+@synthesize colorControl;
+
+
+- (IBAction)changeColor:(id)sender {
+    UISegmentedControl *control = sender;
+    NSInteger index = [control selectedSegmentIndex];
+    
+    QuartzFunView *quartzView = (QuartzFunView *)self.view;
+    
+    switch (index) {
+        case kRedColorTab:
+            quartzView.currentColor = [UIColor redColor];
+            quartzView.useRandomColor = NO;
+            break;
+        case kBlueColorTab:
+            quartzView.currentColor = [UIColor blueColor];
+            quartzView.useRandomColor = NO;
+            break;
+        case kYellowColorTab:
+            quartzView.currentColor = [UIColor yellowColor];
+            quartzView.useRandomColor = NO;
+            break;
+        case kGreenColorTab:
+            quartzView.currentColor = [UIColor greenColor];
+            quartzView.useRandomColor = NO;
+            break;
+        case kRandomColorTab:
+            quartzView.useRandomColor = YES;
+            break;
+        default:
+            break;
+    }
+}
+- (IBAction)changeShape:(id)sender {
+    UISegmentedControl *control = sender;
+    [(QuartzFunView *)self.view setShapeType:[control
+                                              selectedSegmentIndex]];
+    
+    if ([control selectedSegmentIndex] == kImageShape)
+        colorControl.hidden = YES;
+    else
+        colorControl.hidden = NO;
+}
 
 
 
@@ -60,6 +108,7 @@
 
 
 - (void)dealloc {
+	[colorControl release];
     [super dealloc];
 }
 
