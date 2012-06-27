@@ -26,137 +26,27 @@
 #include <GL/glut.h>
 
 
-typedef struct N3D_Vertex
-{
-    float fX;
-    float fY;
-    float fZ;
-
-    float fS;
-    float fT;
-
-    float fR;
-    float fG;
-    float fB;
-    float fA;
-
-    float fNX;
-    float fNY;
-    float fNZ;
-} N3D_Vertex;
-
-typedef struct _RGBIMG {
-    GLuint   w;
-    GLuint   h;
-    GLubyte* data;
-} RGBIMG;
-
-
 
 #define SCREEN_W        480
 #define SCREEN_H        340
 #define TEXTURES_NUM    1
 
 
+
 int     g_gamemode;
 int     g_fullscreen;
-GLuint	g_texid[TEXTURES_NUM];
 
-
-
-int  load_rgb_image(const char* file_name, int w, int h, RGBIMG* refimg)
-{
-#if 0
-    GLuint   sz;    // Our Image's Data Field Length In Bytes
-    FILE*    file;  // The Image's File On Disk
-    long     fsize; // File Size In Bytes
-    GLubyte* p;     // Helper Pointer
-
-    // Update The Image's Fields
-    refimg->w = (GLuint) w;
-    refimg->h = (GLuint) h;
-    // 所加载的是24位的位图; 使每一行都以4字节对齐, 以加载读取速度.
-    sz = (((3*refimg->w+3)>>2)<<2)*refimg->h;
-    refimg->data = new GLubyte [sz];
-    if (refimg->data == NULL) return 0;
-
-    // Open The File And Read The Pixels
-    file = fopen(file_name , "rb");
-    if (!file) return 0;
-    fseek(file, 0L, SEEK_END);
-    fsize = ftell(file);
-    if (fsize != (long)sz) {
-        fclose(file);
-        return 0;
-    }
-    fseek(file, 0L, SEEK_SET);
-    p = refimg->data;
-    while (fsize > 0) {
-        fread(p, 1, 1, file);
-        p++;
-        fsize--;
-    }
-    fclose(file);
-    return 1;
-#else
-    /* refimg->w = (GLuint) w;
-    refimg->h = (GLuint) h;
-    refimg->data = new GLubyte [256*256*3];
-    if (refimg->data == NULL)
-        return 0;
-
-    GLubyte *pb = refimg->data;
-    for ( int y = 0; y < 256; y++ )
-    {
-        for ( int x = 0; x < 256; x++ )
-        {
-            if ( x == y )
-            {
-                *pb = 255;
-                *(pb+1) = 0;
-                *(pb+2) = 0;
-            }
-            else
-            {
-                *pb = 0;
-                *(pb+1) = 255;
-                *(pb+2) = 0;
-            }
-            pb += 3;
-        }
-    } */
-    return 1;
-#endif
-}
-
-int  setup_textures()
-{
-    // RGBIMG img;
-
-    glGenTextures(TEXTURES_NUM, g_texid);
-    // if (!load_rgb_image("tim_256x256.raw", 256, 256, &img)) return 0;
-
-    glBindTexture(GL_TEXTURE_2D, g_texid[0]);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MAG_FILTER,GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D,GL_TEXTURE_MIN_FILTER,GL_LINEAR);
-    // glTexImage2D(GL_TEXTURE_2D, 0, 3, img.w, img.h, 0, GL_RGB, GL_UNSIGNED_BYTE, img.data);
-    glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_REPLACE);
-
-    // delete img.data;
-
-    return 1;
-}
 
 int  init(void)
 {
-    if (!setup_textures()) return 0;
-
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-    glEnable(GL_TEXTURE_2D);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+
     glClearDepth(1.0f);
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);
+    glDisable(GL_TEXTURE_2D);
+
     glShadeModel(GL_SMOOTH);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
 
@@ -176,10 +66,9 @@ static void drawRect()
 void render(void)
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     glLoadIdentity();
     glTranslatef(0.0f,0.0f,-2.0f);
-
-    glBindTexture(GL_TEXTURE_2D, g_texid[0]);
 
     glPushMatrix(); {
         glDisable(GL_TEXTURE_2D);
@@ -190,9 +79,9 @@ void render(void)
         glRectf(-1.0, -1.0, 1.0, 1.0);
     } glPopMatrix();
 
-    usleep(1000 * 200);
-
     glutSwapBuffers();
+
+    usleep(1000 * 200);
 }
 
 // Our Reshaping Handler (Required Even In Fullscreen-Only Modes)
@@ -273,9 +162,8 @@ int main(int argc, char** argv)
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
     glutSpecialFunc(special_keys);
-    // glutIdleFunc(render);
+    glutIdleFunc(render);
     glutMainLoop();
     return 0;
 }
-
 
