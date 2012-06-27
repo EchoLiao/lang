@@ -44,6 +44,19 @@ float   g_cenX = 0.05;
 float   g_accX = 1.0;
 
 
+void resetRandPos()
+{
+    int i;
+
+    for ( i = 0; i < NUM_PENTS; i++ )
+    {
+        g_rand[i][0] = (-100.0 + rand() % 200) / 100.0;
+        g_rand[i][1] = -rand() % 140;
+        printf("%f, %f\n", g_rand[i][0], g_rand[i][1]);
+    }
+}
+
+
 int  init(void)
 {
     int i;
@@ -62,12 +75,7 @@ int  init(void)
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
-    for ( i = 0; i < NUM_PENTS; i++ )
-    {
-        g_rand[i][0] = (-100.0 + rand() % 200) / 100.0;
-        g_rand[i][1] = -rand() % 140;
-        printf("%f, %f\n", g_rand[i][0], g_rand[i][1]);
-    }
+    resetRandPos();
 
     return 1;
 }
@@ -120,7 +128,7 @@ static void drawRoute()
     // float ex2 = ex1;
     float ey1 = sy1;
     float ey2 = ey1;
-    float ez1 = -70.0;
+    float ez1 = -140.0;
     float ez2 = ez1;
 
     float cenX = 0.2;
@@ -181,8 +189,11 @@ void render(void)
     glutSwapBuffers();
 
     g_deltaZ += g_cenZ;
-    if ( g_deltaZ > 30.0 )
+    if ( g_deltaZ > 70.0 )
+    {
         g_deltaZ = 0.0;
+        resetRandPos();
+    }
 }
 
 // Our Reshaping Handler (Required Even In Fullscreen-Only Modes)
