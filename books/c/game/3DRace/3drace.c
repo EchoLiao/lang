@@ -53,7 +53,10 @@ typedef struct _RGBIMG {
 
 
 
-#define TEXTURES_NUM 1
+#define SCREEN_W        480
+#define SCREEN_H        340
+#define TEXTURES_NUM    1
+
 
 int     g_gamemode;
 int     g_fullscreen;
@@ -178,17 +181,14 @@ void render(void)
 
     glBindTexture(GL_TEXTURE_2D, g_texid[0]);
 
-#if 1
     glPushMatrix(); {
         glDisable(GL_TEXTURE_2D);
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glColor4f(1.0, 0.0, 1.0, 1.0);
-        glScalef(0.5, 0.5, 0.5);
+        glScalef(0.99, 0.99, 0.99);
         glRectf(-0.01, -0.01, 0.01, 0.01);
         glRectf(-1.0, -1.0, 1.0, 1.0);
     } glPopMatrix();
-#else
-#endif
 
     usleep(1000 * 200);
 
@@ -198,15 +198,27 @@ void render(void)
 // Our Reshaping Handler (Required Even In Fullscreen-Only Modes)
 void reshape(int w, int h)
 {
-    glViewport(0, 0, w, h);
-    glMatrixMode(GL_PROJECTION);
-    glLoadIdentity();
+    float ratio;
 
     if (h == 0) h = 1;
 
-    glFrustum(-(float)w/h/2.0, (float)w/h/2.0, -0.5, 0.5, 1.0, 100);
-    glMatrixMode(GL_MODELVIEW);
+    glViewport(0, 0, w, h);
 
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+
+    if ( w >= h )
+    {
+        ratio = (float)w / (float)h;
+        glFrustum(-ratio/2.0, ratio/2.0, -0.5, 0.5, 1.0, 100);
+    }
+    else
+    {
+        ratio = (float)h / (float)w;
+        glFrustum(-0.5, 0.5, -ratio/2.0, ratio/2.0, 1.0, 100);
+    }
+
+    glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 }
 
@@ -232,7 +244,7 @@ void special_keys(int a_keys, int x, int y)
             if (!g_gamemode) {
                 g_fullscreen = !g_fullscreen;
                 if (g_fullscreen) glutFullScreen();
-                else glutReshapeWindow(500, 500);
+                else glutReshapeWindow(SCREEN_W, SCREEN_H);
             }
             break;
         default:
@@ -251,7 +263,7 @@ int main(int argc, char** argv)
         else g_gamemode = 0;
     }
     if (!g_gamemode) {
-        glutInitWindowSize(342*2, 256*2);
+        glutInitWindowSize(SCREEN_W, SCREEN_H);
         glutCreateWindow("NeHe's OpenGL Framework");
     }
     if (!init()) {
