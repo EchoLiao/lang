@@ -30,15 +30,24 @@
 #define SCREEN_W        480
 #define SCREEN_H        340
 #define TEXTURES_NUM    1
+#define NUM_PENTS       50
 
 
 
 int     g_gamemode;
 int     g_fullscreen;
+float   g_rand[NUM_PENTS][2];
+float   g_deltaZ;
+float   g_cenZ = 0.009;
+float   g_handX;
+float   g_cenX = 0.05;
+float   g_accX = 1.0;
 
 
 int  init(void)
 {
+    int i;
+
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -53,13 +62,82 @@ int  init(void)
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
+    for ( i = 0; i < NUM_PENTS; i++ )
+    {
+        g_rand[i][0] = (-100.0 + rand() % 200) / 100.0;
+        g_rand[i][1] = -rand() % 140;
+        printf("%f, %f\n", g_rand[i][0], g_rand[i][1]);
+    }
+
     return 1;
 }
 
-static void drawRect()
+static void drawCube()
 {
-    glRectf(-0.01, -0.01, 0.01, 0.01);
-    glRectf(-1.0, -1.0, 1.0, 1.0);
+    glutWireCube(1.0);
+}
+
+static void drawPentahedral()
+{
+    glBegin(GL_TRIANGLE_FAN); {
+        glVertex3f(0.0, 0.0, -1.0);
+        glVertex3f(-1.0,  1.0, 1.0);
+        glVertex3f( 1.0,  1.0, 1.0);
+        glVertex3f( 1.0, -1.0, 1.0);
+        glVertex3f(-1.0, -1.0, 1.0);
+        glVertex3f(-1.0,  1.0, 1.0);
+    } glEnd();
+}
+
+static void drawRandPentahedrals()
+{
+    const float scalex = 0.05;
+    const float scaley = 0.05;
+    const float scalez = 0.20;
+    int i;
+
+    for ( i = 0; i < NUM_PENTS; i++ )
+    {
+        glPushMatrix(); {
+            glTranslatef(g_rand[i][0], -0.25, g_rand[i][1]);
+            glRotatef(90.0, 1.0, 0.0, 0.0);
+            glScalef(scalex, scaley, scalez);
+            drawPentahedral();
+        } glPopMatrix();
+    }
+}
+
+static void drawRoute()
+{
+    float sx1 = -1.0;
+    float sx2 =  1.0;
+    float sy1 = -0.5;
+    float sy2 = sy1;
+    float sz1 =  3.0;
+    float sz2 = sz1;
+
+    // float ex1 = sx1;
+    // float ex2 = ex1;
+    float ey1 = sy1;
+    float ey2 = ey1;
+    float ez1 = -70.0;
+    float ez2 = ez1;
+
+    float cenX = 0.2;
+    float curX;
+
+    for ( curX = sx1; curX <= sx2; curX += cenX )
+    {
+        glBegin(GL_LINE); {
+            glVertex3f(curX, sy2, sz2);
+            glVertex3f(curX, ey2, ez2);
+        } glEnd();
+    }
+}
+
+static int doCheckCollision()
+{
+
 }
 
 // Our Rendering Is Done Here
@@ -68,20 +146,43 @@ void render(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glLoadIdentity();
-    glTranslatef(0.0f,0.0f,-2.0f);
+    glTranslatef(0.0f, 0.0f, -0.0f);
 
     glPushMatrix(); {
-        glDisable(GL_TEXTURE_2D);
+        glTranslatef(0.0, 0.0, g_deltaZ);
+        glColor4f(0.0, 1.0, 0.0, 1.0);
+        drawRoute();
+    } glPopMatrix();
+
+    glPushMatrix(); {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-        glColor4f(1.0, 0.0, 1.0, 1.0);
+        glColor4f(0.0, 0.0, 1.0, 1.0);
         glScalef(0.99, 0.99, 0.99);
         glRectf(-0.01, -0.01, 0.01, 0.01);
         glRectf(-1.0, -1.0, 1.0, 1.0);
     } glPopMatrix();
 
+    glPushMatrix(); {
+        glPolygonMode(GL_FRONT, GL_LINE);
+        glPolygonMode(GL_BACK,  GL_LINE);
+        glTranslatef(0.0, 0.0, g_deltaZ);
+        glColor4f(1.0, 0.0, 1.0, 1.0);
+        drawRandPentahedrals();
+    } glPopMatrix();
+
+    glPushMatrix(); {
+        glTranslatef(g_handX, -0.3, -2.0);
+        // glTranslatef(0.0, 0.0, g_deltaZ);
+        glScalef(0.2, 0.2, 0.2);
+        glColor4f(1.0, 1.0, 1.0, 1.0);
+        drawCube();
+    } glPopMatrix();
+
     glutSwapBuffers();
 
-    usleep(1000 * 200);
+    g_deltaZ += g_cenZ;
+    if ( g_deltaZ > 30.0 )
+        g_deltaZ = 0.0;
 }
 
 // Our Reshaping Handler (Required Even In Fullscreen-Only Modes)
@@ -121,6 +222,22 @@ void keyboard(unsigned char key, int x, int y)
         case ' ':
             glutPostRedisplay();
             break;
+        case 'f':
+            g_accX *= 1.125;
+            printf("NAL g_accX=%f\n", g_accX);
+            break;
+        default:
+            break;
+    }
+}
+
+void keyboardUp(unsigned char key, int x, int y)
+{
+    switch (key) {
+        case 'f':
+            //g_accX = 1.0;
+            printf("NAL UP g_accX=%f\n", g_accX);
+            break;
         default:
             break;
     }
@@ -136,6 +253,23 @@ void special_keys(int a_keys, int x, int y)
                 else glutReshapeWindow(SCREEN_W, SCREEN_H);
             }
             break;
+        case GLUT_KEY_UP:
+            g_deltaZ += g_cenZ;
+            printf("g_deltaZ = %f\n", g_deltaZ);
+            break;
+        case GLUT_KEY_DOWN:
+            g_deltaZ -= g_cenZ;
+            printf("g_deltaZ = %f\n", g_deltaZ);
+            break;
+        case GLUT_KEY_LEFT:
+            g_handX -= g_cenX * g_accX;
+            printf("g_handX = %f\n", g_handX);
+            break;
+        case GLUT_KEY_RIGHT:
+            g_handX += g_cenX * g_accX;
+            printf("g_handX = %f\n", g_handX);
+            break;
+
         default:
             break;
     }
@@ -161,6 +295,7 @@ int main(int argc, char** argv)
     glutDisplayFunc(render);
     glutReshapeFunc(reshape);
     glutKeyboardFunc(keyboard);
+    glutKeyboardUpFunc(keyboardUp);
     glutSpecialFunc(special_keys);
     glutIdleFunc(render);
     glutMainLoop();
