@@ -36,7 +36,7 @@
 
 int     g_gamemode;
 int     g_fullscreen;
-float   g_rand[NUM_PENTS][2];
+float   g_rand[NUM_PENTS][3];
 float   g_deltaZ;
 float   g_cenZ = 0.009;
 float   g_handX;
@@ -52,15 +52,14 @@ void resetRandPos()
     {
         g_rand[i][0] = (-100.0 + rand() % 200) / 100.0;
         g_rand[i][1] = -rand() % 140;
-        printf("%f, %f\n", g_rand[i][0], g_rand[i][1]);
+        g_rand[i][2] = 1.0;
+        // printf("NAL %f, %f\n", g_rand[i][0], g_rand[i][1]);
     }
 }
 
 
 int  init(void)
 {
-    int i;
-
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
@@ -143,11 +142,6 @@ static void drawRoute()
     }
 }
 
-static int doCheckCollision()
-{
-
-}
-
 // Our Rendering Is Done Here
 void render(void)
 {
@@ -178,15 +172,31 @@ void render(void)
         drawRandPentahedrals();
     } glPopMatrix();
 
+    const float sCubeZ = -2.0;
     glPushMatrix(); {
-        glTranslatef(g_handX, -0.3, -2.0);
+        glTranslatef(g_handX, -0.3, sCubeZ);
         // glTranslatef(0.0, 0.0, g_deltaZ);
-        glScalef(0.2, 0.2, 0.2);
+        glScalef(0.125, 0.125, 0.125);
         glColor4f(1.0, 1.0, 1.0, 1.0);
         drawCube();
     } glPopMatrix();
 
     glutSwapBuffers();
+
+    int i;
+    const float sAccuracy = 0.1100;
+    for ( i = 0; i < NUM_PENTS; i++ )
+    {
+        if ( g_rand[i][2] > 0.0 &&
+                fabs(g_rand[i][1] + g_deltaZ - sCubeZ) < sAccuracy && 
+                fabs(g_rand[i][0] - g_handX) < sAccuracy )
+        {
+            g_rand[i][2] = -1.0;
+            printf("NAL rand[%d]=(%f,%f), handX=%f, deltaZ=%f\n", i,
+                    g_rand[i][0], g_rand[i][1], g_handX, g_deltaZ);
+            break;
+        }
+    }
 
     g_deltaZ += g_cenZ;
     if ( g_deltaZ > 70.0 )
@@ -274,11 +284,11 @@ void special_keys(int a_keys, int x, int y)
             break;
         case GLUT_KEY_LEFT:
             g_handX -= g_cenX * g_accX;
-            printf("g_handX = %f\n", g_handX);
+            // printf("g_handX = %f\n", g_handX);
             break;
         case GLUT_KEY_RIGHT:
             g_handX += g_cenX * g_accX;
-            printf("g_handX = %f\n", g_handX);
+            // printf("g_handX = %f\n", g_handX);
             break;
 
         default:
