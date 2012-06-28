@@ -1,8 +1,11 @@
+# -*- coding: utf-8 -*-
+
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
 import datetime
 
+# 使用 GAccount
 class MainPage(webapp.RequestHandler):
     def get(self):
         time = datetime.datetime.now()
