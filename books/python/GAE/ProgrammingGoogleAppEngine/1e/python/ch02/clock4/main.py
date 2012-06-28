@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 from google.appengine.api import users
 from google.appengine.ext import webapp
 from google.appengine.ext.webapp.util import run_wsgi_app
@@ -25,22 +27,23 @@ class MainPage(webapp.RequestHandler):
                         size="4" value="%d" />
                     <input type="submit" value="Set" />
                 </form>
-            ''' % userprefs.tz_offset
+                ''' % userprefs.tz_offset
+            # 按该用户的偏好设置(其所设置的时区)计算出时间
             time += datetime.timedelta(0, 0, 0, 0, 0, userprefs.tz_offset)
             
         self.response.headers['Content-Type'] = 'text/html'
         self.response.out.write('''
-        <html>
-            <head>
-                <title>The Time Is...</title>
-            </head>
-            <body>
-            %s
-                <p>The time is: %s</p>
-            %s
-            </body>
-        </html>
-        ''' % (navbar, str(time), tz_form))
+            <html>
+                <head>
+                    <title>The Time Is...</title>
+                </head>
+                <body>
+                %s
+                    <p>The time is: %s</p>
+                %s
+                </body>
+            </html>
+            ''' % (navbar, str(time), tz_form))
 
 application = webapp.WSGIApplication([('/', MainPage)],
                                      debug=True)

@@ -3,6 +3,8 @@ version: 1
 runtime: python
 api_version: 1
 
+
+# 映射URL: /prefs
 handlers:
 - url: /prefs
   script: prefs.py
