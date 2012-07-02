@@ -6,12 +6,14 @@ import datetime
 
 
 def current_datetime(request):
-    now = datetime.datetime.now()
-    return render_to_response('current_datetime.html', {'current_date': now})
+    #now = datetime.datetime.now()
+    #return render_to_response('current_datetime.html', {'current_date': now})
+    current_date = datetime.datetime.now()
+    return render_to_response('current_datetime.html', locals())
 
 
 def hours_ahead(request, offset):
-    offset = int(offset)
-    dt = datetime.datetime.now() + datetime.timedelta(hours=offset)
-    return render_to_response('hours_ahead.html', {'off_set': offset, 'current_date': dt})
+    off_set = int(offset)
+    dt_date = datetime.datetime.now() + datetime.timedelta(hours=off_set)
+    return render_to_response('hours_ahead.html', locals())
 
