@@ -493,6 +493,133 @@ def delete(self):
 
 
 
+5. 和数据库打交道: 数据建模
+
+5.1 数据库配置
+
+象前面章节提到的 TEMPLATE_DIRS 一样, 数据库配置也是在Django的配置文件里, 缺省
+是 settings.py . 编辑打开这个文件并查找数据库配置:
+
+DATABASE_ENGINE = ''
+DATABASE_NAME = ''
+DATABASE_USER = ''
+DATABASE_PASSWORD = ''
+DATABASE_HOST = ''
+DATABASE_PORT = ''
+
+
+DATABASE_ENGINE     告诉Django使用哪个数据库引擎. 如果你在 Django 中使用数据库,
+DATABASE_ENGINE     必须是 Table 5-1 中所列出的值.
+    表 5-1. 数据库引擎设置
+    ...
+DATABASE_NAME       将数据库名称告知 Django . 如果使用 SQLite, 请对数据库文件
+                    指定完整的文件系统路径. (例如 '/home/django/mydata.db' ).
+DATABASE_USER       告诉 Django 用哪个用户连接数据库. 如果用SQLite, 空白即可.
+DATABASE_PASSWORD   告诉Django连接用户的密码. SQLite 用空密码即可.
+DATABASE_HOST       告诉 Django 连接哪一台主机的数据库服务器. 如果数据库与
+                    Django 安装于同一台计算机(即本机), 可将此项保留空白. 使用
+                    SQLite , 也可保留空白.
+                    此处的 MySQL 是一个特例. 如果使用的是 MySQL 且该项设置值由
+                    斜杠( '/' )开头, MySQL 将通过 Unix socket 来连接指定的套接
+                    字, 例如:
+                        DATABASE_HOST = '/var/run/mysql'
+                    如果用 MySQL 而该项设置的值 不是 以正斜线开始的, 系统将假
+                    定该项值是主机名.
+DATABASE_PORT       告诉 Django 连接数据库时使用哪个端口. 如果用SQLite, 空白即
+                    可. 其他情况下, 如果将该项设置保留空白, 底层数据库适配器将
+                    会连接所给定数据库服务器的缺省端口.
+
+
+// 启动交互界面
+$ python manage.py shell
+
+// 输入下面这些命令来测试你的数据库配置:
+>>> from django.db import connection
+>>> cursor = connection.cursor()
+
+
+5.2 你的第一个应用程序
+
+须创建一个新的app.
+
+// 转到 mysite 项目目录, 执行下面的命令来创建一个新app叫做books:
+$ python manage.py startapp books
+
+
+// 第一步是用Python代码来描述它们. 打开 models.py 并输入下面的内容:
+from django.db import models
+
+class Publisher(models.Model):
+    name = models.CharField(maxlength=30)
+    address = models.CharField(maxlength=50)
+    city = models.CharField(maxlength=60)
+    state_province = models.CharField(maxlength=30)
+    country = models.CharField(maxlength=50)
+    website = models.URLField()
+
+class Author(models.Model):
+    salutation = models.CharField(maxlength=10)
+    first_name = models.CharField(maxlength=30)
+    last_name = models.CharField(maxlength=40)
+    email = models.EmailField()
+    headshot = models.ImageField(upload_to='/tmp')
+
+class Book(models.Model):
+    title = models.CharField(maxlength=100)
+    authors = models.ManyToManyField(Author)
+    publisher = models.ForeignKey(Publisher)
+    publication_date = models.DateField()
+
+
+编辑 settings.py 文件,  找到 INSTALLED_APPS 设置.  INSTALLED_APPS 告诉 Django
+项目哪些 app 处于激活状态.
+
+
+// 现在我们可以创建数据库表了. 首先, 用下面的命令对校验模型的有效性:
+$ python manage.py validate
+
+
+// 模型确认没问题了, 运行下面的命令来生成 CREATE TABLE 语句:
+$ python manage.py sqlall books
+
+
+// 执行这些SQL语句. 运行 syncdb 命令:
+$ python manage.py syncdb
+
+
+注意:   syncdb 并 不能 同步模型的修改到数据库. 如果你修改了模型, 然后你想更新 数
+        据库, 是帮不了你的.
+
+
+// 登录进数据库服务器看看刚才Django创建的数据表.  Django带有一个命令行工具,
+$ python manage.py dbshell
+
+
+5.3 基本数据访问
+
+运行 python manage.py shell 并输入下面的内容试试看：
+
+$ python manage.py shell
+
+>>> from books.models import Publisher
+>>> p1 = Publisher(name='Addison-Wesley', address='75 Arlington Street',
+...  city='Boston', state_province='MA', country='U.S.A.',
+...  website='http://www.apress.com/')
+>>> p1.save()
+>>> p2 = Publisher(name="O'Reilly", address='10 Fawcett St.',
+...  city='Cambridge', state_province='MA', country='U.S.A.',
+...  website='http://www.oreilly.com/')
+>>> p2.save()
+>>> publisher_list = Publisher.objects.all()
+>>> publisher_list
+[<Publisher: Publisher object>, <Publisher: Publisher object>]
+
+
+
+
+
+
+
 
 
 
