@@ -1,10 +1,13 @@
 from django.conf.urls.defaults import *
+from mysite.views import current_datetime
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
+    (r'^time/$', current_datetime),
+
     # Example:
     (r'^blog/', include('mysite.blog.urls')),
 
