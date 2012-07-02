@@ -597,7 +597,7 @@ $ python manage.py dbshell
 
 5.3 基本数据访问
 
-运行 python manage.py shell 并输入下面的内容试试看：
+运行 python manage.py shell 并输入下面的内容试试看:
 
 $ python manage.py shell
 
@@ -624,6 +624,87 @@ $ python manage.py shell
 >>> publisher_list = Publisher.objects.all()
 >>> publisher_list
 [<Publisher: Addison-Wesley>, <Publisher: O'Reilly>]
+
+
+5.4 插入和更新数据
+
+// 先使用一些关键参数创建对象实例, 如下:
+>>> p = Publisher(name='Apress',
+...  address='2755 Telegraph Ave.',
+...  city='Berkeley',
+...  state_province='CA',
+...  country='U.S.A.',
+...  website='http://www.apress.com/')
+...
+>>> p.save()
+
+>>> p.id
+ 52  // this will differ based on your own data
+
+// 接下来再调用 save() 将不会创建新的记录, 而只是修改记录内容(也就是 执行
+// UPDATE SQL语句, 而不是 INSERT 语句):
+>>> p.name = 'Apress Publishing'
+>>> p.save()
+
+
+5.5 选择对象
+
+// 查找所有数据的方法:
+>>> Publisher.objects.all()
+[<Publisher: Addison-Wesley>, <Publisher: O'Reilly>, <Publisher: Apress Publishing>]
+
+
+5.6 数据过滤
+
+// 如果想要获得数据的一个子集, 我们可以使用 filter() 方法:
+>>> Publisher.objects.filter(name="Apress Publishing")
+[<Publisher: Apress Publishing>]
+
+    filter() 根据关键字参数来转换成 WHERE SQL语句. 前面这个例子 相当于这样:
+    SELECT
+        id, name, address, city, state_province, country, website
+    FROM book_publisher
+    WHERE name = 'Apress Publishing';
+
+
+// 可以传递多个参数到 filter() 来缩小选取范围:
+>>> Publisher.objects.filter(country="U.S.A.", state_province="CA")
+[<Publisher: Apress Publishing>]
+
+>>> Publisher.objects.filter(name__contains="press")
+[<Publisher: Apress Publishing>]
+
+
+5.7 获取单个对象
+
+// 有时你只想获取单个对象, 这个时候使用 get() 方法:
+>>> Publisher.objects.get(name="Apress Publishing")
+<Publisher: Apress Publishing>
+
+这样, 就返回了单个对象, 而不是列表(更准确的说, QuerySet).
+所以, 如果结果是多个对象, 会导致抛出异常, 如果查询没有返回结果也会抛出异常.
+
+
+5.8 数据排序
+
+用 order_by() 来 排列返回的数据:
+
+>>> Publisher.objects.order_by("name")
+[<Publisher: Apress Publishing>, <Publisher: Addison-Wesley>, <Publisher: O'Reilly>]
+
+>>> Publisher.objects.order_by("state_provice", "address")
+[<Publisher: Apress Publishing>, <Publisher: O'Reilly>, <Publisher: Addison-Wesley>]
+
+// 我们还可以指定逆向排序, 在前面加一个减号 - 前缀:
+>>> Publisher.objects.order_by("-name")
+[<Publisher: O'Reilly>, <Publisher: Apress Publishing>, <Publisher: Addison-Wesley>]
+
+
+
+
+
+
+
 
 
 
