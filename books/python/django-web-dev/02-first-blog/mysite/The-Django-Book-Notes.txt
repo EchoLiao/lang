@@ -1,0 +1,533 @@
+
+
+4.  Django模板系统
+
+4.1 启动交互界面
+
+// 启动交互界面
+$ python manage.py shell
+
+
+// 下面是一些基本操作:
+>>> from django.template import Template
+>>> t = Template("My name is {{ name }}.")
+>>> print t
+
+
+// 如果你的模板语法有错误, 那么在调用 Template() 时就会抛出
+// TemplateSyntaxError 异常:
+>>> from django.template import Template
+>>> t = Template('{% notatag %} ')
+Traceback (most recent call last):
+File "<stdin>", line 1, in ?
+...
+django.template.TemplateSyntaxError: Invalid block tag: 'notatag'
+
+
+4.2 调用 Template 对象的 render() 方法并传递context来填充模板:
+
+// 调用 Template 对象的 render() 方法并传递context来填充模板:
+>>> from django.template import Context, Template
+>>> t = Template("My name is {{ name }}.")
+>>> c = Context({"name": "Stephane"})
+>>> t.render(c)
+'My name is Stephane.'
+
+
+4.3 字典和Contexts
+
+// 字典和Contexts
+// 下面是编写模板并渲染的示例:
+>>> from django.template import Template, Context
+>>> raw_template = """<p>Dear {{ person_name }},</p>
+... <p>Thanks for ordering {{ product }} from {{ company }}. It's scheduled
+... to ship on {{ ship_date|date:"F j, Y" }}.</p>
+... {% if ordered_warranty %}
+... <p>Your warranty information will be included in the packaging.</p>
+... {% endif %}
+... <p>Sincerely,<br />{{ company }}</p>"""
+>>> t = Template(raw_template)
+>>> import datetime
+>>> c = Context({'person_name': 'John Smith',
+... 'product': 'Super Lawn Mower',
+... 'company': 'Outdoor Equipment',
+... 'ship_date': datetime.date(2009, 4, 2),
+... 'ordered_warranty': True})
+>>> t.render(c)
+"<p>Dear John Smith,</p>\n\n<p>Thanks for ordering Super Lawn Mower from
+Outdoor Equipment. It's scheduled \nto ship on April 2, 2009.</p>\n\n\n
+<p>Your warranty information will be included in the packaging.</p>\n\n\n
+<p>Sincerely,<br />Outdoor Equipment</p>"
+>>> print t.render(c)
+
+
+# 这就是使用Django模板系统的基本规则: 写模板, 创建 Template 对象, 创建
+# Context ,  调用 render() 方法.
+
+
+4.4 同一模板 多个上下文
+
+// 同一模板, 多个上下文
+// 一旦有了 模板 对象, 你就可以通过它渲染多个背景(context), 例如:
+>>> from django.template import Template, Context
+>>> t = Template('Hello, {{ name }}')
+>>> print t.render(Context({'name': 'John'}))
+Hello, John
+>>> print t.render(Context({'name': 'Julie'}))
+Hello, Julie
+>>> print t.render(Context({'name': 'Pat'}))
+Hello, Pat
+
+
+// 无论何时像这样使用同一模板源渲染多个背景, 只创建 一次 模板 对象, 然后对它多
+// 次调用 render() 将会更加高效.
+# Bad
+>>> for name in ('John', 'Julie', 'Pat'):
+>>>     t = Template('Hello, {{ name }}')
+>>>     print t.render(Context({'name': name}))
+>>>
+# Good
+>>> t = Template('Hello, {{ name }}')
+>>> for name in ('John', 'Julie', 'Pat'):
+>>>     print t.render(Context({'name': name}))
+>>>
+
+
+4.5 使用句点可以访问字典的键值 属性 索引 对象的方法
+
+// 在 Django 模板中遍历复杂数据结构的关键是句点字符 (.). 使用句点可以访问字典
+// 的键值,属性,索引和对象的方法.
+>>> from django.template import Template, Context
+>>> person = {'name': 'Sally', 'age': '43'}
+>>> t = Template('{{ person.name }} is {{ person.age }} years old.')
+>>> c = Context({'person': person})
+>>> t.render(c)
+'Sally is 43 years old.'
+
+
+// 同样, 也可以通过句点来访问对象的属性. 比方说,  Python 的 datetime.date 对象
+// 有 year , month 和 day 几个属性,
+>>> from django.template import Template, Context
+>>> import datetime
+>>> d = datetime.date(1993, 5, 2)
+>>> d.year
+1993
+>>> d.month
+5
+>>> d.day
+2
+>>> t = Template('The month is {{ date.month }} and the year is {{ date.year }}.')
+>>> c = Context({'date': d})
+>>> t.render(c)
+'The month is 5 and the year is 1993.'
+
+
+4.5.1 用了一个自定义类:
+
+// 下例使用了一个自定义类:
+>>> from django.template import Template, Context
+>>> class Person(object):
+...     def __init__(self, first_name, last_name):
+...         self.first_name, self.last_name = first_name, last_name
+...
+>>> t = Template('Hello, {{ person.first_name }} {{ person.last_name }}.')
+>>> c = Context({'person': Person('John', 'Smith')})
+>>> t.render(c)
+'Hello, John Smith.'
+
+
+4.5.2 句点还用于调用对象的方法
+
+// 句点还用于调用对象的方法. 例如, 每个 Python 字符串都有 upper() 和 isdigit()
+// 方法, 你在模板中可以使用同样的句点语法来调用它们:
+// 注意: 你不能在方法调用中使用圆括号. 而且也无法给该方法传递参数; 你只能调用
+//       不需参数的方法.
+>>> from django.template import Template, Context
+>>> t = Template('{{ var }} -- {{ var.upper }} -- {{ var.isdigit }}')
+>>> t.render(Context({'var': 'hello'}))
+'hello -- HELLO -- False'
+>>> t.render(Context({'var': '123'}))
+'123 -- 123 -- True'
+
+
+4.5.3 句点也可用于访问列表索引
+
+// 句点也可用于访问列表索引, 例如:
+// 注意: 不允许使用负数列表索引. 像 {{ items.-1 }} 这样的模板变量将会引发
+//       TemplateSyntaxError 异常.
+>>> from django.template import Template, Context
+>>> t = Template('Item 2 is {{ items.2 }}.')
+>>> c = Context({'items': ['apples', 'bananas', 'carrots']})
+>>> t.render(c)
+'Item 2 is carrots.'
+
+
+4.5.4 句点查找规则可概括为:
+
+# 句点查找规则可概括为: 当模板系统在变量名中遇到点时,按照以下顺序尝试进行查找:
+#   字典类型查找 (比如 foo["bar"] )
+#   属性查找 (比如 foo.bar )
+#   方法调用 (比如 foo.bar() )
+#   列表类型索引查找 (比如 foo[bar] )
+# 系统使用所找到的第一个有效类型. 这是一种短路逻辑.
+
+
+4.5.5 句点查找可以多级深度嵌套
+
+// 句点查找可以多级深度嵌套
+>>> from django.template import Template, Context
+>>> person = {'name': 'Sally', 'age': '43'}
+>>> t = Template('{{ person.name.upper }} is {{ person.age }} years old.')
+>>> c = Context({'person': person})
+>>> t.render(c)
+'SALLY is 43 years old.'
+
+4.5.6 方法调用行为
+
+# 方法调用行为
+// 方法调用比其他类型的查找略为复杂一点. 以下是一些注意事项:
+// 在方法查找过程中, 如果某方法抛出一个异常, 除非该异常有一个
+// silent_variable_failure属性并且值为 True , 否则的话它将被传播. 如果该异常
+// 确有属性 silent_variable_failure , 那么(所查找)变量将被渲染为空字符串,
+// 例如:
+>>> t = Template("My name is {{ person.first_name }}.")
+>>> class PersonClass3:
+...     def first_name(self):
+...         raise AssertionError, "foo"
+...
+>>> p = PersonClass3()
+>>> t.render(Context({"person": p}))
+Traceback (most recent call last):
+...
+AssertionError: foo
+
+>>> class SilentAssertionError(AssertionError):
+...     silent_variable_failure = True
+...
+>>> class PersonClass4:
+...     def first_name(self):
+...         raise SilentAssertionError
+...
+>>> p = PersonClass4()
+>>> t.render(Context({"person": p}))
+"My name is ."
+
+
+// 不允许模板包含像 {{account.delete}} 这样的方法调用, 必须设置该方法的
+// alters_data 函数属性:
+// 模板系统不会执行任何以该方式进行标记的方法. 也就是说, 如果模板包含了
+// {{account.delete}} ,该标签不会调用 delete() 方法. 它只会安静地失败(并不会
+// 引发异常).
+def delete(self):
+    # Delete the account
+    delete.alters_data = True
+
+
+4.5.7 如何处理无效变量
+
+# 如何处理无效变量
+// 默认情况下, 如果一个变量不存在, 模板系统会把它展示为空字符串, 不做任何事情
+// 地表示失败, 例如:
+>>> from django.template import Template, Context
+>>> t = Template('Your name is {{ name }}.')
+>>> t.render(Context())
+'Your name is .'
+>>> t.render(Context({'var': 'hello'}))
+'Your name is .'
+>>> t.render(Context({'NAME': 'hello'}))
+'Your name is .'
+>>> t.render(Context({'Name': 'hello'}))
+'Your name is .'
+
+
+4.6 玩一玩上下文(context)对象
+
+// 多数时间, 你可以通过传递一个完全填充(full populated)的字典给 Context() 来初
+// 始化 上下文(Context) .  但是初始化以后, 你也可以从``上下文(Context)`` 对象
+// 添加或者删除条目, 使用标准的Python字典语法(syntax):
+>>> from django.template import Context
+>>> c = Context({"foo": "bar"})
+>>> c['foo']
+'bar'
+>>> del c['foo']
+>>> c['foo']
+''
+>>> c['newvariable'] = 'hello'
+>>> c['newvariable']
+'hello'
+
+
+4.7 标签
+
+4.7.1 if/else
+
+// {% else %} 标签是可选的:
+{% if today_is_weekend %}
+    <p>Welcome to the weekend!</p>
+{% else %}
+    <p>Get back to work.</p>
+{% endif %}
+
+4.7.1.1 Python 的"真值"
+
+在python中空的列表 ( [] ), tuple( () ), 字典( {} ), 字符串( '' ), 零( 0 ), 还
+有 None 对象, 在逻辑判断中都为假, 其他的情况都为真.
+
+4.7.1.2 {% if %} 标签接受 and or 或者 not 关键字来对多个变量做判断 或者对变量取反( not )
+
+{% if athlete_list and coach_list %}
+    Both athletes and coaches are available.
+{% endif %}
+{% if not athlete_list %}
+    There are no athletes.
+{% endif %}
+{% if athlete_list or coach_list %}
+    There are some athletes or some coaches.
+{% endif %}
+{% if not athlete_list or coach_list %}
+    There are no athletes or there are some coaches. (OK, so
+    writing English translations of Boolean logic sounds
+    stupid; it's not our fault.)
+{% endif %}
+{% if athlete_list and not coach_list %}
+    There are some athletes and absolutely no coaches.
+{% endif %}
+
+
+4.7.1.3 {% if %} 标签不允许在同一个标签中同时使用 and 和 or
+
+{% if %} 标签不允许在同一个标签中同时使用 and 和 or , 因为逻辑上可能模糊的, 例如, 如下示例是错误的:
+{% if athlete_list and coach_list or cheerleader_list %} // 错误!!!!!
+
+
+// 系统不支持用圆括号来组合比较操作. 如果你发现需要组合操作, 可以使用嵌套的
+// {% if %} 标签
+{% if athlete_list %}
+    {% if coach_list or cheerleader_list %}
+        We have athletes, and either coaches or cheerleaders!
+    {% endif %}
+{% endif %}
+
+// 多次使用同一个逻辑操作符是没有问题的
+{% if athlete_list or coach_list or parent_list or teacher_list %}
+
+// 并没有 {% elif %} 标签, 请使用嵌套的 {% if %} 标签来达成同样的效果:
+{% if athlete_list %}
+    <p>Here are the athletes: {{ athlete_list }}.</p>
+{% else %}
+    <p>No athletes are available.</p>
+    {% if coach_list %}
+        <p>Here are the coaches: {{ coach_list }}.</p>
+    {% endif %}
+{% endif %}
+
+
+4.7.2 for
+
+// 例如, 给定一个运动员列表 athlete_list 变量, 我们可以使用下面的代码来显示这个列表:
+<ul>
+{% for athlete in athlete_list %}
+    <li>{{ athlete.name }}</li>
+{% endfor %}
+</ul>
+
+// 给标签增加一个 reversed 使得该列表被反向迭代:
+{% for athlete in athlete_list reversed %}
+    ...
+{% endfor %}
+
+// 可以嵌套使用 {% for %} 标签:
+{% for country in countries %}
+    <h1>{{ country.name }}</h1>
+    <ul>
+        {% for city in country.city_list %}
+            <li>{{ city }}</li>
+        {% endfor %}
+    </ul>
+{% endfor %}
+
+4.7.2.1 {% for %} 标签在循环中的一个特殊的 forloop 模板变量
+
+{% for %} 标签在循环中设置了一个特殊的 forloop 模板变量. 这个变量能提供一些当
+前循环进展的信息:
+
+1)  forloop.counter 总是一个表示当前循环的执行次数的整数计数器.
+    这个计数器是从1开始的, 所以在第一次循环时 forloop.counter 将会被设置为1.
+
+// 例子如下:
+{% for item in todo_list %}
+    <p>{{ forloop.counter }}: {{ item }}</p>
+{% endfor %}
+
+2)  forloop.counter0 类似于 forloop.counter , 但是它是从0计数的.
+    第一次执行循环时这个变量会被设置为0.
+
+3)  forloop.revcounter 是表示循环中剩余项的整型变量.
+    在循环初次执行时 forloop.revcounter 将被设置为序列中项的总数. 最后一次循环
+    执行中, 这个变量将被置1.
+
+4)  forloop.revcounter0 类似于 forloop.revcounter , 但它以0做为结束索引.
+    在第一次执行循环时, 该变量会被置为序列的项的个数减1. 在最后一次迭代时, 该
+    变量为0.
+
+5)  forloop.first 是一个布尔值. 在第一次执行循环时该变量为True, 在下面的情形中
+    这个变量是很有用的.
+
+{% for object in objects %}
+    {% if forloop.first %}<li class="first">{% else %}<li>{% endif %}
+    {{ object }}
+    </li>
+{% endfor %}
+
+6)  forloop.last 是一个布尔值; 在最后一次执行循环时被置为True.
+    一个常见的用法是在一系列的链接之间放置管道符(|)
+
+{% for link in links %}{{ link }}{% if not forloop.last %} | {% endif %}{% endfor %}
+    The above template code might output something like this::
+    Link1 | Link2 | Link3 | Link4
+
+7)  forloop.parentloop 是一个指向当前循环的上一级循环的 forloop 对象的引用(在嵌
+    套循环的情况下).
+
+// 例子在此:
+{% for country in countries %}
+    <table>
+    {% for city in country.city_list %}
+        <tr>
+        <td>Country #{{ forloop.parentloop.counter }}</td>
+        <td>City #{{ forloop.counter }}</td>
+        <td>{{ city }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endfor %}
+
+
+4.7.3 ifequal/ifnotequal
+
+{% ifequal %} 标签比较两个值, 当他们相同时, 显示在 {% ifequal %} 和
+{% endifequal %} 之中所有的值.
+
+// 下面的例子比较两个模板变量 user 和 currentuser :
+{% ifequal user currentuser %}
+    <h1>Welcome!</h1>
+{% endifequal %}
+
+// 参数可以是硬编码的字符串, 随便用单引号或这双引号引起来, 所以下列代码都是正
+// 确的:
+{% ifequal section 'sitenews' %}
+    <h1>Site News</h1>
+{% endifequal %}
+{% ifequal section "community" %}
+    <h1>Community</h1>
+{% endifequal %}
+
+// 和 {% if %} 类似,  {% ifequal %} 支持可选的 {% else%} 标签:
+{% ifequal section 'sitenews' %}
+    <h1>Site News</h1>
+{% else %}
+    <h1>No News Here</h1>
+{% endifequal %}
+
+// 注意:    只有模板变量, 字符串, 整数和小数可以作为 {% ifequal %} 标签的参数.
+//          其他的一些类型, 例如Python的字典类型,列表类型,布尔类型, 不能用在
+//          {% ifequal %} 中.
+//这些是正确的例子:
+{% ifequal variable 1 %}
+{% ifequal variable 1.23 %}
+{% ifequal variable 'foo' %}
+{% ifequal variable "foo" %}
+
+
+4.8 注释
+
+象HTML和其他的语言例如python一样, Django模板系统也允许注释.  注释使用 {# #} :
+
+注释不能跨多行.
+
+{# This is a comment #}
+
+
+4.9 过滤器
+
+1)  使用 | 来应用过滤器.
+
+2)  过滤器可以被 串联 ,就是说一个过滤器的输出可以被输入到下一个过滤器.
+
+// 这里有一个常用的 需求, 先转义文本到HTML, 再转换每行到 <p> 标签:
+{{ my_text|escape|linebreaks }}
+
+3)  过滤器参数总是使用双引号标识.
+
+// 这个将显示变量 bio 的前30个词.
+{{ bio|truncatewords:"30" }}
+
+
+4.9.1 一些最重要的过滤器
+
+1)  addslashes : 添加反斜杠到任何反斜杠,单引号或者双引号前面.
+    这在处理包含JavaScript的文本时是非常有用的.
+
+2)  date : 按指定的格式字符串参数格式化 date 或者 datetime 对象.
+
+// 范例:
+{{ pub_date|date:"F j, Y" }}
+
+3)  escape : 转义 &符号, 引号, <, > 符号.
+
+这在确保用户提交的数据是有效的XML或XHTML时是非常有用的.
+
+具体上,  escape 做下面这些转换:
+    转换 & 到 &amp;
+    转换 < 到 &lt;
+    转换 > 到 &gt;
+    转换 " (双引号) 到 &quot;
+    转换 ' (单引号) 到 &#39;
+
+4)  length : 返回变量的长度.
+
+你可以对列表或者字符串, 或者任何知道怎么测定长度的Python 对象使用这个方法(也就
+是说, 有 __len__() 方法的对象).
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+a
