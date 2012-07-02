@@ -1,1 +1,7 @@
-<html><body>In {{ off_set }} hour(s), it will be {{ dt_date }}.</body></html>
+{% extends "base.html" %}
+
+{% block title %}Future time{% endblock %}
+
+{% block content %}
+<p>In {{ off_set }} hour(s), it will be {{ dt_date }}.</p>
+{% endblock %}
