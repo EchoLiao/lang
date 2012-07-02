@@ -1,5 +1,7 @@
+# -*- coding: utf-8 -*-
+
 from django.conf.urls.defaults import *
-from mysite.views import current_datetime
+from mysite.views import current_datetime, hours_ahead
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -7,6 +9,9 @@ admin.autodiscover()
 
 urlpatterns = patterns('',
     (r'^time/$', current_datetime),
+    # 圆括号"()"表示其将作为一个参数(offset)来传递.
+    # def hours_ahead(request, offset):
+    (r'^time/plus/(\d{1,2})/$', hours_ahead),
 
     # Example:
     (r'^blog/', include('mysite.blog.urls')),
