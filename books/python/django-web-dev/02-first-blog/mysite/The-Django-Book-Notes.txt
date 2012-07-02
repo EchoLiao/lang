@@ -605,16 +605,25 @@ $ python manage.py shell
 >>> p1 = Publisher(name='Addison-Wesley', address='75 Arlington Street',
 ...  city='Boston', state_province='MA', country='U.S.A.',
 ...  website='http://www.apress.com/')
+...
 >>> p1.save()
 >>> p2 = Publisher(name="O'Reilly", address='10 Fawcett St.',
 ...  city='Cambridge', state_province='MA', country='U.S.A.',
 ...  website='http://www.oreilly.com/')
+...
 >>> p2.save()
 >>> publisher_list = Publisher.objects.all()
 >>> publisher_list
 [<Publisher: Publisher object>, <Publisher: Publisher object>]
 
 
+添加模块的字符串表现
+
+
+>>> from books.models import Publisher
+>>> publisher_list = Publisher.objects.all()
+>>> publisher_list
+[<Publisher: Addison-Wesley>, <Publisher: O'Reilly>]
 
 
 
