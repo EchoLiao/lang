@@ -1,5 +1,22 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
 
+<style type="text/css">
+    ul.errorlist {
+        margin: 0;
+        padding: 0;
+    }
+    .errorlist li {
+        background-color: red;
+        color: white;
+        display: block;
+        font-size: 10px;
+        margin: 0 0 3px;
+        padding: 4px 5px;
+    }
+</style>
+
+
+
 {# 每一个字段部件(<input type="text">, <select>, <textarea>, 或者类似)都可以通过 #}
 {# 访问{{form.字段名}}进行单独的渲染. 任何跟字段相关的错误都可以通过 #}
 {# {{form.fieldname.errors}}访问. 我们可以同这些form的变量来为我们的表单构造一个 #}
