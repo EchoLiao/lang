@@ -30,6 +30,10 @@ def search(request):
 
 
 def contact(request):
-    form = ContactForm()
+    if request.method == 'POST':    # 处理用户提交动作
+        # ContactForm会自动校验用户输入.
+        form = ContactForm(request.POST)
+    else:
+        form = ContactForm()
     return render_to_response('books/contact.html', {'form': form})
 

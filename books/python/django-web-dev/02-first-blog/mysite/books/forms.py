@@ -11,6 +11,7 @@ TOPIC_CHOICES = (
 
 
 class ContactForm(forms.Form):
+    # ChoiceField等会自动校验用户输入.
     topic = forms.ChoiceField(choices=TOPIC_CHOICES)
     # 使用多行文本框: <textarea>
     message = forms.CharField(widget=forms.Textarea())
