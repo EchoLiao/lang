@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 
 from django.db import models
+from django.contrib import admin
 
 
 # 我们来假定下面的这些概念,字段和关系: 
@@ -21,7 +22,6 @@ class Publisher(models.Model):
     state_province = models.CharField(max_length=30)
     country = models.CharField(max_length=50)
     website = models.URLField()
-    num_pages = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.name
@@ -48,7 +48,25 @@ class Book(models.Model):
     authors = models.ManyToManyField(Author)
     publisher = models.ForeignKey(Publisher)
     publication_date = models.DateField()
+    num_pages = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.title
+
+
+
+class BookAdmin(admin.ModelAdmin):
+    list_display = ('title', 'publisher', 'publication_date', 'num_pages',)
+    # list_filter 选项在右边创建一个过滤条. 我们允许它按日期过滤(它可以让你只
+    # 显示过去一周, 一个月等等出版的书籍)和按出版商过滤. 
+    list_filter = ('publisher', 'publication_date')
+    ordering = ('-publication_date',)
+    search_fields = ('title',)
+
+
+
+
+admin.site.register(Publisher)
+admin.site.register(Author)
+admin.site.register(Book, BookAdmin)
 

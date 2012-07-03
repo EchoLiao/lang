@@ -41,7 +41,7 @@ USE_I18N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = '/tmp'
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -64,9 +64,9 @@ TEMPLATE_LOADERS = (
 )
 
 MIDDLEWARE_CLASSES = (
-    #'django.middleware.common.CommonMiddleware',
-    #'django.contrib.sessions.middleware.SessionMiddleware',
-    #'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
 )
 
 # root url configure
@@ -80,10 +80,10 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
-    #'django.contrib.auth',
+    'django.contrib.auth',
     'django.contrib.admin',
-    #'django.contrib.contenttypes',
-    #'django.contrib.sessions',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
     #'django.contrib.sites',
     'mysite.blog',
     'mysite.books',
