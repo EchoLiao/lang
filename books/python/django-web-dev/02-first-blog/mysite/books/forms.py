@@ -18,3 +18,14 @@ class ContactForm(forms.Form):
             initial="Replace with your feedback")
     sender = forms.EmailField(required=False)
 
+    # 自定义校验规则:
+    # 方法名书写规则: clean_属性名
+    # 这个新的方法将在默认的字段校验器之后被调用(在本例中, 就是CharField的校验器)
+    def clean_message(self):
+        message = self.data.get('message', '')
+        num_words = len(message.split()) # 以空白字符分隔
+        if num_words < 4:
+            raise forms.ValidationError("Not enough words!")
+        return message
+
+
