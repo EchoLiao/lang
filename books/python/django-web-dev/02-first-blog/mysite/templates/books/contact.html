@@ -1,23 +1,9 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
 
-
-<!--  修改form的显示的最快捷的方式是使用CSS. 错误的列表可以做一些视觉上的增强, <ul>  -->
-<!--  标签的class属性为了这个目的.                                                   -->
-<style type="text/css">
-    ul.errorlist {
-        margin: 0;
-        padding: 0;
-    }
-    .errorlist li {
-        background-color: red;
-        color: white;
-        display: block;
-        font-size: 10px;
-        margin: 0 0 3px;
-        padding: 4px 5px;
-    }
-</style>
-
+{# 每一个字段部件(<input type="text">, <select>, <textarea>, 或者类似)都可以通过 #}
+{# 访问{{form.字段名}}进行单独的渲染. 任何跟字段相关的错误都可以通过 #}
+{# {{form.fieldname.errors}}访问. 我们可以同这些form的变量来为我们的表单构造一个 #}
+{# 自定义的模板: #}
 
 <html lang="en">
     <head>
@@ -25,12 +11,22 @@
     </head>
 
     <body>
-        <h1>Contact us</h1>
         <form action="." method="POST">
-            <table>
-                {# as_table是form的一个方法, 它把form渲染成一系列的表格行 #}
-                {{ form.as_table }}
-            </table>
+            <div class="fieldWrapper">
+                {{ form.topic.errors }}
+                <label for="id_topic">Kind of feedback:</label>
+                {{ form.topic }}
+            </div>
+            <div class="fieldWrapper">
+                {{ form.message.errors }}
+                <label for="id_message">Your message:</label>
+                {{ form.message }}
+            </div>
+            <div class="fieldWrapper">
+                {{ form.sender.errors }}
+                <label for="id_sender">Your email (optional):</label>
+                {{ form.sender }}
+            </div>
             <p><input type="submit" value="Submit"></p>
         </form>
     </body>
