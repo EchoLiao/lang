@@ -1,5 +1,24 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN">
 
+
+<!--  修改form的显示的最快捷的方式是使用CSS. 错误的列表可以做一些视觉上的增强, <ul>  -->
+<!--  标签的class属性为了这个目的.                                                   -->
+<style type="text/css">
+    ul.errorlist {
+        margin: 0;
+        padding: 0;
+    }
+    .errorlist li {
+        background-color: red;
+        color: white;
+        display: block;
+        font-size: 10px;
+        margin: 0 0 3px;
+        padding: 4px 5px;
+    }
+</style>
+
+
 <html lang="en">
     <head>
         <title>Contact us</title>
@@ -9,7 +28,7 @@
         <h1>Contact us</h1>
         <form action="." method="POST">
             <table>
-                {# as_table是form的一个方法，它把form渲染成一系列的表格行 #}
+                {# as_table是form的一个方法, 它把form渲染成一系列的表格行 #}
                 {{ form.as_table }}
             </table>
             <p><input type="submit" value="Submit"></p>
