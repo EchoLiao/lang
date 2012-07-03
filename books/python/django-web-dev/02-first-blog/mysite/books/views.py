@@ -4,6 +4,8 @@ from django.db.models import Q
 from django.shortcuts import render_to_response
 from models import Book
 from forms import ContactForm
+from django.core.mail import send_mail
+from django.http import HttpResponseRedirect
 
 
 def search(request):
@@ -33,7 +35,22 @@ def contact(request):
     if request.method == 'POST':    # 处理用户提交动作
         # ContactForm会自动校验用户输入.
         form = ContactForm(request.POST)
+        if form.is_valid():
+            topic = form.data['topic']
+            message = form.data['message']
+            sender = form.data.get('sender', 'noreply@example.com')
+            send_mail('Feedback from your site, topic: %s' % topic,
+                    message, sender,
+                    ['805899693@qq.com']
+                    )
+            # 在一个POST请求过后, 如果用户选择刷新页面, 这个请求就重复提交了. 
+            # 在POST之后重定向页面是一个有用的模式, 可以避免这样的情况出现.
+            return HttpResponseRedirect('/contact/thanks/')
     else:
         form = ContactForm(initial={'sender': 'user@example.com'})
     return render_to_response('books/contact.html', {'form': form})
 
+
+
+def thanks(request):
+    return render_to_response('books/thanks.html')
