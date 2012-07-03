@@ -34,9 +34,15 @@
                 <label for="id_topic">Kind of feedback:</label>
                 {{ form.topic }}
             </div>
-            <div class="fieldWrapper">
-                {{ form.message.errors }}
-                <label for="id_message">Your message:</label>
+            {# 可以把 form.message.errors 当作一个布尔值或者当它是list在上面做迭代 #}
+            <div class="fieldWrapper{% if form.message.errors %}errors{% endif %}">
+                {% if form.message.errors %}
+                <ol>
+                    {% for error in form.message.errors %}
+                    <li><strong>{{ error|escape }}</strong></li>
+                    {% endfor %}
+                </ol>
+                {% endif %}
                 {{ form.message }}
             </div>
             <div class="fieldWrapper">
