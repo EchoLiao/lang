@@ -3,6 +3,7 @@
 from django.db.models import Q
 from django.shortcuts import render_to_response
 from models import Book
+from forms import ContactForm
 
 
 def search(request):
@@ -25,4 +26,10 @@ def search(request):
         "results": results,
         "query": query
         })
+
+
+
+def contact(request):
+    form = ContactForm()
+    return render_to_response('books/contact.html', {'form': form})
 

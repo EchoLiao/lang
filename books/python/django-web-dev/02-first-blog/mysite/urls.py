@@ -14,6 +14,7 @@ urlpatterns = patterns('',
     (r'^time/plus/(\d{1,2})/$', hours_ahead),
 
     (r'^search/$','mysite.books.views.search'),
+    (r'^contact/$', 'mysite.books.views.contact'),
 
     # Example:
     (r'^blog/', include('mysite.blog.urls')),
