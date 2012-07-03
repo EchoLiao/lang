@@ -34,6 +34,6 @@ def contact(request):
         # ContactForm会自动校验用户输入.
         form = ContactForm(request.POST)
     else:
-        form = ContactForm()
+        form = ContactForm(initial={'sender': 'user@example.com'})
     return render_to_response('books/contact.html', {'form': form})
 
