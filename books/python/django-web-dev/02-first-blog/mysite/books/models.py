@@ -21,6 +21,7 @@ class Publisher(models.Model):
     state_province = models.CharField(max_length=30)
     country = models.CharField(max_length=50)
     website = models.URLField()
+    num_pages = models.IntegerField(blank=True, null=True)
 
     def __str__(self):
         return self.name

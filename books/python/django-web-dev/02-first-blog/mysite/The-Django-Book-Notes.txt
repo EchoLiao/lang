@@ -699,13 +699,90 @@ $ python manage.py shell
 >>> Publisher.objects.order_by("-name")
 [<Publisher: O'Reilly>, <Publisher: Apress Publishing>, <Publisher: Addison-Wesley>]
 
+// 同时做 过滤和排序
+>>> Publisher.objects.filter(country="U.S.A.").order_by("-name")
+[<Publisher: O'Reilly>, <Publisher: Apress Publishing>, <Publisher: Addison-Wesley>]
+
+// 只显示第一个. 你可以 这样做:
+>>> Publisher.objects.all()[0]
+<Publisher: Addison-Wesley>
 
 
+5.9 删除对象
+
+// 要删除对象, 只需简单的调用对象的 delete() 方法:
+>>> p = Publisher.objects.get(name="Addison-Wesley")
+>>> p.delete()
+>>> Publisher.objects.all()
+[<Publisher: Apress Publishing>, <Publisher: O'Reilly>]
+
+// 还可以批量删除对象, 通过对查询的结果调用 delete() 方法:
+>>> publishers = Publisher.objects.all()
+>>> publishers.delete()
+>>> Publisher.objects.all()
+[]
+
+注意:
+    删除是 不可恢复 的, 所以要小心操作!事实上, 应该尽量避免删除对象, 除非你 确
+    实需要删除它. 数据库的数据恢复的功能通常不太好, 而从备份数据恢复是很痛苦的
 
 
+5.10 修改数据库表结构
+
+当我们在这一章的前面介绍 syncdb 命令的时候, 我们强调 syncdb 仅仅创建数据库中不
+存在的表, 而不会同步模型的修改或者删除到数据库. 如果你添加或者修改了模型的一个
+字段, 或者删除一个模型, 你必须手动改变你的数据库.
 
 
+当我们处理表结构的修改时, 要时刻想着 Django 的数据库层是如何工作的:
+    1)  如果模型中包含一个在数据库中并不存在的字段, Django会大声抱怨的. 这样当你第
+        一次调用Django的数据库API来查询给定的表时就会出错(也就是说, 它会在执行的时
+        候出错, 而不是编译的时候)
+    2)  Django并不关心数据库表中是否存在没有在模型中定义的列
+    3)  Django并不关心数据库中是否包含没有模型描述的表
 
+
+5.10.1 添加字段
+
+首先, 在开发环境中执行下面的步骤(也就是说, 不是在发布服务器上):
+    1. 把这个字段添加到你的模型中.
+    2. 运行 manage.py sqlall [yourapp] 会看到模型的新的 CREATE TABLE 语句.  注
+        意新的字段的列定义.
+    3. 启动您的数据库交互shell(也就是 psql 或 mysql ,  或者您也可以使用
+        manage.py dbshell ).  执行一个ALTER TABLE 语句, 添加您的新列.
+    4. (可选)用 manage.py shell 启动Python交互式shell, 并通过引入模型并选择表
+        验证新的字段已被正确添加(比如, MyModel.objects.all()[:5] ).
+
+然后在发布服务器上执行下面的步骤:
+    1. 启动你的数据库的交互式命令行;
+    2. 执行 ALTER TABLE 语句, 也就是在开发环境中第3步执行的语句;
+    3. 添加字段到你的模型中. 如果你在开发时使用了版本控制系统并checkin了你的修
+        改, 现在可以更新 代码到发布服务器上了(例如, 使用Subverison的话就是 svn
+        update ).
+    4. 重启Web服务器以使代码修改生效.
+
+
+5.10.2 删除字段
+
+从你的模型里删除这个字段, 并重启Web服务器.
+
+使用如下面所示的命令, 从你的数据库中删掉该列:
+ALTER TABLE books_book DROP COLUMN num_pages;
+
+
+5.10.3 删除 Many-to-Many 字段
+
+删除掉你的模型里的 ManyToManyField , 并且重启Web服务器.
+
+使用如下面所示的命令, 删除掉你数据库里的many-to-many表:
+DROP TABLE books_books_publishers;
+
+5.10.4 删除模型
+
+将此模型从你的 models.py 文件里删除, 并且重启Web服务器.
+
+使用如下的命令, 将此表从你的数据库中删除:
+DROP TABLE books_book;
 
 
 
