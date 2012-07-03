@@ -785,6 +785,10 @@ DROP TABLE books_books_publishers;
 DROP TABLE books_book;
 
 
+6. Django管理站点
+
+
+7. 表单处理
 
 
 

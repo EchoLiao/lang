@@ -13,6 +13,8 @@ urlpatterns = patterns('',
     # def hours_ahead(request, offset):
     (r'^time/plus/(\d{1,2})/$', hours_ahead),
 
+    (r'^search/$','mysite.books.views.search'),
+
     # Example:
     (r'^blog/', include('mysite.blog.urls')),
 
