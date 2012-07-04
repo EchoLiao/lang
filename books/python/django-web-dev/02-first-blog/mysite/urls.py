@@ -12,6 +12,7 @@ admin.autodiscover()
 
 publisher_info = {
         "queryset" : Publisher.objects.all(),
+        "template_object_name" : "publisher",
         }
 
 urlpatterns = patterns('',

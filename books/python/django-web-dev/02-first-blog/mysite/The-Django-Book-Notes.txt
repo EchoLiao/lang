@@ -1326,6 +1326,22 @@ urlpatterns = patterns('',
 {% endblock %}
 
 
+9.3 扩展通用视图
+
+9.3.1 制作友好的模板Context
+
+我们可以很容易的象下面这样修改 template_object_name 参数的名称:
+
+// 比如: 用象 publisher_list 这样的变量名会更好一点, 这样变量的值看起来就很清
+// 楚了.
+publisher_info = {
+    "queryset" : Publisher.objects.all(),
+    "template_object_name" : "publisher", # NEW, 最终构造出 "publisher_list"
+}
+urlpatterns = patterns('',
+        (r'^publishers/$', list_detail.object_list, publisher_info),
+        )
+
 
 
 
