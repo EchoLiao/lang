@@ -12,7 +12,7 @@ admin.autodiscover()
 
 
 publisher_info = {
-        "queryset" : Publisher.objects.all(),
+        "queryset" : Publisher.objects.all().order_by("-name"),
         "template_object_name" : "publisher",
         "extra_context" : {"book_list" : Book.objects.all},
         }

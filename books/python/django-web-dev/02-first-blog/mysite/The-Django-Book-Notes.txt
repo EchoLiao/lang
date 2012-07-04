@@ -1370,6 +1370,8 @@ Solution:
     变量. 任何可以调用的对象(例如一个函数)在传递给 extra_context 后都会在每次
     视图渲染前执行(而不是只执行一次).
 
+    // 注意 Book.objects.all 后面没有括号; 这表示这是一个函数的引用, 并没有 真
+    // 调用它(通用视图将会在渲染时调用它).
     publisher_info = {
         "queryset" : Publisher.objects.all(),
         "template_object_name" : "publisher",
@@ -1379,7 +1381,18 @@ Solution:
     }
 
 
+9.3.3 显示对象的子集(queryset)
 
+大多数通用视图有一个 queryset 参数, 这个参数告诉视图要显示对象的集合.
+
+// 举一个简单的例子, 我们打算对书籍列表按出版日期排序, 最近的排在最前:
+book_info = {
+    "queryset" : Book.objects.all().order_by("-publication_date"),
+}
+urlpatterns = patterns('',
+        (r'^publishers/$', list_detail.object_list, publisher_info),
+        (r'^books/$', list_detail.object_list, book_info),
+        )
 
 
 
