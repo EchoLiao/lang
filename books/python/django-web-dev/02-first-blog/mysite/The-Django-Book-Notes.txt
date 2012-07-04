@@ -749,6 +749,8 @@ $ python manage.py shell
 
 5.10.1 添加字段
 
+ALTER TABLE books_book ADD COLUMN num_pages integer;
+
 首先, 在开发环境中执行下面的步骤(也就是说, 不是在发布服务器上):
     1. 把这个字段添加到你的模型中.
     2. 运行 manage.py sqlall [yourapp] 会看到模型的新的 CREATE TABLE 语句.  注
@@ -1425,6 +1427,37 @@ def books_by_publisher(request, name):
             )
 
 
+9.4 处理额外工作
+
+我们再来看看最后一个常用模式: 在调用通用视图前后做些额外工作.
+
+想象一下我们在 Author 对象里有一个 last_accessed 字段, 我们用这个字段来更正
+对author的最近访问时间. 当然通用视图 object_detail 并不能处理 这个问题, 我
+们可以很容易的写一个自定义的视图来更新这个字段.
+
+// 首先, 我们需要在URL配置里设置指向到新的自定义视图:
+from mysite.books.views import author_detail
+urlpatterns = patterns('',
+        (r'^authors/(?P<author_id>\d+)/$', author_detail),
+        )
+
+// 接下来写包装函数:
+import datetime
+from mysite.books.models import Author
+from django.views.generic import list_detail
+from django.shortcuts import get_object_or_404
+def author_detail(request, author_id):
+    author = get_object_or_404(Author, pk=author_id)
+    author.last_accessed = datetime.datetime.now() # NOTE
+    author.save() # NOTE
+    return list_detail.object_detail(
+            request,
+            queryset = Author.objects.all(),
+            object_id = author_id,
+            )
+
+// books/author_detail.html
+...
 
 
 

@@ -9,6 +9,9 @@ from django.http import HttpResponseRedirect
 from forms import PublisherForm
 from django.http import Http404
 from django.views.generic import list_detail
+from mysite.books.models import Author
+from django.shortcuts import get_object_or_404
+import datetime
 
 
 def search(request):
@@ -88,3 +91,16 @@ def books_by_publisher(request, name):
             extra_context = {"publisher" : publisher}
             )
 
+
+
+def author_detail(request, author_id):
+    author = get_object_or_404(Author, pk=author_id)
+    author.last_accessed = datetime.datetime.now() # NOTE
+    author.save() # NOTE
+    return list_detail.object_detail(
+            request,
+            queryset = Author.objects.all(),
+            # object_detail 默认转到 "App名字/Model名字_detail.html"
+            #template_name = "books/author_detail.html",
+            object_id = author_id,
+            )

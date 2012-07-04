@@ -29,6 +29,7 @@ urlpatterns = patterns('',
     (r'^add_publisher/$', 'mysite.books.views.add_publisher'),
     (r'^publishers/$', list_detail.object_list, publisher_info),
     (r'^books/(\w+)/$', 'mysite.books.views.books_by_publisher'),
+    (r'^authors/(?P<author_id>\d+)/$', 'mysite.books.views.author_detail'),
 
     # Example:
     (r'^blog/', include('mysite.blog.urls')),
