@@ -1343,6 +1343,19 @@ urlpatterns = patterns('',
         )
 
 
+9.3.2 添加额外的Context
+
+所有的通用视图都有一个额外的可选参数 extra_context . 这个参数是一个字典数据类
+型, 包含要添加到模板的context中的额外的对象.
+
+// 这样就把一个 {{ book_list }} 变量放到模板的context中. 这个方法可以用来传递
+// 任意数据 到通用视图模板中去, 非常方便.
+publisher_info = {
+    "queryset" : Publisher.objects.all(),
+    "template_object_name" : "publisher",
+    "extra_context" : {"book_list" : Book.objects.all()}
+}
+
 
 
 

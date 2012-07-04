@@ -4,6 +4,7 @@ from django.conf.urls.defaults import *
 from mysite.views import current_datetime, hours_ahead
 from django.views.generic import list_detail
 from mysite.books.models import Publisher
+from mysite.books.models import Book
 
 # Uncomment the next two lines to enable the admin:
 from django.contrib import admin
@@ -13,6 +14,7 @@ admin.autodiscover()
 publisher_info = {
         "queryset" : Publisher.objects.all(),
         "template_object_name" : "publisher",
+        "extra_context" : {"book_list" : Book.objects.all()},
         }
 
 urlpatterns = patterns('',

@@ -4,8 +4,13 @@
 <h2>Publishers</h2>
 <ul>
     {% for publisher in publisher_list %}
-    <li>{{ publisher.name }}</li>
+        <li>{{ publisher.name }}</li>
     {% endfor %}
+    <p>
+    {% for book in book_list %}
+        {{ book.title }}
+    {% endfor %}
+    </p>
 </ul>
 {% endblock %}
 
