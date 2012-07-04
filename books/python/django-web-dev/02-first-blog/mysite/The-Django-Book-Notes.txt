@@ -1698,6 +1698,39 @@ django.template.loaders.eggs.load_template_source :
     它.
 
 
+10.4 创建一个模板库
+
+创建一个模板库分两步走:
+
+第一, 决定哪个Django应用应当拥有这个模板库. 如果你通过 manage.py startapp 创建了一
+个应用, 你可以把它放在那里, 或者你可以为模板库单独创建一个应用.
+无论你采用何种方式, 请确保把你的应用添加到 INSTALLED_APPS 中.
+
+第二, 在适当的Django应用包里创建一个 templatetags 目录. 这个目录应当和 models.py ,
+views.py 等处于同一层次.  在 templatetags 中创建两个空文件: 一个 __init__.py (
+告诉Python这是 一个包含了Python代码的包)和一个用来存放你自定义的标签/过滤器定
+义的文件.
+
+// 如果你的自定义标签/过滤器在一个叫作 poll_extras.py 的文件中, 你需要在模板中
+// 写入如下内容:
+{% load poll_extras %}
+
+{% load %} 标签检查 INSTALLED_APPS 中的设置, 仅允许加载已安装的Django应用程序
+中的模板库.
+
+
+要成为有效的标签库, 模块必须包含一个模块级的变量:  register , 这是一个
+template.Library 的实例.
+
+
+
+
+
+
+
+
+
+
 
 
 
