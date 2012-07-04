@@ -797,27 +797,533 @@ DROP TABLE books_book;
 
 
 
+8. 高级视图和URL配置
+
+8.1 流线型化(Streamlining)函数导入
+
+8.1.1 使用"对象"指定视图函数
+
+from django.conf.urls.defaults import *
+from mysite.views import current_datetime, hours_ahead, hours_behind, now_in_chicago, now_in_london
+
+urlpatterns = patterns('',
+        (r'^now/$', current_datetime),
+        (r'^now/plus(\d{1,2})hours/$', hours_ahead),
+        (r'^now/minus(\d{1,2})hours/$', hours_behind),
+        (r'^now/in_chicago/$', now_in_chicago),
+        (r'^now/in_london/$', now_in_london),
+        )
+
+
+8.1.2 使用"对象"指定视图函数(改进)
+
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+        (r'^now/$', views.current_datetime),
+        (r'^now/plus(\d{1,2})hours/$', views.hours_ahead),
+        (r'^now/minus(\d{1,2})hours/$', views.hours_behind),
+        (r'^now/in_chicago/$', views.now_in_chicago),
+        (r'^now/in_london/$', views.now_in_london),
+        )
 
 
 
+8.1.3 使用"字符串"指定视图函数
+
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('',
+        (r'^now/$', 'mysite.views.current_datetime'),
+        (r'^now/plus(\d{1,2})hours/$', 'mysite.views.hours_ahead'),
+        (r'^now/minus(\d{1,2})hours/$', 'mysite.views.hours_behind'),
+        (r'^now/in_chicago/$', 'mysite.views.now_in_chicago'),
+        (r'^now/in_london/$', 'mysite.views.now_in_london'),
+        )
+
+
+8.1.4 使用"字符串"指定视图函数(提取出一个公共视图前缀)
+
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('mysite.views',
+        (r'^now/$', 'current_datetime'),
+        (r'^now/plus(\d{1,2})hours/$', 'hours_ahead'),
+        (r'^now/minus(\d{1,2})hours/$', 'hours_behind'),
+        (r'^now/in_chicago/$', 'now_in_chicago'),
+        (r'^now/in_london/$', 'now_in_london'),
+        )
+
+
+8.1.5 使用"字符串"指定视图函数(使用多个视图前缀)
+
+from django.conf.urls.defaults import *
+
+urlpatterns = patterns('mysite.views',
+        (r'^/?$', 'archive_index'),
+        (r'^(\d{4})/([a-z]{3})/$', 'archive_month'),
+        )
+urlpatterns += patterns('weblog.views',
+        (r'^tag/(\w+)/$', 'tag'),
+        )
+
+
+8.1.6 调试模式中的特例
+
+// URL /debuginfo/ 将只有在你的 DEBUG 配置项设为 True 时才有效.
+
+from django.conf.urls.defaults import*
+from django.conf import settings
+
+urlpatterns = patterns('',
+        (r'^$', 'mysite.views.homepage'),
+        (r'^(\d{4})/([a-z]{3})/$', 'mysite.views.archive_month'),
+        )
+if settings.DEBUG:
+    urlpatterns += patterns('',
+            (r'^debuginfo$', 'mysite.views.debug'),
+            )
+
+8.2 使用命名组
+
+1)  关键字参数 对比 位置参数
+
+例如, 考虑这个简单的函数:
+
+// 例如, 考虑这个简单的函数:
+def sell(item, price, quantity):
+    print "Selling %s unit(s) of %s at %s" % (quantity, item, price)
+
+// 为了使用位置参数来调用它, 你要按照在函数定义中的顺序来指定参数.
+sell('Socks', '$2.50', 6)
+
+// 为了使用关键字参数来调用它, 你要指定参数名和值. 下面的语句是等价的:
+sell(item='Socks', price='$2.50', quantity=6)
+sell(item='Socks', quantity=6, price='$2.50')
+sell(price='$2.50', item='Socks', quantity=6)
+
+// 最后, 你可以混合关键字和位置参数, 只要所有的位置参数列在关键字参数之前. 下
+// 面的语句与前面的例子是等价:
+sell('Socks', '$2.50', quantity=6)
+sell('Socks', price='$2.50', quantity=6)
+sell('Socks', quantity=6, price='$2.50')
+
+
+2)
+在 Python 正则表达式中, 命名的正则表达式组的语法是 (?P<name>pattern) , 这里
+name 是组的名字, 而 pattern 是匹配的某个模式.
+
+// 下面是一个使用无名组的 URLconf 的例子:
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+        (r'^articles/(\d{4})/$', views.year_archive),
+        (r'^articles/(\d{4})/(\d{2})/$', views.month_archive),
+        )
+
+
+// 下面是相同的 URLconf, 使用命名组进行了重写:
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+        (r'^articles/(?P<year>\d{4})/$', views.year_archive),
+        (r'^articles/(?P<year>\d{4})/(?P<month>\d{2})/$', views.month_archive),
+        )
+
+
+// 例如, 如果不带命名组, 请求 /articles/2006/03/ 将会 等于这样的函数调用:
+month_archive(request, '2006', '03')
+// 而带命名组, 同样的请求就是这样的函数调用:
+month_archive(request, year='2006', month='03')
+
+
+8.3 传递额外的参数到视图函数中
+
+一个URLconf里面的每一个模式可以包含第三个数据: 一个传到视图函数中的关键字参数
+的字典.
+
+// 这个例子中, URLconf指定了 template_name . 而视图函数则会把它处理成另一个参数而已.
+
+# urls.py
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+        (r'^foo/$', views.foobar_view, {'template_name': 'template1.html'}),
+        (r'^bar/$', views.foobar_view, {'template_name': 'template2.html'}),
+        )
+
+
+# views.py
+from django.shortcuts import render_to_response
+from mysite.models import MyModel
+
+def foobar_view(request, template_name):
+    m_list = MyModel.objects.filter(is_new=True)
+    return render_to_response(template_name, {'m_list': m_list})
+
+
+8.4 伪造捕捉到的URLconf值
+
+// 例如, 你可能有一个显示某一个特定日子的某些数据的应用, URL类似这样的:
+/mydata/jan/01/
+/mydata/jan/02/
+/mydata/jan/03/
+# ...
+/mydata/dec/30/
+/mydata/dec/31/
+
+// 这太简单了, 你可以在一个URLconf中捕捉这些值, 像这样(使用命名组的方法):
+urlpatterns = patterns('',
+        (r'^mydata/(?P<month>\w{3})/(?P<day>\d\d)/$', views.my_view),
+        )
+
+// 然后视图函数的原型看起来会是:
+def my_view(request, month, day):
+    # ....
+
+
+问题在于当你想为添加一个使用 my_view 视图的URL但它没有包含一个month 和/或者 一
+个 day .
+
+
+// 比如你可能会想增加这样一个URL,  /mydata/birthday/ ,  这个URL等价于
+// /mydata/jan/06/ . 这时你可以这样利用额外URLconf参数:
+urlpatterns = patterns('',
+        (r'^mydata/birthday/$', views.my_view, {'month': 'jan', 'day': '06'}),
+        (r'^mydata/(?P<month>\w{3})/(?P<day>\d\d)/$', views.my_view),
+        )
 
 
 
+8.5 创建一个通用视图
+
+可以创作高抽象的视图. 更具体地说, 比如这个视图显示一系列的 Event 对象, 那个视
+图显示一系列的BlogEntry 对象, 并意识到它们都是一个用来显示一系列对象的视图的特
+例, 而对象的类型其实就是一个变量.
+
+
+// 以这段代码作为例子:
+
+# urls.py
+from django.conf.urls.defaults import *
+from mysite import views
+
+urlpatterns = patterns('',
+        (r'^events/$', views.event_list),
+        (r'^blog/entries/$', views.entry_list),
+        )
+
+
+# views.py
+from django.shortcuts import render_to_response
+from mysite.models import Event, BlogEntry
+
+def event_list(request):
+    obj_list = Event.objects.all()
+    return render_to_response('mysite/event_list.html', {'event_list': obj_list})
+
+def entry_list(request):
+    obj_list = BlogEntry.objects.all()
+    return render_to_response('mysite/blogentry_list.html', {'entry_list': obj_list})
+
+
+// 这两个视图做的事情实质上是一样的: 显示一系列的对象. 让我们把它们显示的对象
+// 的类型抽象出来:
+
+
+# urls.py
+from django.conf.urls.defaults import *
+from mysite import models, views
+
+urlpatterns = patterns('',
+        (r'^events/$', views.object_list, {'model': models.Event}),
+        (r'^blog/entries/$', views.object_list, {'model': models.BlogEntry}),
+        )
+
+# views.py
+from django.shortcuts import render_to_response
+
+def object_list(request, model):
+    obj_list = model.objects.all()
+    template_name = 'mysite/%s_list.html' % model.__name__.lower()
+    return render_to_response(template_name, {'object_list': obj_list})
+
+
+就这样小小的改动, 我们突然发现我们有了一个可复用的, 模型无关的视图!从现在开始,
+当我们需要一个视图来显示一系列的对象时, 我们可以简简单单的重用这一个
+object_list 视图, 而无须另外写视图代码了.
+
+
+8.6 提供视图配置选项
+
+如果你发布一个Django的应用, 你的用户可能会希望配置上能有些自由度. 这种情况下,
+为你认为用户可能希望改变的配置选项添加一些钩子到你的视图中会试一个很好的主意.
+你可以用额外URLconf参数实现.
+
+// 一个应用中比较常见的可供配置代码是模板名字:
+def my_view(request, template_name):
+    var = do_something()
+    return render_to_response(template_name, {'var': var})
+
+
+8.7 捕捉值和额外参数之间的优先级
+
+当冲突出现的时候, 额外URLconf参数优先于捕捉值. 也就是说, 如果URLconf捕捉到的一
+个命名组变量和一个额外URLconf参数包含的变量同名时, 额外URLconf参数的值会被使用
+
+
+// 例如, 下面这个URLconf:
+// 这里, 正则表达式和额外字典都包含了一个 id . 硬编码的(额外字典的) id 将优先
+// 使用. 就是说任何请求(比如, /mydata/2/ 或者 /mydata/432432/ )都会作 id 设置
+// 为 3 对待, 不管URL里面能捕捉到什么样的值.
+from django.conf.urls.defaults import *
+urlpatterns = patterns('',
+        (r'^mydata/(?P<id>\d+)/$', views.my_view, {'id': 3}),
+        )
 
 
 
+8.8 使用缺省视图参数
+
+另外一个方便的特性是你可以给一个视图指定默认的参数. 这样, 当没有给这个参数赋值
+的时候将会使用默认的值.
+
+// 请看例子:
+
+# urls.py
+from django.conf.urls.defaults import *
+urlpatterns = patterns('',
+        (r'^blog/$', views.page),
+        (r'^blog/page(?P<num>\d+)/$', views.page),
+        )
+
+# views.py
+def page(request, num="1"):
+    # Output the appropriate page of blog entries, according to num.
+    # ...
 
 
 
+8.9 特殊情况下的视图
+
+有时你有一个模式来处理在你的URLconf中的一系列URL, 但是有时候需要特别处理其中的
+某个URL. 在这种情况下, 要使用将URLconf中把特殊情况放在首位的线性处理方式.
+
+// 例如, Django的admin站点中添加一个对象页面是如下配置的:
+urlpatterns = patterns('',
+        ('^([^/]+)/([^/]+)/add/$', 'django.contrib.admin.views.main.add_stage'),
+        )
+
+这将匹配像 /myblog/entries/add/ 和 /auth/groups/add/ 这样的URL . 然而, 对于用
+户对象的添加页面(/auth/user/add/ )是个特殊情况, 因为它不会显示所有的表单域, 它
+显示两个密码域等等.
+
+// 利用URLconf从顶向下的解析顺序这个特点:
+urlpatterns = patterns('',
+        ('^auth/user/add/$', 'django.contrib.admin.views.auth.user_add_stage'),
+        ('^([^/]+)/([^/]+)/add/$', 'django.contrib.admin.views.main.add_stage'),
+        )
+
+
+8.10 从URL中捕获文本
+
+每个被捕获的参数将被作为纯Python字符串来发送, 而不管正则表达式中的格式.
+
+// 举个例子, 在这行URLConf中:
+// 尽管 \d{4} 将只匹配整数的字符串, 但是参数 year 是作为字符串传至
+// views.year_archive() 的, 而不是整型.
+(r'^articles/(?P<year>\d{4})/$', views.year_archive),
+
+
+8.11 决定URLconf搜索的东西
+
+当一个请求进来时, Django试着将请求的URL作为一个普通Python字符串进行URLconf模式
+匹配(而不是作为一个Unicode字符串). 这并不包括 GET 或 POST 参数或域名. 它也不包
+括第一个斜杠, 因为每个URL必定有一个斜杠.
+
+// 例如:
+在向 http://www.example.com/myapp/ 的请求中,        Django将试着去匹配 myapp/ .
+在向http://www.example.com/myapp/?page=3 的请求中,  Django同样会去匹配 myapp/ .
+
+在解析URLconf时, 请求方法(例如,  POST ,  GET ,  HEAD )并 不会 被考虑. 换而言之
+, 对于相同的URL的所有请求方法将被导向到相同的函数中. 因此根据请求方法来处理分
+支是视图函数的责任.
+
+
+8.12 包含其他URLconf
+
+# mysite.urls
+from django.conf.urls.defaults import *
+urlpatterns = patterns('',
+        (r'^weblog/', include('mysite.blog.urls')),
+        (r'^photos/', include('mysite.photos.urls')),
+        (r'^about/$', 'mysite.views.about'),
+        )
+
+# mysite.blog.urls
+from django.conf.urls.defaults import *
+urlpatterns = patterns('',
+        (r'^(\d\d\d\d)/$', 'mysite.blog.views.year_detail'),
+        (r'^(\d\d\d\d)/(\d\d)/$', 'mysite.blog.views.month_detail'),
+        )
+
+
+通过这两个URLconf, 下面是一些处理请求的例子:
+    /weblog/2007/ : 在第一个URLconf中, 模式 r'^weblog/' 被匹配. 因为它是一个
+                    include() , Django将截掉所有匹配的文本, 在这里是'weblog/'.
+                    URL剩余的部分是 2007/ ,  将在 mysite.blog.urls 这个URLconf
+                    的第一行中被匹配到.
+    /weblog//2007/ :  在第一个URLconf中, 模式 r'^weblog/' 被匹配. 因为它是一个
+                      include() , Django将截掉所有匹配的文本, 在这里是
+                      'weblog/' . URL剩余的部分是/2007/ (开头有一个斜杠), 将不
+                      会匹配mysite.blog.urls 中的任何URLconf.
 
 
 
+8.12.1 捕获的参数如何和include()协同工作
+
+一个被包含的URLconf接收任何来自parent URLconfs的被捕获的参数.
+
+// 比如:
+// 在这个例子中, 被捕获的 username 变量将传递给被包含的 URLconf, 进而传递给那
+// 个URLconf中的 每一个 视图函数.
+
+# root urls.py
+from django.conf.urls.defaults import *
+urlpatterns = patterns('',
+        (r'^(?P<username>\w+)/blog/', include('foo.urls.blog')),
+        )
+
+# foo/urls/blog.py
+from django.conf.urls.defaults import *
+urlpatterns = patterns('',
+        (r'^$', 'foo.views.blog_index'),
+        (r'^archive/$', 'foo.views.blog_archive'),
+        )
+
+
+8.12.2 额外的URLconf参数如何和include()协同工作
+
+相似的, 你可以传递额外的URLconf选项到 include() , 就像你可以通过字典传递额外的
+URLconf选项到普通的视图. 当你这样做的时候, 被包含URLconf的 每一 行都会收到那些
+额外的参数.
+
+// 比如, 下面的两个URLconf在功能上是相等的.
+
+// 第一个:
+
+# urls.py
+from django.conf.urls.defaults import *
+urlpatterns = patterns('',
+        (r'^blog/', include('inner'), {'blogid': 3}),
+        )
+
+# inner.py
+from django.conf.urls.defaults import *
+urlpatterns = patterns('',
+        (r'^archive/$', 'mysite.views.archive'),
+        (r'^about/$', 'mysite.views.about'),
+        (r'^rss/$', 'mysite.views.rss'),
+        )
+
+
+// 第二个:
+
+# urls.py
+from django.conf.urls.defaults import *
+urlpatterns = patterns('',
+        (r'^blog/', include('inner')),
+        )
+
+# inner.py
+from django.conf.urls.defaults import *
+urlpatterns = patterns('',
+        (r'^archive/$', 'mysite.views.archive', {'blogid': 3}),
+        (r'^about/$', 'mysite.views.about', {'blogid': 3}),
+        (r'^rss/$', 'mysite.views.rss', {'blogid': 3}),
+        )
+
+
+9. 通用视图
+
+9.1 使用通用视图
+
+使用通用视图的方法是在URLconf文件中创建配置字典, 然后把这些字典作为URLconf元组
+的第三个成员.
+
+// 例如, 下面是一个呈现静态"关于"页面的URLconf:
+// direct_to_template 视图 是通用的!
+from django.conf.urls.defaults import *
+from django.views.generic.simple import direct_to_template
+urlpatterns = patterns('',
+        ('^about/$', direct_to_template, {'template': 'about.html' })
+        )
 
 
 
+// 记住: direct_to_template 视图 是通用的!
+from django.conf.urls.defaults import *
+from django.views.generic.simple import direct_to_template
+from mysite.books.views import about_pages
+urlpatterns = patterns('',
+        ('^about/$', direct_to_template, { 'template': 'about.html' }),
+        ('^about/(w+)/$', about_pages),
+)
+
+from django.http import Http404
+from django.template import TemplateDoesNotExist
+from django.views.generic.simple import direct_to_template
+def about_pages(request, page):
+    try:
+        # 使用通用视图: direct_to_template
+        return direct_to_template(request, template="about/%s.html" % page)
+    except TemplateDoesNotExist:
+        raise Http404()
 
 
 
+9.2 对象的通用视图
+
+direct_to_template 毫无疑问是非常有用的, 但Django通用视图最有用的是在呈现 数据
+库中的数据. 因为这个应用实在太普遍了, Django带有很多内建的通用视图来帮助你很容
+易的生成对象的列表和明细视图.
+
+比如: 为所有的书籍创建一个列表页面.
+
+# urls.py
+// 要为所有的书籍创建一个列表页面, 我们使用下面的URL配置:
+from django.conf.urls.defaults import *
+from django.views.generic import list_detail
+from mysite.books.models import Publisher
+publisher_info = {
+    "queryset" : Publisher.objects.all(),
+}
+urlpatterns = patterns('',
+        (r'^publishers/$', list_detail.object_list, publisher_info)
+        )
+
+
+注意:
+    我们可以通过在额外参数 字典里包含 template_name来清楚的告诉 object_list 视
+    图使用哪个模板, 但是 由于Django在不给定模板的时候会用对象的名称推导出一个.
+    在这个例子中, 这个推导出的模板名称 将是 "books/publisher_list.html" , 其中
+    books部分是定义这个模型的app的名称, publisher部分是这个模型名称的小写.
+
+
+# books/publisher_list.html
+{% extends "base.html" %}
+{% block content %}
+    <h2>Publishers</h2>
+    <ul>
+        {% for publisher in object_list %}
+            <li>{{ publisher.name }}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
 
 
 
