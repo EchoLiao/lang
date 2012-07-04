@@ -28,6 +28,7 @@ urlpatterns = patterns('',
     (r'^contact/thanks/$', 'mysite.books.views.thanks'),
     (r'^add_publisher/$', 'mysite.books.views.add_publisher'),
     (r'^publishers/$', list_detail.object_list, publisher_info),
+    (r'^books/(\w+)/$', 'mysite.books.views.books_by_publisher'),
 
     # Example:
     (r'^blog/', include('mysite.blog.urls')),

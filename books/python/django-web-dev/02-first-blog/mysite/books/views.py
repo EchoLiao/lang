@@ -2,11 +2,13 @@
 
 from django.db.models import Q
 from django.shortcuts import render_to_response
-from models import Book
+from models import Book, Publisher
 from forms import ContactForm
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
 from forms import PublisherForm
+from django.http import Http404
+from django.views.generic import list_detail
 
 
 def search(request):
@@ -68,4 +70,21 @@ def add_publisher(request):
     else:
         form = PublisherForm()
     return render_to_response('books/add_publisher.html', {'form': form})
+
+
+
+def books_by_publisher(request, name):
+    # Look up the publisher (and raise a 404 if it can't be found).
+    try:
+        publisher = Publisher.objects.get(name__iexact=name)
+    except Publisher.DoesNotExist:
+        raise Http404
+    # Use the object_list view for the heavy lifting.
+    return list_detail.object_list(
+            request,
+            queryset = Book.objects.filter(publisher=publisher),
+            template_name = "books/books_by_publisher.html",
+            template_object_name = "books", # 最终是: "books_list"
+            extra_context = {"publisher" : publisher}
+            )
 

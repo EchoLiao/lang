@@ -1395,6 +1395,38 @@ urlpatterns = patterns('',
         )
 
 
+9.3.4 用函数包装来处理复杂的数据过滤
+
+通过对 object_list 通用视图进行包装.
+
+# urls.py
+urlpatterns = patterns('',
+        (r'^publishers/$', list_detail.object_list, publisher_info),
+        (r'^books/(\w+)/$', books_by_publisher),
+        )
+
+# books_by_publisher 视图:
+from django.http import Http404
+from django.views.generic import list_detail
+from mysite.books.models import Book, Publisher
+def books_by_publisher(request, name):
+    # Look up the publisher (and raise a 404 if it can't be found).
+    try:
+        publisher = Publisher.objects.get(name__iexact=name)
+    except Publisher.DoesNotExist:
+        raise Http404
+    # Use the object_list view for the heavy lifting.
+    return list_detail.object_list(
+            request,
+            queryset = Book.objects.filter(publisher=publisher),
+            template_name = "books/books_by_publisher.html",
+            template_object_name = "books",
+            extra_context = {"publisher" : publisher}
+            )
+
+
+
+
 
 
 
