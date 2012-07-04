@@ -104,3 +104,18 @@ def author_detail(request, author_id):
             #template_name = "books/author_detail.html",
             object_id = author_id,
             )
+
+
+
+def author_list_plaintext(request):
+    response = list_detail.object_list(
+            request,
+            queryset = Author.objects.all(),
+            mimetype = "text/plain",
+            template_name = "books/author_list.txt"
+            )
+    # Content-Disposition 的含义是 告诉浏览器下载并保存这个页面, 而不是在浏览 
+    # 器中显示它.
+    response["Content-Disposition"] = "attachment; filename=authors.txt"
+    return response
+

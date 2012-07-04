@@ -1463,6 +1463,26 @@ def author_detail(request, author_id):
 
 
 
+我们可以用同样的方法修改通用视图的返回值. 如果我们想要提供一个供下载用的 纯文
+本版本的author列表.
+
+// 我们可以用下面这个视图:
+def author_list_plaintext(request):
+    response = list_detail.object_list(
+            request,
+            queryset = Author.objects.all(),
+            mimetype = "text/plain",
+            template_name = "books/author_list.txt"
+            )
+    # Content-Disposition 的含义是 告诉浏览器下载并保存这个页面, 而不是在浏览
+    # 器中显示它.
+    response["Content-Disposition"] = "attachment; filename=authors.txt"
+    return response
+
+
+
+
+
 
 
 
