@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 
 from django import forms as forms
+from models import Publisher
+from django.forms.models import modelform_factory as form_for_model
+
 
 
 TOPIC_CHOICES = (
@@ -28,4 +31,8 @@ class ContactForm(forms.Form):
             raise forms.ValidationError("Not enough words!")
         return message
 
+
+
+# 一个新的form，用于提交一个新出版商的信息到我们的book应用
+PublisherForm = form_for_model(Publisher)
 

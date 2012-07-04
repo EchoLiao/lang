@@ -6,6 +6,7 @@ from models import Book
 from forms import ContactForm
 from django.core.mail import send_mail
 from django.http import HttpResponseRedirect
+from forms import PublisherForm
 
 
 def search(request):
@@ -54,3 +55,17 @@ def contact(request):
 
 def thanks(request):
     return render_to_response('books/thanks.html')
+
+
+
+def add_publisher(request):
+    if request.method == 'POST':
+        form = PublisherForm(request.POST)
+        if form.is_valid():
+            # 从 form_for_model 而来的表单对象包含一个 save() 方法.
+            form.save()
+            return HttpResponseRedirect('/contact/thanks/')
+    else:
+        form = PublisherForm()
+    return render_to_response('books/add_publisher.html', {'form': form})
+

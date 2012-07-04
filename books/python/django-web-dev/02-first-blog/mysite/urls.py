@@ -16,6 +16,7 @@ urlpatterns = patterns('',
     (r'^search/$','mysite.books.views.search'),
     (r'^contact/$', 'mysite.books.views.contact'),
     (r'^contact/thanks/$', 'mysite.books.views.thanks'),
+    (r'^add_publisher/$', 'mysite.books.views.add_publisher'),
 
     # Example:
     (r'^blog/', include('mysite.blog.urls')),
