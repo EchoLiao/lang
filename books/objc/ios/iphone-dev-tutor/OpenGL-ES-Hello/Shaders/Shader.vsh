@@ -16,8 +16,8 @@ uniform float translate;
 void main()
 {
     gl_Position = position;
-    gl_Position.y += sin(translate) / 2.0;
-    gl_Position.x += cos(translate) / 2.0;
+//    gl_Position.y += sin(translate) / 2.0;
+//    gl_Position.x += cos(translate) / 2.0;
 
     colorVarying = color;
 }

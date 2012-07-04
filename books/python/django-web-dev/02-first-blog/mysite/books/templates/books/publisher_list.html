@@ -1,10 +1,12 @@
 {% extends "base.html" %}
 
+
+
 {% block content %}
 <h2>Publishers</h2>
 <ul>
     {% for publisher in publisher_list %}
-        <li>{{ publisher.name }}</li>
+        <li>{{ publisher.name|cut:"A" }}</li>
     {% endfor %}
     <p>
     {% for book in book_list %}
