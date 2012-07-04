@@ -1,12 +1,14 @@
 {% extends "base.html" %}
 
 
+{% load poll_extras %}
+
 
 {% block content %}
 <h2>Publishers</h2>
 <ul>
     {% for publisher in publisher_list %}
-        <li>{{ publisher.name|cut:"A" }}</li>
+        <li>{{ publisher.name|cut:"s" }}</li>
     {% endfor %}
     <p>
     {% for book in book_list %}
