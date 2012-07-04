@@ -1481,6 +1481,227 @@ def author_list_plaintext(request):
 
 
 
+10. 深入模板引擎
+
+10.1 RequestContext和Context处理器
+
+你需要一段context来解析模板. 一般情况下, 这是一个 django.template.Context 的实
+例, 不过在Django中还可以用一个特殊的子类,  django.template.RequestContext , 这
+个运用起来稍微有些不同.  RequestContext 默认地在模板context中加入了一些变量,
+如 HttpRequest 对象或当前登录用户的相关信息.
+
+当你不想在一系例模板中都明确指定一些相同的变量时, 你应该使用 RequestContext .
+
+
+
+// 例如:
+
+from django.template import loader, Context
+
+def view_1(request):
+    t = loader.get_template('template1.html')
+    c = Context({
+            'app': 'My app',
+            'user': request.user,
+            'ip_address': request.META['REMOTE_ADDR'],
+            'message': 'I am view 1.'
+            })
+    return t.render(c)
+
+def view_2(request):
+    t = loader.get_template('template2.html')
+    c = Context({
+            'app': 'My app',
+            'user': request.user,
+            'ip_address': request.META['REMOTE_ADDR'],
+            'message': 'I am the second view.'
+            })
+    return t.render(c)
+
+
+Question:
+    每个视图都给模板传入了三个相同的变量:  app , user 和 ip_address . 如果我们
+    能把这些冗余去掉会不会看起来更好?
+
+Solution:
+    用context处理器来创建一些处理器并传递给 RequestContext.
+
+
+// RequestContext 有一个可选的参数 processors , 这是一个包含context处理器函数
+// 的list或者tuple. 在这里, 我们传递了我们之前定义的函数 curstom_proc .
+from django.template import loader, RequestContext
+
+def custom_proc(request):
+    return {
+        'app': 'My app',
+            'user': request.user,
+            'ip_address': request.META['REMOTE_ADDR']
+    }
+
+def view_1(request):
+    t = loader.get_template('template1.html')
+    c = RequestContext(request, {'message': 'I am view 1.'},
+            processors=[custom_proc])
+    return t.render(c)
+
+def view_2(request):
+    t = loader.get_template('template2.html')
+    c = RequestContext(request, {'message': 'I am the second view.'},
+            processors=[custom_proc])
+    return t.render(c)
+
+
+
+Solution:
+    使用 render_to_response() 解决同样的问题.
+
+// 使用 render_to_response() 解决同样的问题, 使用context_instance 参数:
+from django.shortcuts import render_to_response
+from django.template import RequestContext
+
+def custom_proc(request):
+    return {
+        'app': 'My app',
+        'user': request.user,
+        'ip_address': request.META['REMOTE_ADDR']
+    }
+
+def view_1(request):
+    return render_to_response('template1.html',
+            {'message': 'I am view 1.'},
+            context_instance=RequestContext(request, processors=[custom_proc]))
+
+def view_2(request):
+    return render_to_response('template2.html',
+            {'message': 'I am the second view.'},
+            context_instance=RequestContext(request, processors=[custom_proc]))
+
+
+10.2 TEMPLATE_CONTEXT_PROCESSORS
+
+Django因此提供对 全局 context处理器的支持.  TEMPLATE_CONTEXT_PROCESSORS 指定了
+总是 使用哪些context processors . 这样就省去了每次使用 RequestContext 都指定
+processors 的麻烦.
+
+// 默认情况下,  TEMPLATE_CONTEXT_PROCESSORS 设置如下:
+// 这个设置是一个可调用函数的Tuple, 其中的每个函数使用了和上文中我们的
+// custom_proc 相同的接口: 接收一个request对象作为参数, 返回一个包含了将被合并
+// 到context中的项的字典.
+TEMPLATE_CONTEXT_PROCESSORS = (
+        'django.core.context_processors.auth',
+        'django.core.context_processors.debug',
+        'django.core.context_processors.i18n',
+        'django.core.context_processors.media',
+        )
+
+
+NOTE:
+    每个处理器将会按照顺序应用. 也就是说如果你在第一个处理器里面向context添加
+    了一个变量, 而第二个处理器添加了同样名字的变量, 那么第二个将会覆盖第一个.
+
+
+10.2.1 django.core.context_processors.auth
+
+如果 TEMPLATE_CONTEXT_PROCESSORS 包含了这个处理器, 那么每个 RequestContext 将
+包含这些变量:
+
+user :
+    一个 django.contrib.auth.models.User 实例, 描述了当前登录用户(或者一个
+    AnonymousUser 实例,如果客户端没有登录).
+messages :
+    一个当前登录用户的消息列表(字符串). 在后台, 对每一个请求这个变量都调用
+request.user.get_and_delete_messages() 方法.
+    这个方法收集用户的消息然后把它们从数据库中删除.
+perms :
+    django.core.context_processors.PermWrapper 的一个实例, 包含了当前登录用户
+    有哪些权限.
+
+
+10.2.2 django.core.context_processors.debug
+
+这个处理器把调试信息发送到模板层. 如果 TEMPLATE_CONTEXT_PROCESSORS 包含了这个
+处理器,  RequestContext 将包含这些变量:
+
+debug :
+    你设置的 DEBUG 的值( True 或 False ). 你可以在模板里面用这个变量测试是否处
+    在debug模式下.
+sql_queries :
+    包含类似于 {'sql': ..., 'time': ...} 的字典的一个列表,  记录了这个请求期间
+    的每个SQL查询以及查询所耗费的时间. 这个列表是按照请求顺序进行排列的.
+
+
+NOTE:
+    由于调试信息比较敏感, 所以这个context处理器只有当同时满足下面两个条件的时
+    候才有效:
+        DEBUG 参数设置为 True .
+        请求的ip应该包含在 INTERNAL_IPS 的设置里面.
+
+10.2.3 django.core.context_processors.i18n
+
+如果这个处理器启用, 每个 RequestContext 将包含下面的变量:
+
+LANGUAGES :
+    LANGUAGES 选项的值.
+LANGUAGE_CODE :
+    如果 request.LANGUAGE_CODE 存在,就等于它; 否则, 等同于 LANGUAGE_CODE 设置.
+
+10.2.4 django.core.context_processors.media
+
+如果启用这个处理器, 每个 RequestContext 将包含变量 request ,  也就是当前的
+HttpRequest 对象. 注意这个处理器默认是不启用的, 你需要激活它.
+
+
+10.3 模板加载的内幕
+
+10.3.1 Django有两种方法加载模板
+
+django.template.loader.get_template(template_name) :
+    get_template 根据给定的模板名称返回一个已编译的模板(一个 Template 对象).
+    如果模板不存在, 就触发 TemplateDoesNotExist 的异常.
+django.template.loader.select_template(template_name_list) :
+    select_template 很像get_template , 不过它是以模板名称的列表作为参数的, 并
+    且它返回第一个存在的模板. 如果模板都不存在, 将会触发TemplateDoesNotExist
+    异常.
+
+10.3.2 模板加载器
+
+默认情况下这些函数(10.3.1)使用 TEMPLATE_DIRS 的设置来载入模板.
+
+但是你可以通过编辑 TEMPLATE_LOADERS 设置来激活其它加载器.
+
+TEMPLATE_LOADERS 应当是一个字符串的元组, 其中每个字符串都表示一个模板加载器.
+这些模板加载器随Django一起发布.
+
+
+
+*   TEMPLATE_LOADERS:
+
+django.template.loaders.filesystem.load_template_source :
+    在默认情况下这个加载器被启用.
+    这个加载器根据TEMPLATE_DIRS 的设置从文件系统加载模板.
+
+django.template.loaders.app_directories.load_template_source :
+    这个加载器默认启用.
+    这个加 载器从文件系统上的Django应用中加载模板. 对 INSTALLED_APPS 中的每个
+    应用, 这个加 载器会查找一个 templates 子目录. 如果这个目录存在, Django就在
+    那里寻找模板.
+    这意味着你可以把模板和你的应用一起保存, 从而使得Django应用更容易和默认模板
+    一起发布. 例如, 如果 INSTALLED_APPS 包含
+    ('myproject.polls','myproject.music') , 那么get_template('foo.html') 会按
+    这个顺序查找模板:
+        /path/to/myproject/polls/templates/foo.html
+        /path/to/myproject/music/templates/foo.html
+
+django.template.loaders.eggs.load_template_source :
+    这个加载器类似app_directories , 只不过它从Python eggs而不是文件系统中加载
+    模板. 这个加载器默认被禁用; 如果你使用eggs来发布你的应用, 那么你就需要启用
+    它.
+
+
+
+
+
+
 
 
 

@@ -1,17 +1,22 @@
-
+CC = gcc
 CFLAGS = -g -Wall
+LLDLIBS = -lglut -lGLU -lGL -lXmu -lXext -lX11 -lm
 
-all: soduku_test
+OBJ_SODUKU = soduku.o
+TARGETS = soduku_test soduku_glut
 
 
-soduku.o: soduku.c soduku.h
 
-soduku_test.o: soduku_test.c soduku_test.h
+all: $(TARGETS)
 
-soduku_test: soduku_test.o soduku.o
-	gcc $^ -o $@
+
+$(TARGETS): %: %.o $(OBJ_SODUKU)
+	$(CC) $(CFLAGS) $< $(OBJ_SODUKU) $(LLDLIBS) -o $@
+
+
+-include Makefile.d
 
 
 
 clean:
-	-rm -f *.o soduku_test
+	-rm -f *.o $(TARGETS) $(OBJ_SODUKU)
