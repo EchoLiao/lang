@@ -12,7 +12,9 @@
     {% endfor %}
     <p>
     {% for book in book_list %}
-        {{ book.title }}
+        {% upper %}
+            {{ book.title }}
+        {% endupper %}
     {% endfor %}
     </p>
 </ul>

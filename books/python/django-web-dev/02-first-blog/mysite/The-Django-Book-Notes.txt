@@ -1781,15 +1781,177 @@ def lower(value):
 
 为了自定义一个这样的模板标签, 你需要告诉Django当遇到你的标签时怎样进行这过程.
 
+当Django编译一个模板时, 它将原始模板分成一个个 节点 . 每个节点都是
+django.template.Node 的一个实例, 并且具备render() 方法. 于是, 一个已编译的模板
+就是 Node 对象的一个列表.
+
+当你调用一个已编译模板的 render() 方法时, 模板就会用给定的context来调用每个在
+它的节点列表上的节点的 render() 方法.
+
+所以, 为了定义一个自定义的模板标签, 你需要明确这个模板标签转换为一个 Node (已
+编译的函数)和这个node的render() 方法.
 
 
+10.4.2.1 编写编译函数
+
+当遇到一个模板标签(template tag)时, 模板解析器就会把标签包含的内容, 以及模板解
+析器自己作为参数调用一 个python函数. 这个函数负责返回一个和当前模板标签内容相
+对应的节点(Node)的实例.
+
+例如, 写一个显示当前日期的模板标签: {% current_time %}, 该标签会根据参数指定的
+strftime 格式(参见: http://www.djangoproject.com/r/python/strftime/ )显示当前
+时间.
+
+// 在继续做其它事情以前, 先决定标签的语法是一个好主意. 在我们的例子里, 该标签
+// 将会像这样被使用:
+<p>The time is {% current_time "%Y-%m-%d %I:%M %p" %}.</p>
 
 
+// 这个函数的分析器会获取参数并创建一个 Node 对象:
+// token.contents 是包含有标签原始内容的字符串:
+//      'current_time "%Y-%m-%d %I:%M %p"'
+//
+// 这个函数返回一个 CurrentTimeNode, 它包含了节点需要知道的关于这个标签的全部
+// 信息. 在这个例子中, 它只是传递了参数 %Y-%m-%d %I:%M %p . 模板标签开头和结
+// 尾的引号使用 format_string[1:-1] 除去.
+//
+// 模板标签编译函数 必须 返回一个 Node 子类, 返回其它值都是错的.
+from django import template
+def do_current_time(parser, token):
+    try:
+        # split_contents() knows not to split quoted strings.
+        tag_name, format_string = token.split_contents()
+    except ValueError:
+        msg = '%r tag requires a single argument' % token.contents[0]
+        raise template.TemplateSyntaxError(msg)
+    return CurrentTimeNode(format_string[1:-1])
 
 
+10.4.2.2 编写模板节点
+
+编写自定义标签的第二步就是定义一个拥有 render() 方法的 Node 子类. 继续前面的例
+子, 我们需要定义CurrentTimeNode :
+
+// 与模板过滤器一样, 这些渲染函数应该捕获错误, 而不是抛出错误. 模板标签只能在
+// 编译的时候才能抛出错误.
+import datetime
+class CurrentTimeNode(template.Node):
+    def __init__(self, format_string):
+        self.format_string = format_string
+    def render(self, context):
+        now = datetime.datetime.now()
+        return now.strftime(self.format_string)
 
 
+10.4.2.3 注册标签
 
+最后, 你需要用你的模块 实例注册这个标签. 注册自定义标签与注册自定义过滤器非常
+类似.
+
+@register.tag(name="current_time")
+def do_current_time(parser, token):
+    # ...
+
+@register.tag
+def shout(parser, token):
+    # ...
+
+
+10.4.2.4 在上下文中设置变量
+
+要在上下文中设置变量, 在 render() 函数的context对象上使用字典赋值.
+
+
+// 比如: {{ my_current_time }} 变量在标签中设置.
+{% get_current_time "%Y-%M-%d %I:%M %p" as my_current_time %}
+<p>The current time is {{ my_current_time }}.</p>
+
+// Node类
+class CurrentTimeNode3(template.Node):
+    def __init__(self, format_string, var_name):
+        self.format_string = format_string
+        self.var_name = var_name
+    def render(self, context):
+        now = datetime.datetime.now()
+        context[self.var_name] = now.strftime(self.format_string)
+        return ''
+
+// 编译函数
+@register.tag(name="get_current_time")
+def do_current_time(parser, token):
+    # This version uses a regular expression to parse tag contents.
+    try:
+        # Splitting by None == splitting by spaces.
+        tag_name, arg = token.contents.split(None, 1)
+    except ValueError:
+        msg = '%r tag requires arguments' % token.contents[0]
+        raise template.TemplateSyntaxError(msg)
+    m = re.search(r'(.*?) as (\w+)', arg)
+    if m:
+        fmt, var_name = m.groups()
+    else:
+        msg = '%r tag had invalid arguments' % tag_name
+        raise template.TemplateSyntaxError(msg)
+    if not (fmt[0] == fmt[-1] and fmt[0] in ('"', "'")):
+        msg = "%r tag's argument should be in quotes" % tag_name
+        raise template.TemplateSyntaxError(msg)
+    return CurrentTimeNode3(fmt[1:-1], var_name)
+
+
+10.4.2.5 分析直至另一个块标签
+
+模板标签可以像包含其它标签的块一样工作(想想 {% if %} , {% for %} 等).  要创建
+一个这样的模板标签, 在你的编译函数中使用 parser.parse() .
+
+// 标准的 {% comment %} 标签是这样实现的:
+def do_comment(parser, token):
+    nodelist = parser.parse(('endcomment',))
+    parser.delete_first_token()
+    return CommentNode()
+class CommentNode(template.Node):
+    def render(self, context):
+        return ''
+
+10.4.2.6 分析直至另外一个块标签并保存内容
+
+// 例如, 这个自定义模板标签:  {% upper %} , 它把自己和 {% endupper %} 之间的所
+// 有内容都变成大写:
+{% upper %}
+    This will appear in uppercase, {{ your_name }}.
+{% endupper %}
+
+
+// 就像前面的例子一样, 我们将使用 parser.parse() . 这次, 我们将产生的 nodelist
+// 传递给 Node :
+@register.tag
+def do_upper(parser, token):
+    nodelist = parser.parse(('endupper',))
+    parser.delete_first_token()
+    return UpperNode(nodelist)
+
+class UpperNode(template.Node):
+    def __init__(self, nodelist):
+        self.nodelist = nodelist
+    def render(self, context):
+        # 对节点列表中的每个 Node简单的调用 render() .
+        output = self.nodelist.render(context)
+        return output.upper()
+
+
+10.4.2.7 简单标签的快捷方式
+
+许多模板标签接收单一的字符串参数或者一个模板变量 引用,然后独立地根据输入变量和
+一些其它外部信息进行处理并返回一个字符串. 例如, 我们先前写的 current_time 标签
+就是这样一个例子. 我们给它格式字符串, 然后它把时间作为字符串返回.
+
+为了简化这类标签, Django 提供了一个帮助函数:  simple_tag . 这个函数是
+django.template.Library 的一个方法,它接受一个只有一个参数的函数作参数, 把它包
+装在 render 函数和之前提及过的其他的必要单位中, 然后通过模板系统注册标签.
+
+// 我们之前的的 current_time 函数于是可以写成这样:
+def current_time(format_string):
+    return datetime.datetime.now().strftime(format_string)
+register.simple_tag(current_time)
 
 
 
