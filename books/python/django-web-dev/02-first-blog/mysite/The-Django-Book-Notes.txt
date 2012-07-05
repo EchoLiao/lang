@@ -5,6 +5,68 @@
 
 
 
+
+// 创建一个项目
+$ django-admin.py startproject mysite
+
+// 启动开发服务器(dev)
+$ cd mysite
+$ ./manage.py runserver
+
+// 创建一个app
+$ ./manage.py startapp blog
+
+// 更数据库信息
+$ ./manage.py syncdb
+
+
+
+
+http://127.0.0.1:8000
+
+// 后台应用admin
+http://127.0.0.1:8000/admin/
+
+// 公众页面
+http://127.0.0.1:8000/blog
+
+
+
+0. 安装
+
+1)  用默认方法安装
+
+到http://www.djangoproject.com/download/下载tarball的Django-*.tar.gz
+
+   1. tar xzvf Django-*.tar.gz
+   2. cd Django-*
+   3. sudo python setup.py install
+
+安装完以后, 在Python交互环境下应该可以import django模块
+
+   1. >>> import django
+   2. >>> django.VERSION
+   3.  (1, 0, 'official')
+
+
+2)  自定义安装
+
+   0. 选择一个安装目录:
+        []$ cd ~/work
+        []$ mkdir django-root
+        []$ cd django-root
+   1. 解压:
+        []$ tar xzvf Django-*.tar.gz
+   2. 复制主管理工具到$PATH目录:
+        []$ cp Django-*/bin/django-admin.py /bin
+   3. 配置 $PYTHONPATH , 在 ~/.bashrc 中添加:
+        export PYTHONPATH=/home/scr/work/django-root/Django-*
+
+
+
+
+
+
 4.  Django模板系统
 
 4.1 启动交互界面
