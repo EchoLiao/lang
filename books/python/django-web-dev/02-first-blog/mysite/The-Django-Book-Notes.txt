@@ -1955,6 +1955,72 @@ register.simple_tag(current_time)
 
 
 
+10.4.2.8 包含标签
+
+如何写包含标签最好通过举例来说明.
+
+我们来写一个可以生成一个选项列表的多选项对象 Poll .
+
+// 标签这样使用:
+{% show_results poll %}
+
+// 结果将会像下面这样:
+<ul>
+    <li>First choice</li>
+    <li>Second choice</li>
+    <li>Third choice</li>
+</ul>
+
+
+首先, 我们定义一个函数, 通过给定的参数生成一个字典形式的结果.
+
+
+// 需要注意的是, 我们只需要返回字典类型的结果就行了.
+// dict 的 key 作为变量名在模板中被使用
+def show_books_for_author(author):
+    books = author.book_set.all()
+    return {'books': books}
+
+
+接下来, 我们创建用于渲染标签输出的模板.
+
+
+// 在我们的例子中, 模板很简单:
+<ul>
+    {% for book in books %}
+        <li> {{ book }} </li>
+    {% endfor %}
+</ul>
+
+
+最后, 我们通过对一个 Library 对象使用 inclusion_tag() 方法来创建并注册这个包含
+标签.
+
+
+// 在我们的例子中, 如果先前的模板在 polls/result_snippet.html 文件中, 那么我们
+// 这样注册标签:
+register.inclusion_tag('books/books_for_author.html')(show_books_for_author)
+
+// 和往常一样, 我们也可以使用Python 2.4中的修饰语法, 所以我们还可以这么写:
+@register.inclusion_tag('books/books_for_author.html')
+def show_books_for_author(show_books_for_author):
+    ...
+
+
+10.5 编写自定义模板加载器
+
+Djangos 内置的模板加载器(在先前的模板加载内幕章节有叙述)通常会满足你的所有的模
+板加载需求, 但是如果你有特殊的加载需求的话, 编写自己的模板加载器也会相当简单.
+比如: 你可以从数据库加载模板, 或者使用 Subversions的Python实现直接从Subversion
+库加载模板, 再或者(稍后展示)从zip文件加载模板.
+
+
+
+
+
+
+
+
 
 
 
