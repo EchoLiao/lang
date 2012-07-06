@@ -50,12 +50,12 @@ USE_L10N = True
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/home/media/media.lawrence.com/media/"
-MEDIA_ROOT = ''
+MEDIA_ROOT = get_path('uploads')
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash.
 # Examples: "http://media.lawrence.com/media/", "http://example.com/media/"
-MEDIA_URL = ''
+MEDIA_URL = '/uploads/'
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
@@ -121,6 +121,7 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'grappelli',
+    'filebrowser',
     # Uncomment the next line to enable the admin:
     'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
@@ -149,3 +150,20 @@ LOGGING = {
         },
     }
 }
+
+
+# Self define
+# Needed install: PIL, whoosh,
+# Grappelli
+GRAPPELLI_ADMIN_TITLE = "NuoErlz Blog"
+# Filebrowser
+FILEBROWSER_DIRECTORY = MEDIA_ROOT if MEDIA_ROOT.endswith(os.sep) \
+        else MEDIA_ROOT + os.sep
+
+
+
+try:
+    from local_settings import *
+except:
+    pass
+
