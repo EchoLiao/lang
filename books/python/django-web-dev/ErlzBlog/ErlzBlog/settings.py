@@ -166,9 +166,22 @@ FILEBROWSER_DIRECTORY = MEDIA_ROOT if MEDIA_ROOT.endswith(os.sep) \
         else MEDIA_ROOT + os.sep
 
 
+# Google authorized api
+google_api = {
+    'client_id': '',
+    'client_secret': '',
+    'redirect_urls': '',
+}
+# Weibo
+weibo_api = {
+    'app_key': '',
+    'app_secret': ''
+}
+
+
 
 try:
     from local_settings import *
-except:
+except ImportError:
     pass
 
