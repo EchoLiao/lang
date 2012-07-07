@@ -1,18 +1,21 @@
 #!/usr/bin/env python
 #coding=utf-8
-from django.db import models
-
-from django.contrib.auth.admin import User
 from datetime import datetime
+
+from django.db import models
+from django.contrib.auth.admin import User
 from django.db.models import permalink
 from django.contrib.sitemaps import ping_google
+from django.contrib.contenttypes import generic
+from django.contrib.contenttypes.models import ContentType
 
 from mptt.models import MPTTModel
+from filebrowser.fields import FileBrowseField
 
 class Category(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50, unique=True, verbose_name='分类名')
     slug = models.SlugField()
-    order = models.IntegerField(blank=True, null=True)
+    order = models.IntegerField(blank=True, null=True, verbose_name='顺序')
     
     class Meta:
         verbose_name = "分类"
@@ -38,10 +41,10 @@ class Category(models.Model):
         super(Category, self).save()
         
 class Tag(models.Model):
-    name = models.CharField(max_length=50, unique=True)
+    name = models.CharField(max_length=50, unique=True, verbose_name='标签名')
     slug = models.SlugField()
     
-    articles = models.ManyToManyField("Article", through="ArticleTag")
+    articles = models.ManyToManyField("Article", through="ArticleTag", verbose_name='文章')
     
     class Meta:
         verbose_name = "标签"
@@ -76,6 +79,7 @@ class Article(models.Model):
     author = models.ForeignKey(User, verbose_name='作者')
     
     tags = models.ManyToManyField(Tag, through="ArticleTag", verbose_name='标签')
+    commens = generic.GenericRelation('Comment')
     
     class Meta:
         verbose_name = "文章"
@@ -112,3 +116,42 @@ class ArticleTag(models.Model):
         
     def __unicode__(self):
         return unicode(self.tag)
+    
+class Comment(MPTTModel):
+    username = models.CharField(max_length=50, verbose_name='用户名')
+    email_address = models.EmailField(verbose_name='邮箱地址')
+    site = models.URLField(verify_exists=False, blank=True, verbose_name='站点')
+    avatar = models.URLField(blank=True, null=True, verbose_name='头像')
+    content = models.TextField(verbose_name='内容')
+    post_date = models.DateTimeField(editable=False, default=datetime.now, verbose_name='评论时间')
+    visible = models.BooleanField(default=True, verbose_name='是否可见')
+    
+    # mptt
+    reply_to_comment = models.ForeignKey("self", blank=True, null=True, related_name="children")
+    
+    # contenttypes
+    content_type = models.ForeignKey(ContentType)
+    object_id = models.PositiveIntegerField()
+    comment_obj = generic.GenericForeignKey('content_type', 'object_id')
+    
+    class Meta:
+        ordering = ['-post_date']
+        verbose_name = '评论'
+        verbose_name_plural = '评论'
+        
+    class MPTTMeta:
+        parent_attr = 'reply_to_comment'
+        
+    def __unicode__(self):
+        return self.content
+    
+class BlogUser(User):
+    small_avatar = FileBrowseField(max_length=40, verbose_name='头像（40×40）')
+    info = models.TextField(verbose_name='用户信息')
+    
+    class Meta:
+        verbose_name = '用户'
+        verbose_name_plural = '用户'
+        
+    def __unicode__(self):
+        return self.info
