@@ -108,8 +108,8 @@
         cell = [[[UITableViewCell alloc] initWithStyle:UITableViewCellStyleSubtitle
                                        reuseIdentifier: SimpleTableIdentifier] autorelease];
 #else
-        cell = [[[UITableViewCell alloc] initWithFrame::CGRectZero
-                                       reuseIdentifier: SimpleTableIdentifier] autorelease];
+        cell = [[[UITableViewCell alloc] initWithFrame:CGRectZero
+                                       reuseIdentifier:SimpleTableIdentifier] autorelease];
 #endif
         
     }
