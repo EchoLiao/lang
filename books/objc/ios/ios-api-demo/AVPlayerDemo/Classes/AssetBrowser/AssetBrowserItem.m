@@ -309,6 +309,24 @@ CGRect makeRectWithAspectRatioOutsideRect(CGSize aspectRatio, CGRect containerRe
 	return YES;
 }
 
+
+CGRect MY_AVMakeRectWithAspectRatioInsideRect(CGSize aspect, CGRect boundingRect)
+{
+    // Test: bw = 192, bh = 128
+    CGRect rect = CGRectZero;
+    if ( aspect.width / boundingRect.size.width > aspect.height / boundingRect.size.height ) {
+        // Test: aw = 587, ah = 128
+        rect.size.width  = boundingRect.size.width;
+        rect.size.height = boundingRect.size.width * aspect.height / aspect.width;
+    } else {
+        // Test: aw = 192, ah = 287
+        rect.size.height = boundingRect.size.height;
+        rect.size.width  = boundingRect.size.height * aspect.width / aspect.height;
+    }
+    
+    return rect;
+}
+
 // Must be called on assetQueue.
 - (void)generateNonVideoThumbnailWithSize:(CGSize)size fillMode:(AssetBrowserItemFillMode)mode completionHandler:(void (^)(UIImage *thumbnail))handler
 {	
@@ -327,7 +345,7 @@ CGRect makeRectWithAspectRatioOutsideRect(CGSize aspectRatio, CGRect containerRe
 		boundingRect.size = thumb.size;
 		boundingRect.size.width *= thumb.scale;
 		boundingRect.size.height *= thumb.scale;
-		
+        
 		CGSize cropSize = AVMakeRectWithAspectRatioInsideRect(size, boundingRect).size;
 		if ( !CGSizeEqualToSize(cropSize, size) ) {
 			thumb = [[self copyImageFromCGImage:[thumb CGImage] croppedToSize:cropSize] autorelease];
