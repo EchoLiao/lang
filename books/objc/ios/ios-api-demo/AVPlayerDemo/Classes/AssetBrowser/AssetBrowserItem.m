@@ -318,10 +318,14 @@ CGRect MY_AVMakeRectWithAspectRatioInsideRect(CGSize aspect, CGRect boundingRect
         // Test: aw = 587, ah = 128
         rect.size.width  = boundingRect.size.width;
         rect.size.height = boundingRect.size.width * aspect.height / aspect.width;
+        rect.origin.x = 0.0f;
+        rect.origin.y = (boundingRect.size.height - rect.size.height) / 2.0f;
     } else {
         // Test: aw = 192, ah = 287
         rect.size.height = boundingRect.size.height;
         rect.size.width  = boundingRect.size.height * aspect.width / aspect.height;
+        rect.origin.y = 0.0f;
+        rect.origin.x = (boundingRect.size.width - rect.size.width) / 2.0f;
     }
     
     return rect;
@@ -345,8 +349,21 @@ CGRect MY_AVMakeRectWithAspectRatioInsideRect(CGSize aspect, CGRect boundingRect
 		boundingRect.size = thumb.size;
 		boundingRect.size.width *= thumb.scale;
 		boundingRect.size.height *= thumb.scale;
+		boundingRect.size.width = 24;
+		boundingRect.size.height = 32;
+//        size.width  = 2000;
+//        size.height = 23;
         
 		CGSize cropSize = AVMakeRectWithAspectRatioInsideRect(size, boundingRect).size;
+        NSLog(@"NAL 1A &&&&&&&&&&&&&&& sys(%.2f,%.2f,%.2f,%.2f); my(%.2f,%.2f,%.2f,%.2f)",
+              AVMakeRectWithAspectRatioInsideRect(size, boundingRect).origin.x,
+              AVMakeRectWithAspectRatioInsideRect(size, boundingRect).origin.y,
+              cropSize.width, cropSize.height,
+              MY_AVMakeRectWithAspectRatioInsideRect(size, boundingRect).origin.x,
+              MY_AVMakeRectWithAspectRatioInsideRect(size, boundingRect).origin.y,
+              MY_AVMakeRectWithAspectRatioInsideRect(size, boundingRect).size.width,
+              MY_AVMakeRectWithAspectRatioInsideRect(size, boundingRect).size.height
+              );
 		if ( !CGSizeEqualToSize(cropSize, size) ) {
 			thumb = [[self copyImageFromCGImage:[thumb CGImage] croppedToSize:cropSize] autorelease];
 		}
