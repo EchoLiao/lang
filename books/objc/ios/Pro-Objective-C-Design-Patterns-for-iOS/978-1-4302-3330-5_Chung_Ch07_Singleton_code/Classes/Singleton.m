@@ -20,43 +20,62 @@ static Singleton *sharedSingleton_ = nil;
   NSLog(@"Singleton");
 }
 
++ (void) createSharedInstance:(Singleton **)singleton
+{
+    if ( *singleton == nil ) {
+        *singleton = [NSAllocateObject([self class], 0, NULL) init];
+    }
+}
+
 + (Singleton *) sharedInstance
 {
-  if (sharedSingleton_ == nil)
-  {
-    sharedSingleton_ = [NSAllocateObject([self class], 0, NULL) init];
-  }
-  
-  return sharedSingleton_;
+//  if (sharedSingleton_ == nil)
+//  {
+//    // 为了使得该类可以子类化必须使用 NSAllocateObject(), 而不能使用 [super allocWithZone:NULL];
+//    // 因为若子类化了, 子类调用该方法时, super 指向的是该类! 而 allocWithZone: 等已被重载, 所以...
+//    sharedSingleton_ = [NSAllocateObject([self class], 0, NULL) init];
+//  }
+//  
+//  return sharedSingleton_;
+    
+    [Singleton createSharedInstance:&sharedSingleton_];
+    return sharedSingleton_;
 }
 
 
+// 重载, 以保证返回的是同一个实例.
+// retain 也已被重载.
 + (id) allocWithZone:(NSZone *)zone
 {
   return [[self sharedInstance] retain];
 }
 
 
+// 重载, 以保证返回的是同一个实例.
 - (id) copyWithZone:(NSZone*)zone
 {
   return self;
 }
 
+// 重载, 以保证返回的是同一个实例.
 - (id) retain
 {
   return self;
 }
 
+// 重载, 以保证返回的是同一个实例.
 - (NSUInteger) retainCount
 {
   return NSUIntegerMax; // denotes an object that cannot be released
 }
 
-- (void) release
+// 重载, 以保证实例在整个程序生命期间存在
+- (oneway void) release
 {
   // do nothing
 }
 
+// 重载, 以保证返回的是同一个实例.
 - (id) autorelease
 {
   return self;

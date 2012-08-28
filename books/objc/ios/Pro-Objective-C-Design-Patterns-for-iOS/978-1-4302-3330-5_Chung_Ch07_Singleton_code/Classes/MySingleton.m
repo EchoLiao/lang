@@ -9,13 +9,21 @@
 #import "MySingleton.h"
 
 
-
 @implementation MySingleton
+
+static MySingleton *sSharedMySingleton = nil;
+
+
++ (MySingleton *) sharedInstance
+{
+    [super createSharedInstance:&sSharedMySingleton];
+    return sSharedMySingleton;
+}
+
 
 - (id) init
 {
-  
-  return self; 
+  return self;
 }
 
 - (void) operation

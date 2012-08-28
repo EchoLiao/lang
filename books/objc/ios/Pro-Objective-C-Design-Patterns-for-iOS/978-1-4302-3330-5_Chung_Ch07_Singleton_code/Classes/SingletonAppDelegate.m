@@ -8,6 +8,8 @@
 
 #import "SingletonAppDelegate.h"
 #import "MySingleton.h"
+#import "MySingleton2.h"
+
 
 @implementation SingletonAppDelegate
 
@@ -19,12 +21,40 @@
 
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {    
   
-  // Override point for customization after application launch.
-  
-  Singleton *s = [MySingleton sharedInstance];
-  
-  [s operation];
-  
+    Singleton *s_root = [Singleton sharedInstance];
+    assert(s_root != nil);
+    [s_root operation];
+    
+    Singleton *s = [MySingleton sharedInstance];
+    assert(s != nil);
+    Singleton *s2 = [MySingleton2 sharedInstance];
+    assert(s2 != nil);
+    assert(s_root != s && s_root != s2 && s != s2);
+    [s operation];
+    [s2 operation];
+    
+    Singleton *s_copy = [s copy];
+    assert(s_copy == s);
+    [s_copy operation];
+    
+    Singleton *s_alloc = [MySingleton alloc];
+    assert(s_alloc == s);
+    [s_alloc operation];
+    
+    Singleton *s_retain = [s retain];
+    assert(s_retain == s);
+    [s_retain operation];
+    
+    [s release];
+    [s release];
+    [s release];
+    [s release];
+    [s release];
+    [s release];
+    [s release];
+    assert(s != nil);
+    [s operation];
+    
   [window makeKeyAndVisible];
   
   return YES;

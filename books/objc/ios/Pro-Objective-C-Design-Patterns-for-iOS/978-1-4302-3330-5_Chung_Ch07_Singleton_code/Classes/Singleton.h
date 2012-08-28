@@ -14,6 +14,8 @@
 
 }
 
+
++ (void) createSharedInstance:(Singleton **)singleton;
 + (Singleton *) sharedInstance;
 
 - (void) operation;
