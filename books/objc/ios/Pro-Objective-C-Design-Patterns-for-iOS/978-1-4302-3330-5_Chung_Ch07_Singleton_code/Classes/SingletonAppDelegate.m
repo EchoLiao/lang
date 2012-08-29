@@ -9,6 +9,8 @@
 #import "SingletonAppDelegate.h"
 #import "MySingleton.h"
 #import "MySingleton2.h"
+#import "MySingletonChild.h"
+
 
 
 @implementation SingletonAppDelegate
@@ -29,9 +31,12 @@
     assert(s != nil);
     Singleton *s2 = [MySingleton2 sharedInstance];
     assert(s2 != nil);
-    assert(s_root != s && s_root != s2 && s != s2);
+    Singleton *s_child = [MySingletonChild sharedInstance];
+    assert(s_child != nil);
+    assert(s_root != s && s_root != s2 && s != s2 && s2 != s_child);
     [s operation];
     [s2 operation];
+    [s_child operation];
     
     Singleton *s_copy = [s copy];
     assert(s_copy == s);
