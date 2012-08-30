@@ -86,6 +86,7 @@
     CGContextClipToRect(currentContext, rect);//设置当前绘图环境到矩形框
     CGContextRotateCTM(currentContext, M_PI);
     CGContextTranslateCTM(currentContext, -rect.size.width, -rect.size.height);
+    
     CGContextDrawImage(currentContext, rect, image.CGImage);//绘图
     // [image drawInRect:rect];
     UIImage *cropped = UIGraphicsGetImageFromCurrentImageContext();//获得图片
@@ -93,6 +94,9 @@
     
     UIImageView *contentView = [[UIImageView alloc] initWithFrame:rect];
     contentView.image = cropped;
+    contentView.transform = CGAffineTransformIdentity;
+    contentView.transform = CGAffineTransformMakeScale(-1.0, 1.0);
+    
     self.view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] applicationFrame]];
     [self.view addSubview:contentView];
     
