@@ -74,6 +74,13 @@
 
 
 
+/*
+    CGContextRotateCTM();
+    CGContextTranslateCTM();
+    CGContextScaleCTM();
+    ... 
+ 这些命令的书写顺序产生的效果与OpenGL是一样的!
+*/
 -(void)loadView 
 {
     [[UIApplication sharedApplication] setStatusBarHidden:YES
@@ -84,6 +91,8 @@
     UIGraphicsBeginImageContext(rect.size);//根据size大小创建一个基于位图的图形上下文
     CGContextRef currentContext = UIGraphicsGetCurrentContext();//获取当前quartz 2d绘图环境
     CGContextClipToRect(currentContext, rect);//设置当前绘图环境到矩形框
+    CGContextTranslateCTM(currentContext, rect.size.width, 0.0);
+    CGContextScaleCTM(currentContext, -1.0, 1.0);
     CGContextRotateCTM(currentContext, M_PI);
     CGContextTranslateCTM(currentContext, -rect.size.width, -rect.size.height);
     
@@ -94,8 +103,6 @@
     
     UIImageView *contentView = [[UIImageView alloc] initWithFrame:rect];
     contentView.image = cropped;
-    contentView.transform = CGAffineTransformIdentity;
-    contentView.transform = CGAffineTransformMakeScale(-1.0, 1.0);
     
     self.view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] applicationFrame]];
     [self.view addSubview:contentView];
