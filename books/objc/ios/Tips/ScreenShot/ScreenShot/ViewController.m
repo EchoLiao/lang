@@ -25,10 +25,22 @@
     UIImageView *contentView = [[UIImageView alloc]
                                 initWithFrame:[[UIScreen mainScreen] applicationFrame]];
     UIImage *image = [UIImage imageNamed:@"iphone.png"];
-    [contentView setImage:image];
+    
+    CGRect rect = CGRectMake(0, 0, 768, 1024);//创建矩形框
+    UIGraphicsBeginImageContext(rect.size);//根据size大小创建一个基于位图的图形上下文
+    CGContextRef currentContext = UIGraphicsGetCurrentContext();//获取当前quartz 2d绘图环境
+    CGContextClipToRect(currentContext, rect);//设置当前绘图环境到矩形框
+    
+    CGContextDrawImage(currentContext, rect, image.CGImage);//绘图
+    UIImage *cropped = UIGraphicsGetImageFromCurrentImageContext();//获得图片
+    UIGraphicsEndImageContext();//从当前堆栈中删除quartz 2d绘图环境
+    
+    contentView.image = cropped;
     
     self.view = [[UIView alloc] initWithFrame:[[UIScreen mainScreen] applicationFrame]];
     [self.view addSubview:contentView];
+    
+    [cropped release];
 }
 
 - (void)viewDidLoad
