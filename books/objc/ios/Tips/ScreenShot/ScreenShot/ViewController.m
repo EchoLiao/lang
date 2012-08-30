@@ -86,8 +86,8 @@
     [[UIApplication sharedApplication] setStatusBarHidden:YES
                                             withAnimation: UIStatusBarAnimationSlide];
     UIImage *image = [UIImage imageNamed:@"iphone.png"];
+#if 0
     CGRect rect = CGRectMake(0, 0, 210, 280);//创建矩形框
-    
     UIGraphicsBeginImageContext(rect.size);//根据size大小创建一个基于位图的图形上下文
     CGContextRef currentContext = UIGraphicsGetCurrentContext();//获取当前quartz 2d绘图环境
     CGContextClipToRect(currentContext, rect);//设置当前绘图环境到矩形框
@@ -108,6 +108,16 @@
     [self.view addSubview:contentView];
     
     [cropped release];
+#else
+    CGRect rect = CGRectMake(10, 20, 21, 40);//创建矩形框
+    UIImageView *contentView = [[UIImageView alloc] initWithFrame:rect];
+    contentView.image=[UIImage imageWithCGImage:CGImageCreateWithImageInRect([image CGImage], rect)];
+    
+    self.view=[[UIView alloc] initWithFrame:[[UIScreen mainScreen] applicationFrame]];
+    [self.view addSubview:contentView];
+    
+    [image release];
+#endif
 }
 
 - (void)viewDidLoad
