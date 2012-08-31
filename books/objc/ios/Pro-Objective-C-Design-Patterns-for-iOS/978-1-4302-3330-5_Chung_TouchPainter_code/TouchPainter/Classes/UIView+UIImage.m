@@ -18,12 +18,14 @@
   // On iOS 4 and later, use UIGraphicsBeginImageContextWithOptions to take the scale into consideration
   // On iOS prior to 4, fall back to use UIGraphicsBeginImageContext
   CGSize imageSize = [self bounds].size;// [[UIScreen mainScreen] bounds].size;
-  
+    
+  // 根据size大小创建一个基于位图的图形上下文
   if (NULL != UIGraphicsBeginImageContextWithOptions)
     UIGraphicsBeginImageContextWithOptions(imageSize, NO, 0);
   else
     UIGraphicsBeginImageContext(imageSize);
   
+  // 获取当前quartz 2d绘图环境
   CGContextRef context = UIGraphicsGetCurrentContext();
   
   // Iterate over every window from back to front
@@ -53,7 +55,10 @@
   
   // Retrieve the screenshot image
   UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+  // NSData *imageData = UIImageJPEGRepresentation(image, 100);
+
   
+  // 从当前堆栈中删除quartz 2d绘图环境
   UIGraphicsEndImageContext();
   
   return image;
