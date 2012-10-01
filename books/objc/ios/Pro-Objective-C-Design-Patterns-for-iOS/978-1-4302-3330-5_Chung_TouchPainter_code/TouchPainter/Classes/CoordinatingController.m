@@ -35,7 +35,8 @@ static CoordinatingController *sharedCoordinator = nil;
 {
   if (sharedCoordinator == nil)
   {
-    sharedCoordinator = [[super allocWithZone:NULL] init];
+    // sharedCoordinator = [[super allocWithZone:NULL] init];
+    sharedCoordinator = [NSAllocateObject([self class], 0, NULL) init];
     
     // initialize the first view controller
     // and keep it with the singleton
@@ -65,7 +66,7 @@ static CoordinatingController *sharedCoordinator = nil;
   return NSUIntegerMax;
 }
 
-- (void) release
+- (oneway void) release
 {
   // do nothing
 }
@@ -125,7 +126,7 @@ static CoordinatingController *sharedCoordinator = nil;
         // take the user back to the first page in
         // conjunction with the design
         // other objects will follow the same path
-        [canvasViewController_ dismissModalViewControllerAnimated:YES];
+        [activeViewController_ dismissModalViewControllerAnimated:YES];
         
         // set the activeViewController back to 
         // canvasViewController
@@ -137,7 +138,7 @@ static CoordinatingController *sharedCoordinator = nil;
   // every thing else goes to the main canvasViewController
   else 
   {
-    [canvasViewController_ dismissModalViewControllerAnimated:YES];
+    [activeViewController_ dismissModalViewControllerAnimated:YES];
     
     // set the activeViewController back to 
     // canvasViewController
