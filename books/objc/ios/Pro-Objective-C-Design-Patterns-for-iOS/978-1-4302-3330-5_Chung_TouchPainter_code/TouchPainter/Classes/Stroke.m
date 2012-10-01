@@ -11,8 +11,8 @@
 
 @implementation Stroke
 
-@synthesize color=color_, size=size_;
-@dynamic location;
+
+#pragma mark - Init Methods
 
 - (id) init
 {
@@ -23,6 +23,12 @@
   
   return self;
 }
+
+
+#pragma mark - Property Interface
+
+@synthesize color=color_, size=size_;
+@dynamic location; // 告诉编译器其存取方法由我们实现
 
 - (void) setLocation:(CGPoint)aPoint
 {
@@ -37,9 +43,21 @@
     return [[children_ objectAtIndex:0] location];
   }
   
-  // otherwise returns the origin
   return CGPointZero;
 }
+
+- (NSUInteger) count
+{
+  return [children_ count];
+}
+
+- (id <Mark>) lastChild
+{
+  return [children_ lastObject];
+}
+
+
+#pragma mark - Prototype Pattern Interface
 
 - (void) addMark:(id <Mark>) mark
 {
@@ -63,7 +81,6 @@
   }
 }
 
-
 - (id <Mark>) childMarkAtIndex:(NSUInteger) index
 {
   if (index >= [children_ count]) return nil;
@@ -71,40 +88,7 @@
   return [children_ objectAtIndex:index];
 }
 
-
-// a convenience method to return the last child
-- (id <Mark>) lastChild
-{
-  return [children_ lastObject];
-}
-
-// returns number of children
-- (NSUInteger) count
-{
-  return [children_ count];
-}
-
-
-- (void) acceptMarkVisitor:(id <MarkVisitor>)visitor
-{
-  for (id <Mark> dot in children_)
-  {
-    [dot acceptMarkVisitor:visitor];
-  }
-  
-  [visitor visitStroke:self];
-}
-
-- (void) dealloc
-{
-  [color_ release];
-  [children_ release];
-  [super dealloc];
-}
-
-#pragma mark -
 #pragma mark NSCopying method
-
 
 - (id)copyWithZone:(NSZone *)zone
 {
@@ -126,6 +110,27 @@
   
   return strokeCopy;
 }
+
+
+#pragma mark - Others Interface
+
+- (void) acceptMarkVisitor:(id <MarkVisitor>)visitor
+{
+  for (id <Mark> dot in children_)
+  {
+    [dot acceptMarkVisitor:visitor];
+  }
+  
+  [visitor visitStroke:self];
+}
+
+- (void) dealloc
+{
+  [color_ release];
+  [children_ release];
+  [super dealloc];
+}
+
 
 #pragma mark -
 #pragma mark NSCoder methods

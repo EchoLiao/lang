@@ -10,7 +10,31 @@
 
 
 @implementation Dot
+
+
+#pragma mark - Property Interface
+
 @synthesize size=size_, color=color_;
+
+
+#pragma mark - Prototype Pattern Interface
+#pragma mark NSCopying method
+
+// it needs to be implemented for memento
+- (id)copyWithZone:(NSZone *)zone
+{
+  Dot *dotCopy = [[[self class] allocWithZone:zone] initWithLocation:location_];
+  
+  // copy the color
+  [dotCopy setColor:[UIColor colorWithCGColor:[color_ CGColor]]];
+  // copy the size
+  [dotCopy setSize:size_];
+  
+  return dotCopy;
+}
+
+
+#pragma mark - Others Interface
 
 - (void) acceptMarkVisitor:(id <MarkVisitor>)visitor
 {
@@ -21,23 +45,6 @@
 {
   [color_ release];
   [super dealloc];
-}
-
-#pragma mark -
-#pragma mark NSCopying method
-
-// it needs to be implemented for memento
-- (id)copyWithZone:(NSZone *)zone
-{
-  Dot *dotCopy = [[[self class] allocWithZone:zone] initWithLocation:location_];
-  
-  // copy the color
-  [dotCopy setColor:[UIColor colorWithCGColor:[color_ CGColor]]];
-  
-  // copy the size
-  [dotCopy setSize:size_];
-  
-  return dotCopy;
 }
 
 

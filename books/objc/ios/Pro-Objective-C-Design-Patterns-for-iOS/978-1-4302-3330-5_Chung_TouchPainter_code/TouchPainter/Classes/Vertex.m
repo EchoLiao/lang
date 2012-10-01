@@ -10,8 +10,7 @@
 
 
 @implementation Vertex
-@synthesize location=location_;
-@dynamic color, size;
+
 
 - (id) initWithLocation:(CGPoint) aLocation
 {
@@ -23,27 +22,13 @@
   return self;
 }
 
-// default properties do nothing
-- (void) setColor:(UIColor *)color {}
-- (UIColor *) color { return nil; }
-- (void) setSize:(CGFloat)size {}
-- (CGFloat) size { return 0.0; }
 
-// Mark operations do nothing
-- (void) addMark:(id <Mark>) mark {}
-- (void) removeMark:(id <Mark>) mark {}
-- (id <Mark>) childMarkAtIndex:(NSUInteger) index { return nil; }
-- (id <Mark>) lastChild { return nil; }
-- (NSUInteger) count { return 0; }
-- (NSEnumerator *) enumerator { return nil; }
+#pragma mark - Property Interface
+
+@synthesize location=location_;
 
 
-- (void) acceptMarkVisitor:(id <MarkVisitor>)visitor
-{
-  [visitor visitVertex:self];
-}
-
-#pragma mark -
+#pragma mark - Prototype Pattern Interface
 #pragma mark NSCopying method
 
 // it needs to be implemented for memento
@@ -52,6 +37,16 @@
   Vertex *vertexCopy = [[[self class] allocWithZone:zone] initWithLocation:location_];
   
   return vertexCopy;
+}
+
+
+#pragma mark - Others Interface
+
+- (NSEnumerator *) enumerator { return nil; }
+
+- (void) acceptMarkVisitor:(id <MarkVisitor>)visitor
+{
+  [visitor visitVertex:self];
 }
 
 

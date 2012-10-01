@@ -18,14 +18,11 @@
   CGFloat size_;
 }
 
-@property (nonatomic, retain) UIColor *color;
-@property (nonatomic, assign) CGFloat size;
+// for the Prototype pattern
+- (id) copyWithZone:(NSZone *)zone;
 
 // for the Visitor pattern
 - (void) acceptMarkVisitor:(id <MarkVisitor>)visitor;
-
-// for the Prototype pattern
-- (id) copyWithZone:(NSZone *)zone;
 
 // for the Memento pattern
 - (id)initWithCoder:(NSCoder *)coder;
