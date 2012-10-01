@@ -9,6 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "CanvasView.h"
 
+
+// 工厂方模式
+
 @interface CanvasViewGenerator : NSObject 
 {
 

@@ -15,6 +15,7 @@
 
 }
 
+// 重载父类方法
 - (CanvasView *) canvasViewWithFrame:(CGRect) aFrame;
 
 @end

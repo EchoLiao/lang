@@ -14,18 +14,19 @@
 
 - (id)initWithFrame:(CGRect)frame 
 {
-  if ((self = [super initWithFrame:frame])) 
-  {
-    // Add a paper image view on top
-    // as the canvas background
-    UIImage *backgroundImage = [UIImage imageNamed:@"paper"];
-    UIImageView *backgroundView = [[[UIImageView alloc] 
-                                    initWithImage:backgroundImage] 
-                                   autorelease];
-    [self addSubview:backgroundView];
-  }
-  
-  return self;
+    if ((self = [super initWithFrame:frame]))
+    {
+        // Add a paper image view on top
+        // as the canvas background
+        UIImage *backgroundImage = [UIImage imageNamed:@"paper"];
+        UIImageView *backgroundView = [[[UIImageView alloc]
+                                        initWithFrame:[[UIScreen mainScreen] bounds]] autorelease];
+        backgroundView.image = backgroundImage;
+        backgroundView.contentMode = UIViewContentModeScaleToFill;
+        [self addSubview:backgroundView];
+    }
+    
+    return self;
 }
 
 // implementation for other behaviors

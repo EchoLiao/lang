@@ -9,6 +9,7 @@
 #import "CanvasViewController.h"
 #import "Dot.h"
 #import "Stroke.h"
+#import "PaperCanvasViewGenerator.h"
 
 @implementation CanvasViewController
 
@@ -46,7 +47,7 @@
   // Get a default canvas view
   // with the factory method of 
   // the CanvasViewGenerator
-  CanvasViewGenerator *defaultGenerator = [[[CanvasViewGenerator alloc] init] autorelease];
+  CanvasViewGenerator *defaultGenerator = [[[PaperCanvasViewGenerator alloc] init] autorelease];
   [self loadCanvasViewWithGenerator:defaultGenerator];
   
   // initialize a Scribble model
