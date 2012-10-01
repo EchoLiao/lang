@@ -56,7 +56,7 @@
   
   NSUInteger index = [mark count];
   id <Mark> childMark;
-  while (childMark = [mark childMarkAtIndex:--index]) 
+  while ( nil != (childMark = [mark childMarkAtIndex:--index]) )
   {
     [self traverseAndBuildStackWithMark:childMark];
   }

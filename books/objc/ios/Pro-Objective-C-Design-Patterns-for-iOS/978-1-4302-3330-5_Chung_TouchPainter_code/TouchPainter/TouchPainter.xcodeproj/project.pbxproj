@@ -61,8 +61,6 @@
 		8B1F9EAA130D941F00FF009E /* redo.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B1F9EA8130D941F00FF009E /* redo.png */; };
 		8B1F9EAB130D941F00FF009E /* undo.png in Resources */ = {isa = PBXBuildFile; fileRef = 8B1F9EA9130D941F00FF009E /* undo.png */; };
 		8B3B491A12D6BBA2003BA61D /* MarkEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B491912D6BBA2003BA61D /* MarkEnumerator.m */; };
-		F47E599515EF1F0B004B99FD /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = F47E599315EF1F0B004B99FD /* Icon.png */; };
-		F47E599615EF1F0B004B99FD /* Icon@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F47E599415EF1F0B004B99FD /* Icon@2x.png */; };
 		F4AFD0131619868E009E66A3 /* cloth.png in Resources */ = {isa = PBXBuildFile; fileRef = F4AFD0111619868E009E66A3 /* cloth.png */; };
 		F4AFD0141619868E009E66A3 /* paper.png in Resources */ = {isa = PBXBuildFile; fileRef = F4AFD0121619868E009E66A3 /* paper.png */; };
 /* End PBXBuildFile section */
@@ -163,8 +161,6 @@
 		8B3B491912D6BBA2003BA61D /* MarkEnumerator.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MarkEnumerator.m; sourceTree = "<group>"; };
 		8B3B492712D6BCC4003BA61D /* MarkEnumerator+Internal.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "MarkEnumerator+Internal.h"; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* TouchPainter-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "TouchPainter-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
-		F47E599315EF1F0B004B99FD /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = Icon.png; path = Resources/Images/Icon.png; sourceTree = "<group>"; };
-		F47E599415EF1F0B004B99FD /* Icon@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "Icon@2x.png"; path = "Resources/Images/Icon@2x.png"; sourceTree = "<group>"; };
 		F4AFD0111619868E009E66A3 /* cloth.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cloth.png; path = Resources/Images/cloth.png; sourceTree = "<group>"; };
 		F4AFD0121619868E009E66A3 /* paper.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = paper.png; path = Resources/Images/paper.png; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -401,10 +397,8 @@
 		23BFDFBA1220C50F005A882E /* Images */ = {
 			isa = PBXGroup;
 			children = (
-				F47E599315EF1F0B004B99FD /* Icon.png */,
 				F4AFD0111619868E009E66A3 /* cloth.png */,
 				F4AFD0121619868E009E66A3 /* paper.png */,
-				F47E599415EF1F0B004B99FD /* Icon@2x.png */,
 				8B1F9EA8130D941F00FF009E /* redo.png */,
 				8B1F9EA9130D941F00FF009E /* undo.png */,
 				23E7B2F91288056C00C96CD9 /* placeholder.png */,
@@ -559,8 +553,6 @@
 				23E7B2FA1288056C00C96CD9 /* placeholder.png in Resources */,
 				8B1F9EAA130D941F00FF009E /* redo.png in Resources */,
 				8B1F9EAB130D941F00FF009E /* undo.png in Resources */,
-				F47E599515EF1F0B004B99FD /* Icon.png in Resources */,
-				F47E599615EF1F0B004B99FD /* Icon@2x.png in Resources */,
 				F4AFD0131619868E009E66A3 /* cloth.png in Resources */,
 				F4AFD0141619868E009E66A3 /* paper.png in Resources */,
 			);
