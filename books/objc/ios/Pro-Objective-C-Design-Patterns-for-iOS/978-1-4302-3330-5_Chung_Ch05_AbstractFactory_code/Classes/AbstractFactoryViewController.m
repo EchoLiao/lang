@@ -25,7 +25,7 @@
 
 
 // Implement loadView to create a view hierarchy programmatically, without using a nib.
-- (void)loadView 
+- (void)loadView // MMMMM
 {
 	NSNumber * boolNumber = [NSNumber numberWithBool:YES];
 	NSNumber * charNumber = [NSNumber numberWithChar:'a'];

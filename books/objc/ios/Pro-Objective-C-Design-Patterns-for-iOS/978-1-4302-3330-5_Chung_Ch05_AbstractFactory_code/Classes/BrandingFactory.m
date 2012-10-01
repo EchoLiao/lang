@@ -13,6 +13,7 @@
 
 @implementation BrandingFactory
 
+// 所有细节只有 BrandingFactory 知道.
 + (BrandingFactory *) factory
 {
 #if defined (USE_ACME)
