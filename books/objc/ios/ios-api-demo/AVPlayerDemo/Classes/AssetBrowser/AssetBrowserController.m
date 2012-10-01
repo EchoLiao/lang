@@ -100,7 +100,7 @@ enum {
 		
 		self.wantsFullScreenLayout = YES;
 		
-		thumbnailScale = [[UIScreen mainScreen] scale];
+		thumbnailScale = [[UIScreen mainScreen] scale]; // QQQQQ
 		
 		activeAssetSources = [[NSMutableArray alloc] initWithCapacity:0];
 		isModal = modalPresentation;
@@ -180,9 +180,9 @@ enum {
 	}
 	
 	[self updateActiveAssetSources];
-	
 	[self.tableView reloadData];
 	
+    // 把 delegate 放到最后初始化是因为: updateBrowserItemsAndSignalDelegate:newItems !!
 	for (AssetBrowserSource *source in self.assetSources) {
 		source.delegate = self;	
 	}
@@ -200,7 +200,7 @@ enum {
 	[super viewDidAppear:animated];
 
 	[self enableThumbnailAndTitleGeneration];
-	[self generateThumbnailsAndTitles];
+	[self generateThumbnailsAndTitles]; // MMMMM
 	
 	NSIndexPath *indexPath = [self.tableView indexPathForSelectedRow];
 	if (indexPath) {
@@ -242,7 +242,8 @@ enum {
 	if ( [UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad ) {
 		return YES;
 	}
-	return (interfaceOrientation == UIInterfaceOrientationPortrait);
+	// return (interfaceOrientation == UIInterfaceOrientationPortrait);
+	return YES;
 }
 
 - (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation
@@ -269,7 +270,8 @@ enum {
 
 - (NSInteger)numberOfSectionsInTableView:(UITableView *)tableView 
 {
-	return [activeAssetSources count];
+    NSLog(@"[activeAssetSources count]=======%d", [activeAssetSources count]);
+	return [activeAssetSources count]; // QQQQQ
 }
 
 - (NSString *)tableView:(UITableView *)tableView titleForHeaderInSection:(NSInteger)section 
@@ -286,6 +288,7 @@ enum {
 	
 	NSInteger numRows = 0;
 	
+    // items is declare in AssetBrowserSource.h
 	numRows = [[[activeAssetSources objectAtIndex:section] items] count];
 	
 	return numRows;
@@ -326,7 +329,7 @@ enum {
 		cell.accessoryType = isModal ? UITableViewCellAccessoryNone : UITableViewCellAccessoryDisclosureIndicator;
 	}
 	
-	[self configureCell:cell forIndexPath:indexPath];
+	[self configureCell:cell forIndexPath:indexPath]; // MMMMM
 	
 	return cell;
 }
@@ -339,7 +342,7 @@ enum {
 	AssetBrowserItem *selectedItem = [[(AssetBrowserSource*)[activeAssetSources objectAtIndex:indexPath.section] items] objectAtIndex:indexPath.row];
 	
 	if ([self.delegate respondsToSelector:@selector(assetBrowser:didChooseItem:)]) {
-		AssetBrowserItem *selectedItemCopy = [selectedItem copy];
+		AssetBrowserItem *selectedItemCopy = [selectedItem copy]; // QQQQQ
 		[self.delegate assetBrowser:self didChooseItem:selectedItemCopy];
 		[selectedItemCopy release];
 	}
@@ -391,24 +394,23 @@ enum {
 		if (assetItem) {
 			__block NSInteger runningRequests = 0;
 			if (assetItem.thumbnailImage == nil) {
-				CGFloat targetHeight = self.tableView.rowHeight -1.0; // The contentView is one point smaller than the cell because of the divider.
+				CGFloat targetHeight = self.tableView.rowHeight - 1.0; // The contentView is one point smaller than the cell because of the divider.
 				targetHeight *= thumbnailScale;
 				
-				CGFloat targetAspectRatio = 1.5;
+				CGFloat targetAspectRatio = (CGFloat)192 / 128;
+				// CGFloat targetAspectRatio = 0.7;
 				CGSize targetSize = CGSizeMake(targetHeight*targetAspectRatio, targetHeight);
 				
 				runningRequests++;
 				[assetItem generateThumbnailAsynchronouslyWithSize:targetSize fillMode:AssetBrowserItemFillModeCrop completionHandler:^(UIImage *thumbnail)
-				{
-					runningRequests--;
-					if (runningRequests == 0) {
-						[self updateCellForBrowserItemIfVisible:assetItem];
-						// Continue generating until all thumbnails/titles in range have been finished.
-						[self thumbnailsAndTitlesTask];
-					}
-				}];
-				
-
+                 {
+                     runningRequests--;
+                     if (runningRequests == 0) {
+                         [self updateCellForBrowserItemIfVisible:assetItem];
+                         // Continue generating until all thumbnails/titles in range have been finished.
+                         [self thumbnailsAndTitlesTask];
+                     }
+                 }];
 			}
 			if (!assetItem.haveRichestTitle) {
 				runningRequests++;

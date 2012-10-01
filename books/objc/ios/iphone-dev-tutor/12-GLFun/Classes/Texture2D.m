@@ -96,6 +96,9 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 			case kTexture2DPixelFormat_RGBA8888:
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
 				break;
+			case kTexture2DPixelFormat_RGB888:
+				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, data);
+                break;
 			case kTexture2DPixelFormat_RGB565:
 				glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_SHORT_5_6_5, data);
 				break;
@@ -128,7 +131,9 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 
 - (NSString*) description
 {
-	return [NSString stringWithFormat:@"<%@ = %08X | Name = %i | Dimensions = %ix%i | Coordinates = (%.2f, %.2f)>", [self class], self, _name, _width, _height, _maxS, _maxT];
+	return [NSString stringWithFormat:@"<%@ = %08X | Name = %i | Dimensions = %ix%i | "
+            "Coordinates = (%.2f, %.2f)>",
+            [self class], (int)self, _name, _width, _height, _maxS, _maxT];
 }
 
 @end
@@ -309,7 +314,7 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 
 
 
-- (void) drawAtPoint:(CGPoint)point 
+- (void) drawAtPoint:(CGPoint)point
 {
 	GLfloat		coordinates[] = { 0,	_maxT,
 								_maxS,	_maxT,

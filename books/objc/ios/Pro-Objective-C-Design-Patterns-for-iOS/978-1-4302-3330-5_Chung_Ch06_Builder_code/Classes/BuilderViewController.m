@@ -37,11 +37,15 @@
 {
   [super viewDidLoad];
   
+  // [(P70)]
+  // a builder
   CharacterBuilder *characterBuilder = [[[StandardCharacterBuilder alloc] init] autorelease];
+  // a director
   ChasingGame *game = [[[ChasingGame alloc] init] autorelease];
   
   Character *player = [game createPlayer:characterBuilder];
   Character *enemy = [game createEnemy:characterBuilder];
+    
   
   // do something else with the
   // player and enemey

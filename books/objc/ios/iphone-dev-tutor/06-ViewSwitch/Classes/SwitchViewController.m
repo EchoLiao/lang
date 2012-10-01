@@ -24,7 +24,7 @@
 	UIViewAnimationTransition transition;
 	
 	[UIView beginAnimations:@"View Flip" context:nil];
-    [UIView setAnimationDuration:1.25];
+    [UIView setAnimationDuration:0.85];
     [UIView setAnimationCurve:UIViewAnimationCurveEaseInOut];
     
     if (self.yellowViewController.view.superview == nil)

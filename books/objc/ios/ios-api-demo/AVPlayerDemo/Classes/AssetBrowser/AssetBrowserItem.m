@@ -349,10 +349,10 @@ CGRect MY_AVMakeRectWithAspectRatioInsideRect(CGSize aspect, CGRect boundingRect
 		boundingRect.size = thumb.size;
 		boundingRect.size.width *= thumb.scale;
 		boundingRect.size.height *= thumb.scale;
-		boundingRect.size.width = 24;
-		boundingRect.size.height = 32;
-//        size.width  = 2000;
-//        size.height = 23;
+//		boundingRect.size.width = 24;
+//		boundingRect.size.height = 32;
+        size.width  = 200;
+        size.height = 23;
         
 		CGSize cropSize = AVMakeRectWithAspectRatioInsideRect(size, boundingRect).size;
         NSLog(@"NAL 1A &&&&&&&&&&&&&&& sys(%.2f,%.2f,%.2f,%.2f); my(%.2f,%.2f,%.2f,%.2f)",
@@ -428,7 +428,7 @@ CGRect MY_AVMakeRectWithAspectRatioInsideRect(CGSize aspect, CGRect boundingRect
 }
 
 - (void)generateThumbnailAsynchronouslyWithSize:(CGSize)size fillMode:(AssetBrowserItemFillMode)mode completionHandler:(void (^)(UIImage *thumbnail))handler
-{	
+{
 	dispatch_async(assetQueue, ^(void) {
 		if (!canGenerateThumbnails) {
 			[self generateNonVideoThumbnailWithSize:size fillMode:mode completionHandler:handler];

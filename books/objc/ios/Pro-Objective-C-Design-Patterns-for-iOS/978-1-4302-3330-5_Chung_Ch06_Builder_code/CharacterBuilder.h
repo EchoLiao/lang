@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "Character.h"
 
+// Builder
 @interface CharacterBuilder : NSObject 
 {
   @protected

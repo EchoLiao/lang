@@ -59,7 +59,6 @@ Copyright (C) 2010-2011 Apple Inc. All Rights Reserved.
 static NSString* const AVPlayerDemoContentURLUserDefaultsKey = @"URL";
 static NSString* const AVPlayerDemoContentTimeUserDefaultsKey = @"time";
 
-typedef void (^AlertViewCompletionHandler)(void);
 
 @implementation AVPlayerDemoAppDelegate
 
@@ -90,7 +89,8 @@ typedef void (^AlertViewCompletionHandler)(void);
 		[assetBrowserControllers addObject:[self assetBrowserControllerWithSourceType:AssetBrowserSourceTypeFileSharing delegate:delegate]];
 	}
 	if (sourceType & AssetBrowserSourceTypeIPodLibrary) {
-		[assetBrowserControllers addObject:[self assetBrowserControllerWithSourceType:AssetBrowserSourceTypeIPodLibrary delegate:delegate]];
+		// [assetBrowserControllers addObject:[self assetBrowserControllerWithSourceType:AssetBrowserSourceTypeIPodLibrary delegate:delegate]];
+        [assetBrowserControllers addObject:[self assetBrowserControllerWithSourceType:AssetBrowserSourceTypeAll delegate:delegate]];
 	}
 	
 	assetTabBarController.viewControllers = assetBrowserControllers;
@@ -100,13 +100,12 @@ typedef void (^AlertViewCompletionHandler)(void);
 
 - (BOOL)application:(UIApplication*)application didFinishLaunchingWithOptions:(NSDictionary*)launchOptions
 {
-    alertCompletionHandlers = [[NSMutableArray alloc] initWithCapacity:0];
-
     tabBarController = [self tabbedAssetBrowserControllerWithSourceType:AssetBrowserSourceTypeAll delegate:self];
 
 	[window setRootViewController:self.cachedAssetBrowser];
     [window addSubview:self.cachedAssetBrowser.view];
     
+#if 0
     NSUserDefaults* defaults = [NSUserDefaults standardUserDefaults];
     // Restore saved tab bar item from the defaults system.
     // The UITabBarItem 'tag' value is used to identify the saved tab bar item.
@@ -121,12 +120,16 @@ typedef void (^AlertViewCompletionHandler)(void);
     {
         tabBarController.selectedIndex = tabBarItemIndex;
     }
+#else 
+    tabBarController.selectedIndex = 1;
+#endif
     
     // Add the tab bar controller's current view as a subview of the window
     [self.cachedAssetBrowser pushViewController:tabBarController animated:NO];
 
     [window makeKeyAndVisible];	
     
+#if 0
     // Restore saved media from the defaults system.
 	NSURL* URL = [defaults URLForKey:AVPlayerDemoContentURLUserDefaultsKey];
 	if (URL)
@@ -145,6 +148,7 @@ typedef void (^AlertViewCompletionHandler)(void);
 	}
 	
 	[[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:NULL];
+#endif
 	
 	return YES;
 }
@@ -197,6 +201,7 @@ typedef void (^AlertViewCompletionHandler)(void);
 		}
 		
 		[playbackViewController setURL:urlAsset.URL];
+        NSLog(@"NAL &&&&&&&&---&&&&&&%@", urlAsset.URL); // MMMMM
 		
 		[self.cachedAssetBrowser pushViewController:playbackViewController animated:YES];
 	}

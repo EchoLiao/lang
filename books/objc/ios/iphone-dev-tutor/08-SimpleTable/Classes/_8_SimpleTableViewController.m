@@ -181,7 +181,7 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath
 - (CGFloat)tableView:(UITableView *)tableView 
 heightForRowAtIndexPath:(NSIndexPath *)indexPath
 {
-    return 70;
+    return 65;
 }
 
 @end

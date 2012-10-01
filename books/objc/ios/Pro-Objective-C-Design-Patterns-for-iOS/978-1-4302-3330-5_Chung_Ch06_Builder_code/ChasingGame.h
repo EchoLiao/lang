@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "StandardCharacterBuilder.h"
 
+
+// Director
 @interface ChasingGame : NSObject 
 {
 

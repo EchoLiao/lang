@@ -14,12 +14,16 @@
     // the gradient
     CAGradientLayer* g = [[CAGradientLayer alloc] init];
     g.frame = self.bounds;
+//    NSLog(@"frame: (%f, %f, %f, %f)", g.frame.origin.x, g.frame.origin.y, g.frame.size.width,
+//          g.frame.size.height);
     g.colors = [NSArray arrayWithObjects:
                 (id)[[UIColor blackColor] CGColor],
+                [[UIColor blueColor] CGColor],
                 [[UIColor redColor] CGColor],
                 nil];
     g.locations = [NSArray arrayWithObjects:
                    [NSNumber numberWithFloat: 0.0],
+                   [NSNumber numberWithFloat: 0.5],
                    [NSNumber numberWithFloat: 1.0],
                    nil];
     [self addSublayer:g];
@@ -27,8 +31,7 @@
     // the circle
     CAShapeLayer* circle = [[CAShapeLayer alloc] init];
     circle.lineWidth = 2.0;
-    circle.fillColor = 
-    [[UIColor colorWithRed:0.9 green:0.95 blue:0.93 alpha:0.9] CGColor];
+    circle.fillColor = [[UIColor colorWithRed:0.9 green:0.95 blue:0.93 alpha:0.6] CGColor];
     circle.strokeColor = [[UIColor grayColor] CGColor];
     CGMutablePathRef p = CGPathCreateMutable();
     CGPathAddEllipseInRect(p, NULL, CGRectInset(self.bounds, 3, 3));
@@ -46,6 +49,8 @@
         t.bounds = CGRectMake(0,0,40,30);
         t.position = CGPointMake(CGRectGetMidX(circle.bounds), 
                                  CGRectGetMidY(circle.bounds));
+        // t.anchorPoint.y = rert;
+        // rert = (CGRectGetMidY(circle.bounds) / (CGRectGetHeight(t.bounds) / 2)) * 0.5
         CGFloat vert = (CGRectGetMidY(circle.bounds) - 5) / CGRectGetHeight(t.bounds);
         t.anchorPoint = CGPointMake(0.5, vert);
         t.alignmentMode = kCAAlignmentCenter;
@@ -60,10 +65,10 @@
     arrow.position = CGPointMake(CGRectGetMidX(self.bounds), 
                                  CGRectGetMidY(self.bounds));
     arrow.anchorPoint = CGPointMake(0.5, 0.8);
-    arrow.delegate = self;
+    arrow.delegate = self; // MMMMM
     [arrow setAffineTransform:CGAffineTransformMakeRotation(M_PI/5.0)];
     [self addSublayer:arrow];
-    [arrow setNeedsDisplay];
+    [arrow setNeedsDisplay]; //drawLayer:inContext: will be called!
     
     
     // uncomment next line (only) for Figure 16-4, contentsCenter and contentsGravity
@@ -105,16 +110,16 @@ void drawStripes (void *info, CGContextRef con) {
 }
 
 - (void) drawLayer:(CALayer *)layer inContext:(CGContextRef)con {
-    
     NSLog(@"drawLayer:inContext: for arrow");
-        
+    
+    
     // punch triangular hole in context clipping region
     CGContextMoveToPoint(con, 10, 100);
     CGContextAddLineToPoint(con, 20, 90);
     CGContextAddLineToPoint(con, 30, 100);
     CGContextClosePath(con);
     CGContextAddRect(con, CGRectMake(0,0,40,100));
-    CGContextEOClip(con);    
+    CGContextEOClip(con);
     
     
     // draw a black (by default) vertical line, the shaft of the arrow

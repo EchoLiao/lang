@@ -39,7 +39,20 @@
 					  @"Chewbacca", @"Artoo", @"Threepio", @"Lando", nil];
 	self.pickerData = array;
 	[array release];
+    
+    
+    
+    UIToolbar *toolbar = [[UIToolbar alloc] init];
+    toolbar.frame = CGRectMake(0, 0, self.view.frame.size.width, 44);
+    NSMutableArray *items = [[NSMutableArray alloc] init];
+    [items addObject:[[[UIBarButtonItem alloc] initWithImage:nil style:UIBarButtonItemStyleBordered  target:self action:nil] autorelease]];
+    [toolbar setItems:items animated:NO];
+    [items release];
+    [self.view addSubview:toolbar];
+    [toolbar release];
+
 }
+
 
 
 // The designated initializer.  Override if you create the controller programmatically and want to perform customization that is not appropriate for viewDidLoad.

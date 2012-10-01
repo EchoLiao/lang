@@ -13,6 +13,7 @@
 
 - (Character *) createPlayer:(CharacterBuilder *) builder
 {
+  // 取决于具体的 CharacterBuilder 类或其子类.
   [builder buildNewCharacter];
   [builder buildStrength:50.0];
   [builder buildStamina:25.0];
@@ -21,12 +22,12 @@
   [builder buildAggressiveness:35.0];
   
   // an alternative way to build a character
-  [[[[[[builder buildNewCharacter]
-       buildStrength:50.0]
-      buildStamina:25.0]
-     buildIntelligence:75.0]
-    buildAgility:65.0]
-   buildAggressiveness:35.0];
+//  [[[[[[builder buildNewCharacter]
+//       buildStrength:50.0]
+//      buildStamina:25.0]
+//     buildIntelligence:75.0]
+//    buildAgility:65.0]
+//   buildAggressiveness:35.0];
   
   return [builder character];
 }

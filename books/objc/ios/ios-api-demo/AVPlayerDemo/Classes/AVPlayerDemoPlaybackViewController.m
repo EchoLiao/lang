@@ -280,7 +280,7 @@ static void *AVPlayerDemoPlaybackViewControllerCurrentItemObservationContext = &
 }
 
 /* The user is dragging the movie controller thumb to scrub through the movie. */
-- (IBAction)beginScrubbing:(id)sender
+- (void)beginScrubbing:(id)sender
 {
 	mRestoreAfterScrubbingRate = [mPlayer rate];
 	[mPlayer setRate:0.f];
@@ -290,7 +290,7 @@ static void *AVPlayerDemoPlaybackViewControllerCurrentItemObservationContext = &
 }
 
 /* Set the player current time to match the scrubber position. */
-- (IBAction)scrub:(id)sender
+- (void)scrub:(id)sender
 {
 	if ([sender isKindOfClass:[UISlider class]])
 	{
@@ -316,7 +316,7 @@ static void *AVPlayerDemoPlaybackViewControllerCurrentItemObservationContext = &
 }
 
 /* The user has released the movie thumb control to stop scrubbing through the movie. */
-- (IBAction)endScrubbing:(id)sender
+- (void)endScrubbing:(id)sender
 {
 	if (!mTimeObserver)
 	{

@@ -209,7 +209,8 @@ static char *vs =
 "void main()\n"
 "{\n"
 "   v_color = ar_color;\n"
-"	gl_Position = Projection * Modelview * ar_pos;\n"
+"	// gl_Position = Projection * Modelview * ar_pos;\n"
+"	gl_Position = ar_pos;\n"
 "}\n";
 
 

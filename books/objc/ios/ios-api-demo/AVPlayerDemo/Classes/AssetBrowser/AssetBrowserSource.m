@@ -57,7 +57,9 @@
 
 @interface AssetBrowserSource () <DirectoryWatcherDelegate>
 
-@property (nonatomic, copy) NSArray *items; // NSArray of AssetBrowserItems
+// 除了 readonly 和 readwrite 以外, 其它的必须与 *.h 中声明的一样!!
+// @property (nonatomic, readonly, copy) NSArray *items; // IN *.h
+@property (nonatomic, copy, readwrite) NSArray *items; // NSArray of AssetBrowserItems
 
 @end
 
@@ -157,9 +159,11 @@
 		NSArray *mediaItems = [videoQuery items];
 		for (MPMediaItem *mediaItem in mediaItems) {
 			NSURL *URL = (NSURL*)[mediaItem valueForProperty:MPMediaItemPropertyAssetURL];
+            NSLog(@"&&&&&&& iPod Libs: %@", URL);
 			
 			if (URL) {
 				NSString *title = (NSString*)[mediaItem valueForProperty:MPMediaItemPropertyTitle];
+                NSLog(@"======== iPod Libs title: %@", title);
 				AssetBrowserItem *item = [[AssetBrowserItem alloc] initWithURL:URL title:title];
 				[items addObject:item];
 				[item release];
@@ -208,6 +212,7 @@
 					  ALAssetRepresentation *defaultRepresentation = [asset defaultRepresentation];
 					  NSString *uti = [defaultRepresentation UTI];
 					  NSURL *URL = [[asset valueForProperty:ALAssetPropertyURLs] valueForKey:uti];
+                      NSLog(@"=========== camera URL: %@", URL);
 					  NSString *title = [NSString stringWithFormat:@"%@ %i", NSLocalizedString(@"Video", nil), [assetItems count]+1];
 					  AssetBrowserItem *item = [[[AssetBrowserItem alloc] initWithURL:URL title:title] autorelease];
 					  

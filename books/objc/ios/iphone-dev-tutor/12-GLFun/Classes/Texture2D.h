@@ -53,6 +53,7 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 typedef enum {
 	kTexture2DPixelFormat_Automatic = 0,
 	kTexture2DPixelFormat_RGBA8888,
+	kTexture2DPixelFormat_RGB888,
 	kTexture2DPixelFormat_RGB565,
 	kTexture2DPixelFormat_A8,
 } Texture2DPixelFormat;

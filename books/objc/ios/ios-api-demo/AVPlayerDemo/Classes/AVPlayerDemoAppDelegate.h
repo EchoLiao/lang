@@ -62,7 +62,6 @@ Copyright (C) 2010-2011 Apple Inc. All Rights Reserved.
     IBOutlet UINavigationController* cachedAssetBrowser;
     IBOutlet UIWindow *window;
     UITabBarController *tabBarController;
-	NSMutableArray *alertCompletionHandlers;
 	AVPlayerDemoPlaybackViewController* playbackViewController;
 }
 

@@ -120,9 +120,13 @@
             
         }
         case kImageShape:
+            NSLog(@"kImageShape ........................");
             glEnable(GL_TEXTURE_2D);
-            [sprite drawAtPoint:CGPointMake(lastTouch.x, 
-                                            self.frame.size.height - lastTouch.y)];
+            // [sprite drawAtPoint:CGPointMake(lastTouch.x, self.frame.size.height - lastTouch.y)];
+            // [sprite drawAtPoint:CGPointMake(lastTouch.x, self.frame.size.height - lastTouch.y)];
+            CGRect rect = { 50, 50, 200, 380 };
+            // glRotatef(40.0, 0.0, 0.0, 1.0);
+            [sprite drawInRect:rect];
             break;
         default:
             break;

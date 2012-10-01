@@ -9,16 +9,17 @@
 #import <Foundation/Foundation.h>
 #import "CharacterBuilder.h"
 
-@interface StandardCharacterBuilder : CharacterBuilder 
+// Concrete Builder
+@interface StandardCharacterBuilder : CharacterBuilder
 {
 
 }
 
 // overriden methods from the abstract CharacterBuilder
-- (CharacterBuilder *) buildStrength:(float) value;
-- (CharacterBuilder *) buildStamina:(float) value;
-- (CharacterBuilder *) buildIntelligence:(float) value;
-- (CharacterBuilder *) buildAgility:(float) value;
-- (CharacterBuilder *) buildAggressiveness:(float) value;
+//- (CharacterBuilder *) buildStrength:(float) value;
+//- (CharacterBuilder *) buildStamina:(float) value;
+//- (CharacterBuilder *) buildIntelligence:(float) value;
+//- (CharacterBuilder *) buildAgility:(float) value;
+//- (CharacterBuilder *) buildAggressiveness:(float) value;
 
 @end

@@ -27,6 +27,7 @@
     lay3.backgroundColor = [[UIColor colorWithRed:0 green:0 blue:1 alpha:1] CGColor];
     lay3.frame = CGRectMake(43, 197, 160, 230);
     [v.layer addSublayer:lay3];
+    lay3.zPosition = -1.0;
 
     
     

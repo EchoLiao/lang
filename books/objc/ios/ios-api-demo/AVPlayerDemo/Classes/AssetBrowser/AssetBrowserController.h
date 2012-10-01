@@ -96,6 +96,11 @@
 
 @end
 
+
+
+
+
+
 @protocol AssetBrowserControllerDelegate <NSObject>
 @optional
 
@@ -107,10 +112,18 @@
 
 @end
 
+
+
+
+
 @interface UINavigationController (AssetBrowserConvenienceMethods)
 // Has a navigation bar and a cancel button. Present the navigation controller modally.
 + (UINavigationController*)modalAssetBrowserControllerWithSourceType:(AssetBrowserSourceType)sourceType delegate:(id <AssetBrowserControllerDelegate>)delegate;
 @end
+
+
+
+
 
 @interface UITabBarController (AssetBrowserConvenienceMethods)
 // Configured with one source per tab. Present the tab bar controller modally.
