@@ -10,6 +10,9 @@
 #import "Mark.h"
 #import "ScribbleMemento.h"
 
+
+// MARK-Observer: Scribble 充当"Subject". [(P137)], [(P141)]
+// 使用 NSObject 提供的 KVO
 @interface Scribble : NSObject
 {
   @private

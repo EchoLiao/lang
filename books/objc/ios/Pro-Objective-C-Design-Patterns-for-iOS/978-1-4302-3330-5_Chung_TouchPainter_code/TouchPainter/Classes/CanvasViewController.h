@@ -13,6 +13,8 @@
 #import "CommandBarButton.h"
 #import "NSMutableArray+Stack.h"
 
+
+// MARK-Observer: CanvasViewController 充当"Observer". [(P137)], [(P141)]
 @interface CanvasViewController : UIViewController
 {
   @private

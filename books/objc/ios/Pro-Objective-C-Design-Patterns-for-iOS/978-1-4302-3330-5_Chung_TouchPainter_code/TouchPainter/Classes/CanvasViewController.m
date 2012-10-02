@@ -30,6 +30,8 @@
     // add itself to the scribble as
     // an observer for any changes to
     // its internal state - mark
+      
+    // MARK-Observer: Add Observer
     [scribble_ addObserver:self
                 forKeyPath:@"mark"
                    options:NSKeyValueObservingOptionInitial | 
@@ -200,7 +202,7 @@
   
   // we don't need to undo every vertex
   // so we are keeping this
-  [scribble_ addMark:vertex shouldAddToPreviousMark:YES];
+  [scribble_ addMark:vertex shouldAddToPreviousMark:YES]; // MARK-Observer
 }
 
 - (void)touchesEnded:(NSSet *)touches withEvent:(UIEvent *)event
@@ -253,6 +255,7 @@
 #pragma mark -
 #pragma mark Scribble observer method
 
+// MARK-Observer: 重载观察方法
 - (void) observeValueForKeyPath:(NSString *)keyPath 
                        ofObject:(id)object 
                          change:(NSDictionary *)change 

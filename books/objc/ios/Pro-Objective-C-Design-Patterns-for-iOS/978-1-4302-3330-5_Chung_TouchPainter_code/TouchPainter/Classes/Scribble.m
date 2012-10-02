@@ -42,7 +42,7 @@
 
 - (void) addMark:(id <Mark>)aMark shouldAddToPreviousMark:(BOOL)shouldAddToPreviousMark
 {
-  // manual KVO invocation
+  // manual KVO invocation, Subject.
   [self willChangeValueForKey:@"mark"];
   
   // if the flag is set to YES
@@ -63,7 +63,7 @@
     incrementalMark_ = aMark;
   }
   
-  // manual KVO invocation
+  // manual KVO invocation, Subject.
   [self didChangeValueForKey:@"mark"];
 }
 
