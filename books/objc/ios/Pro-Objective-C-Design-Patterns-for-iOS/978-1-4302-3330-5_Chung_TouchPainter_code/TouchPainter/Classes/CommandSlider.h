@@ -9,6 +9,8 @@
 #import <Foundation/Foundation.h>
 #import "Command.h"
 
+
+// MARK-Adapter: CommandSlider 充当"被适配者". [(P94)]
 @interface CommandSlider : UISlider
 {
   @protected

@@ -12,9 +12,12 @@
 
 @implementation SetStrokeColorCommand
 
+#ifdef Use_Delegate_Implement_Adapter
 @synthesize delegate=delegate_;
+#else
 @synthesize postColorUpdateProvider=postColorUpdateProvider_;
 @synthesize RGBValuesProvider=RGBValuesProvider_;
+#endif
 
 
 - (void) execute
@@ -25,16 +28,18 @@
   
   // Retrieve RGB values from a delegate or a block 
   
+#ifdef Use_Delegate_Implement_Adapter
   // Delegation (object adapter) approach:
   [delegate_ command:self didRequestColorComponentsForRed:&redValue
                                                     green:&greenValue
                                                      blue:&blueValue];
-  
+#else
   // Block approach:
   if (RGBValuesProvider_ != nil)
   {
     RGBValuesProvider_(&redValue, &greenValue, &blueValue);
   }
+#endif
   
   // Create a color object based on the RGB values
   UIColor *color = [UIColor colorWithRed:redValue
@@ -49,20 +54,24 @@
   
   // Forward a post update message
   
-  // Delegation approach:
+#ifdef Use_Delegate_Implement_Adapter
+    // Delegation approach:
   [delegate_ command:self didFinishColorUpdateWithColor:color];
-  
+#else
   // Block approach:
   if (postColorUpdateProvider_ != nil)
   {
     postColorUpdateProvider_(color);
   }
+#endif
 }
 
 - (void) dealloc
 {
+#ifndef Use_Delegate_Implement_Adapter
   [RGBValuesProvider_ release];
   [postColorUpdateProvider_ release];
+#endif
   [super dealloc];
 }
 

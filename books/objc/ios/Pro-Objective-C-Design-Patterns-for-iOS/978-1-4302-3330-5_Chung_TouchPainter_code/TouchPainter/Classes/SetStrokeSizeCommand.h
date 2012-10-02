@@ -9,14 +9,15 @@
 #import <Foundation/Foundation.h>
 #import "Command.h"
 
+
 @class SetStrokeSizeCommand;
 
 @protocol SetStrokeSizeCommandDelegate
-
 - (void) command:(SetStrokeSizeCommand *)command 
                 didRequestForStrokeSize:(CGFloat *)size;
-
 @end
+
+
 
 
 @interface SetStrokeSizeCommand : Command 

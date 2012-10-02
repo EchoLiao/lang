@@ -38,6 +38,7 @@
 {
   [super viewDidLoad];
   
+#ifndef Use_Delegate_Implement_Adapter
   // initialize the RGB sliders with
   // a StrokeColorCommand
   SetStrokeColorCommand *colorCommand = (SetStrokeColorCommand *)[redSlider_ command];
@@ -57,6 +58,7 @@
    {
      [paletteView_ setBackgroundColor:color];
    }];
+#endif
   
   
   // restore the original values of the sliders
@@ -112,6 +114,10 @@
   [super dealloc];
 }
 
+
+
+#ifdef Use_Delegate_Implement_Adapter
+
 #pragma mark -
 #pragma mark SetStrokeColorCommandDelegate methods
 
@@ -131,6 +137,9 @@
   [paletteView_ setBackgroundColor:color];
 }
 
+#endif
+
+
 #pragma mark SetStrokeSizeCommandDelegate method
 
 - (void) command:(SetStrokeSizeCommand *)command 
@@ -138,6 +147,8 @@
 {
   *size = [sizeSlider_ value];
 }
+
+
 
 #pragma mark -
 #pragma mark Slider event handler
@@ -149,3 +160,4 @@
 
 
 @end
+

@@ -12,9 +12,12 @@
 #import "SetStrokeColorCommand.h"
 #import "SetStrokeSizeCommand.h"
 
-@interface PaletteViewController : UIViewController 
+// MARK-Adapter: PaletteViewController 充当"适配器". [(P94)]
+@interface PaletteViewController : UIViewController
+#ifdef Use_Delegate_Implement_Adapter
                                    <SetStrokeColorCommandDelegate, 
                                     SetStrokeSizeCommandDelegate>
+#endif
 {
 	@private
 	IBOutlet CommandSlider *redSlider_;
