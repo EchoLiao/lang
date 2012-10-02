@@ -10,6 +10,8 @@
 #import "Car.h"
 #import "Taximeter.h"
 
+
+// MARK-Facade: CabDriver 充当"Facader"
 @interface CabDriver : NSObject 
 {
 
