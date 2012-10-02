@@ -9,7 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "ConsoleCommands.h"
 
-@interface ConsoleEmulator : NSObject 
+
+// MARK-Bridge: ConsoleEmulator 充当"Implementor". [(P107)]
+@interface ConsoleEmulator : NSObject
 {
 
 }

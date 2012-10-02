@@ -9,7 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "ConsoleEmulator.h"
 
-@interface GameGearEmulator : ConsoleEmulator 
+
+// The second Implementor
+@interface GameGearEmulator : ConsoleEmulator
 {
 
 }

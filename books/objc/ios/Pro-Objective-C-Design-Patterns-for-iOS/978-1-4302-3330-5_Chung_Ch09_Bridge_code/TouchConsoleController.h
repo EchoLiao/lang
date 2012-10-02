@@ -9,7 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "ConsoleController.h"
 
-@interface TouchConsoleController : ConsoleController 
+
+// one RefinedAbstraction
+@interface TouchConsoleController : ConsoleController
 {
 
 }

@@ -10,10 +10,12 @@
 #import "ConsoleEmulator.h"
 #import "ConsoleCommands.h"
 
-@interface ConsoleController : NSObject 
+
+// MARK-Bridge: ConsoleController 充当"Abstraction". [(P107)]
+@interface ConsoleController : NSObject
 {
   @private
-  ConsoleEmulator *emulator_;
+  ConsoleEmulator *emulator_; // Bridge
 }
 
 @property (nonatomic, retain) ConsoleEmulator *emulator;
