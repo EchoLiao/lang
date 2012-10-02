@@ -18,6 +18,8 @@ typedef enum
   kButtonTagOpenThumbnailView
 } ButtonTag;
 
+
+// MARK-Mediator: CoordinatingController 充当"中介者". [(P129)]
 @interface CoordinatingController : NSObject
 {
   @private
