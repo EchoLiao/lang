@@ -10,6 +10,7 @@
 #import "Scribble.h"
 #import "ScribbleThumbnailViewImageProxy.h"
 
+// MARK-Facade: ScribbleManager 充当"外观". [(P118)]
 @interface ScribbleManager : NSObject 
 {
 	
