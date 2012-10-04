@@ -36,7 +36,7 @@
 
 - (void) prepareBread
 {
-  
+  // 添加异常, 用来保证子类实现此方法.
   [NSException raise:NSInternalInconsistencyException 
               format:@"You must override %@ in a subclass", NSStringFromSelector(_cmd)];
 }

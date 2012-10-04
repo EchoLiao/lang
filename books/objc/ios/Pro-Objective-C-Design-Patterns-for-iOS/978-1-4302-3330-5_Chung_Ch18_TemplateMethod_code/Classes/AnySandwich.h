@@ -21,7 +21,7 @@
 - (void) putBreadOnPlate;
 - (void) addMeat;
 - (void) addCondiments;
-- (void) extraStep;
+- (void) extraStep; // "钩子"方法
 - (void) serve;
 
 @end
