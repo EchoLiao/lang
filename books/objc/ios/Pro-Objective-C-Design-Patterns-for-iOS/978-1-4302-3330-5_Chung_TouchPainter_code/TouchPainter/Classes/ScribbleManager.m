@@ -95,6 +95,7 @@
   NSString *scribbleThumbnailPath = [scribbleThumbnailPathsArray objectAtIndex:index];
   NSString *scribblePath = [scribblePathsArray objectAtIndex:index];
   
+  // MARK-Proxy: "Client"
   if (scribbleThumbnailPath)
   {
     // initialize an instance of ScribbleThumbnailProxy

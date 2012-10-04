@@ -10,6 +10,8 @@
 #import "Scribble.h"
 #import "ScribbleSource.h"
 
+
+// MARK-Proxy: 
 @interface ScribbleThumbnailView : UIView <ScribbleSource> 
 {
   @protected

@@ -61,7 +61,8 @@
 // loading process and draw a placeholder frame.
 // Once the real payload is loaded, 
 // it will redraw itself with the real one.
-- (void)drawRect:(CGRect)rect 
+// MARK-Proxy:
+- (void)drawRect:(CGRect)rect
 {
   // if is no real image available
   // from realImageView_,
@@ -120,6 +121,7 @@
 #pragma mark -
 #pragma mark A private method for loading a real image in a thread
 
+// MARK-Proxy: Laoding Thread
 - (void) forwardImageLoadingThread
 {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];

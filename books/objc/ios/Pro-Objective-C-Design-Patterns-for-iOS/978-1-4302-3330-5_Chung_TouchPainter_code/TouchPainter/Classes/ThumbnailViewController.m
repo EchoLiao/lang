@@ -129,8 +129,9 @@
   for (NSInteger i = 0; i < numberOfSupportedThumbnails && 
        (thumbnailIndex + i) < numberOfScribbles; ++i)
   {
+    // MARK-Proxy:
     UIView *scribbleThumbnail = [scribbleManager_ scribbleThumbnailViewAtIndex:
-                                            thumbnailIndex + i];
+                                 thumbnailIndex + i];
     [cell addThumbnailView:scribbleThumbnail atIndex:i];
   }
   

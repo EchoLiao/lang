@@ -10,6 +10,8 @@
 #import "ScribbleThumbnailView.h"
 #import "Command.h"
 
+
+// MARK-Proxy: 
 @interface ScribbleThumbnailViewImageProxy : ScribbleThumbnailView
 {
   @private
