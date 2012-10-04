@@ -9,6 +9,8 @@
 #import "MarkEnumerator.h"
 #import "MarkEnumerator+Internal.h"
 
+
+// MARK-Iterator:
 @implementation MarkEnumerator
 
 - (NSArray *)allObjects
@@ -28,6 +30,7 @@
   [stack_ release];
   [super dealloc];
 }
+
 
 #pragma mark -
 #pragma mark Private Methods

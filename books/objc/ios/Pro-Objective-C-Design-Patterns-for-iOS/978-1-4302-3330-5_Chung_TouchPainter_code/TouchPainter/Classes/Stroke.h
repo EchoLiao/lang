@@ -41,6 +41,7 @@
 // for the Visitor pattern
 - (void) acceptMarkVisitor:(id <MarkVisitor>)visitor;
 
+// MARK-Iterator: 提供的迭代器
 // for the Iterator pattern
 - (NSEnumerator *) enumerator;
 

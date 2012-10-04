@@ -155,14 +155,17 @@
   [coder encodeObject:children_ forKey:@"StrokeChildren"];
 }
 
+
 #pragma mark -
 #pragma mark enumerator methods
 
+// 外部迭代器
 - (NSEnumerator *) enumerator
 {
   return [[[MarkEnumerator alloc] initWithMark:self] autorelease];
 }
 
+// 内部迭代器
 - (void) enumerateMarksUsingBlock:(void (^)(id <Mark> item, BOOL *stop)) block
 {
   BOOL stop = NO;
@@ -176,6 +179,7 @@
       break;
   }
 }
+
 
 #pragma mark -
 #pragma mark An Extended Direct-draw Example

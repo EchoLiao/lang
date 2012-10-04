@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 
+// MARK-Iterator:
 @interface NSMutableArray (Stack)
 
 - (void) push:(id)object;

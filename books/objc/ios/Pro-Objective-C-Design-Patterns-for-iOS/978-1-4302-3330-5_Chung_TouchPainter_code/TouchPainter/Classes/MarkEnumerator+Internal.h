@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 
 
+// 内部接口, 其实现在 MarkEnumerator.m 中进行. 该文件只对内部开放, Client 看不到. 
 @interface MarkEnumerator ()
 
 - (id) initWithMark:(id <Mark>)mark;
