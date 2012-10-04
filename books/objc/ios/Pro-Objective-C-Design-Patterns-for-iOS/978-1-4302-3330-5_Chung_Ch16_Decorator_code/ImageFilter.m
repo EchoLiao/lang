@@ -31,6 +31,7 @@
   // to apply real filters
 }
 
+// MARK-Decorator: MMMMM
 - (id) forwardingTargetForSelector:(SEL)aSelector
 {
   NSString *selectorName = NSStringFromSelector(aSelector);

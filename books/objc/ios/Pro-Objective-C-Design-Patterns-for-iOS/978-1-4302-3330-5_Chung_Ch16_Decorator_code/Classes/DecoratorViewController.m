@@ -31,14 +31,16 @@
                                                                           image.size.height / 8.0);
   CGAffineTransform finalTransform = CGAffineTransformConcat(rotateTransform, translateTransform);
   
-  // a true subclass approach
-  id <ImageComponent> transformedImage = [[[ImageTransformFilter alloc] initWithImageComponent:image
-                                                                                     transform:finalTransform] 
+    
+#if 1
+    // a true subclass approach
+  id <ImageComponent> transformedImage = [[[ImageTransformFilter alloc] 
+                                           initWithImageComponent:image transform:finalTransform]
                                           autorelease];
   id <ImageComponent> finalImage = [[[ImageShadowFilter alloc] initWithImageComponent:transformedImage] 
-                autorelease]; 
+                                    autorelease];
 
-  /*
+#else // Use Categories approach
   // a category approach
   // add transformation
   UIImage *transformedImage = [image imageWithTransform:finalTransform];
@@ -48,12 +50,14 @@
 
   // category approach in one line
   //id <ImageComponent> finalImage = [[image imageWithTransform:finalTransform] imageWithDropShadow];
-  */
+#endif
   
   // create a new image view
   // with a filtered image
   DecoratorView *decoratorView = [[[DecoratorView alloc] initWithFrame:[self.view bounds]]
                                   autorelease];
+  // [DecoratorView drawRect:]  -->  [finalImage drawInRect:] ([ImageShadowFilter drawInRect:])
+  // [ImageTransformFilter drawInRect:]  -->  [[UIImage drawInRect:]
   [decoratorView setImage:finalImage];
   [self.view addSubview:decoratorView];
 }

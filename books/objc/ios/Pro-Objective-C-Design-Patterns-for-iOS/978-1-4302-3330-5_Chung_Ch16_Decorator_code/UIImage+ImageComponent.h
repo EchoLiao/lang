@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "ImageComponent.h"
 
+// MARK-Decorator: add ImageComponent Delegate to UIImage.
 @interface UIImage (ImageComponent) <ImageComponent>
 
 @end

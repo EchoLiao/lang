@@ -10,6 +10,7 @@
 #import "ImageComponent.h"
 #import "UIImage+ImageComponent.h"
 
+// MARK-Decorator:
 @interface ImageFilter : NSObject <ImageComponent>
 {
   @private

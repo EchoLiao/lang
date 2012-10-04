@@ -9,6 +9,7 @@
 #import <UIKit/UIKit.h>
 
 
+// MARK-Decorator:
 @protocol ImageComponent <NSObject>
 
 // We will intercept these
