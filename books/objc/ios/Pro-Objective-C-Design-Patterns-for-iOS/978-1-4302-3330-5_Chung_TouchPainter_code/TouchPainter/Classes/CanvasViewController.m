@@ -177,8 +177,10 @@
     [newStroke setColor:strokeColor_];
     [newStroke setSize:strokeSize_];
     
-    //[scribble_ addMark:newStroke shouldAddToPreviousMark:NO];
-    
+#if 0
+    [scribble_ addMark:newStroke shouldAddToPreviousMark:NO];
+#else
+    // 利用系统 NSUndoManager, NSInvocation 实现撤销与恢复.
     // retrieve a new NSInvocation for drawing and
     // set new arguments for the draw command
     NSInvocation *drawInvocation = [self drawScribbleInvocation];
@@ -191,6 +193,7 @@
     
     // execute the draw command with the undraw command
     [self executeInvocation:drawInvocation withUndoInvocation:undrawInvocation];
+#endif
   }
   
   // add the current touch as another vertex to the
@@ -274,15 +277,15 @@
 #pragma mark -
 #pragma mark Draw Scribble Invocation Generation Methods
 
+// 利用系统 NSUndoManager, NSInvocation 实现撤销与恢复.
+// [(P244)]
 - (NSInvocation *) drawScribbleInvocation
 {
   NSMethodSignature *executeMethodSignature = [scribble_ 
                                                methodSignatureForSelector:
-                                               @selector(addMark:
-                                                         shouldAddToPreviousMark:)];
-  NSInvocation *drawInvocation = [NSInvocation 
-                                  invocationWithMethodSignature:
-                                  executeMethodSignature];
+                                               @selector(addMark:shouldAddToPreviousMark:)];
+  NSInvocation *drawInvocation = [NSInvocation
+                                  invocationWithMethodSignature:executeMethodSignature];
   [drawInvocation setTarget:scribble_];
   [drawInvocation setSelector:@selector(addMark:shouldAddToPreviousMark:)];
   BOOL attachToPreviousMark = NO;
@@ -305,7 +308,10 @@
   return undrawInvocation;
 }
 
+
 #pragma mark Draw Scribble Command Methods
+
+// 利用系统 NSUndoManager, NSInvocation 实现撤销与恢复.
 
 - (void) executeInvocation:(NSInvocation *)invocation 
         withUndoInvocation:(NSInvocation *)undoInvocation
