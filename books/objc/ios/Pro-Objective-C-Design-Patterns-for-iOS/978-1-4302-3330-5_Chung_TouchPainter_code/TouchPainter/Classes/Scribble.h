@@ -13,6 +13,7 @@
 
 // MARK-Observer: Scribble 充当"Subject". [(P137)], [(P141)]
 // 使用 NSObject 提供的 KVO
+// MARK-Memento: "Originator" . [(P283)]
 @interface Scribble : NSObject
 {
   @private

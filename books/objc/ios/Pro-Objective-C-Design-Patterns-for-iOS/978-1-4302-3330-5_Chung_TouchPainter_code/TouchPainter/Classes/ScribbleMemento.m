@@ -11,6 +11,7 @@
 
 @implementation ScribbleMemento
 
+// @property in "ScribbleMemento+Friend.h"
 @synthesize mark=mark_;
 @synthesize hasCompleteSnapshot=hasCompleteSnapshot_;
 
@@ -26,7 +27,7 @@
   id <Mark> retoredMark = (id <Mark>)[NSKeyedUnarchiver unarchiveObjectWithData:data];
   ScribbleMemento *memento = [[[ScribbleMemento alloc] 
                                initWithMark:retoredMark] autorelease];
-  
+
   return memento;
 }
 

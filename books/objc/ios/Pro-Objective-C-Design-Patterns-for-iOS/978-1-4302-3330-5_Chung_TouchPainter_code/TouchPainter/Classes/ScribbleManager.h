@@ -11,6 +11,7 @@
 #import "ScribbleThumbnailViewImageProxy.h"
 
 // MARK-Facade: ScribbleManager 充当"外观". [(P118)]
+// MARK-Memento: "Caretaker"
 @interface ScribbleManager : NSObject 
 {
 	

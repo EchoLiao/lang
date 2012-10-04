@@ -38,6 +38,8 @@
   NSString *scribbleThumbnailName = [NSString stringWithFormat:@"thumbnail_%d.png", 
                                      newIndex];
   
+    
+  // MARK-Memento:
   // get a memento from the scribble
   // then save the memento in the file system
   ScribbleMemento *scribbleMemento = [scribble scribbleMemento];
@@ -67,6 +69,7 @@
   Scribble *loadedScribble = nil;
   NSArray *scribbleDataPathsArray = [self scribbleDataPaths];
   
+  // MARK-Memento:
   // load scribble data from the path indicated
   // by the index
   NSString *scribblePath = [scribbleDataPathsArray objectAtIndex:index];
