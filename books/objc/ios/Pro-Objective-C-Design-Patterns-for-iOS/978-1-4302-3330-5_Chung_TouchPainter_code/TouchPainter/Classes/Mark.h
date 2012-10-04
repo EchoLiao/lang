@@ -14,6 +14,10 @@
 @protocol Mark <NSObject, NSCopying, NSCoding>
 @optional
 
+// ---------------
+// MARK-Composite: Mark 充当组合模式中的节点的抽象节点. 其抽象并统一所有节点的方法接口, 因为
+//                 为了给 Client 提供统一的接口方法, 而其又是一个抽象类(协议), 所以其直接子
+//                 类应该实现其所有方法. [(P157)]
 #pragma mark - Property Interface
 @property (nonatomic, retain) UIColor *color;
 @property (nonatomic, assign) CGFloat size;
@@ -21,11 +25,14 @@
 @property (nonatomic, readonly) NSUInteger count;
 @property (nonatomic, readonly) id <Mark> lastChild;
 
-#pragma mark - Prototype Pattern Interface
-- (id) copy;
 - (void) addMark:(id <Mark>) mark;
 - (void) removeMark:(id <Mark>) mark;
 - (id <Mark>) childMarkAtIndex:(NSUInteger) index;
+// ---------------
+
+
+#pragma mark - Prototype Pattern Interface
+- (id) copy;
 
 
 #pragma mark - Others Interface

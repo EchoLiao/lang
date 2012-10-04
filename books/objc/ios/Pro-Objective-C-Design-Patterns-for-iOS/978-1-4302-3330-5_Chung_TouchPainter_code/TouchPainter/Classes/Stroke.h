@@ -20,6 +20,20 @@
   NSMutableArray *children_;
 }
 
+// ---------------
+// MARK-Composite:
+#pragma mark - Property Interface
+@property (nonatomic, retain) UIColor *color;
+@property (nonatomic, assign) CGFloat size;
+@property (nonatomic, assign) CGPoint location;
+@property (nonatomic, readonly) NSUInteger count;
+@property (nonatomic, readonly) id <Mark> lastChild;
+
+- (void) addMark:(id <Mark>) mark;
+- (void) removeMark:(id <Mark>) mark;
+- (id <Mark>) childMarkAtIndex:(NSUInteger) index;
+// ---------------
+
 
 // for the Prototype pattern
 - (id) copyWithZone:(NSZone *)zone;

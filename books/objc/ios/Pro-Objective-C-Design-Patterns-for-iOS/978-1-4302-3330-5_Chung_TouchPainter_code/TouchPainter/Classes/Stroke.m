@@ -25,6 +25,7 @@
 }
 
 
+#pragma mark - Composite Pattern Interface
 #pragma mark - Property Interface
 
 @synthesize color=color_, size=size_;
@@ -57,8 +58,6 @@
 }
 
 
-#pragma mark - Prototype Pattern Interface
-
 - (void) addMark:(id <Mark>) mark
 {
   [children_ addObject:mark];
@@ -88,6 +87,8 @@
   return [children_ objectAtIndex:index];
 }
 
+
+#pragma mark - Prototype Pattern Interface
 #pragma mark NSCopying method
 
 - (id)copyWithZone:(NSZone *)zone

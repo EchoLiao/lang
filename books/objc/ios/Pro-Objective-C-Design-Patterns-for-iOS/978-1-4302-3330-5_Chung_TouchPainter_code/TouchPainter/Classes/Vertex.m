@@ -23,9 +23,24 @@
 }
 
 
+// MARK-Composite:
 #pragma mark - Property Interface
-
 @synthesize location=location_;
+@dynamic color, size;
+
+// MARK-Composite: 直接子类应该实现其所有方法.
+- (void)setColor:(UIColor *)color {}
+- (UIColor*)color { return nil; }
+- (void)setSize:(CGFloat)size {}
+- (CGFloat)size { return 0.0; }
+- (id <Mark>)lastChild { return nil; }
+- (NSUInteger)count { return 0; }
+
+// MARK-Composite: 直接子类应该实现其所有方法.
+- (void) addMark:(id <Mark>) mark {}
+- (void) removeMark:(id <Mark>) mark {}
+- (id <Mark>) childMarkAtIndex:(NSUInteger) index { return nil; }
+
 
 
 #pragma mark - Prototype Pattern Interface

@@ -14,6 +14,7 @@
 
 #pragma mark - Property Interface
 
+// MARK-Composite:
 @synthesize size=size_, color=color_;
 
 
