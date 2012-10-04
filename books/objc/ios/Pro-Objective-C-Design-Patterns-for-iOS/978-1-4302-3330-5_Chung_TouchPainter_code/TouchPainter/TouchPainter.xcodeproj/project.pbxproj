@@ -63,6 +63,7 @@
 		8B3B491A12D6BBA2003BA61D /* MarkEnumerator.m in Sources */ = {isa = PBXBuildFile; fileRef = 8B3B491912D6BBA2003BA61D /* MarkEnumerator.m */; };
 		F4AFD0131619868E009E66A3 /* cloth.png in Resources */ = {isa = PBXBuildFile; fileRef = F4AFD0111619868E009E66A3 /* cloth.png */; };
 		F4AFD0141619868E009E66A3 /* paper.png in Resources */ = {isa = PBXBuildFile; fileRef = F4AFD0121619868E009E66A3 /* paper.png */; };
+		F4AFD040161DAECB009E66A3 /* DrawScribbleCommand.m in Sources */ = {isa = PBXBuildFile; fileRef = F4AFD03F161DAECA009E66A3 /* DrawScribbleCommand.m */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -163,6 +164,8 @@
 		8D1107310486CEB800E47090 /* TouchPainter-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "TouchPainter-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
 		F4AFD0111619868E009E66A3 /* cloth.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = cloth.png; path = Resources/Images/cloth.png; sourceTree = "<group>"; };
 		F4AFD0121619868E009E66A3 /* paper.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = paper.png; path = Resources/Images/paper.png; sourceTree = "<group>"; };
+		F4AFD03E161DAEC9009E66A3 /* DrawScribbleCommand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DrawScribbleCommand.h; sourceTree = "<group>"; };
+		F4AFD03F161DAECA009E66A3 /* DrawScribbleCommand.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = DrawScribbleCommand.m; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -337,6 +340,8 @@
 				238C3729128A15B70022CF5E /* SetStrokeSizeCommand.m */,
 				23282868128A2DA400283F62 /* SetStrokeColorCommand.h */,
 				23282869128A2DA400283F62 /* SetStrokeColorCommand.m */,
+				F4AFD03E161DAEC9009E66A3 /* DrawScribbleCommand.h */,
+				F4AFD03F161DAECA009E66A3 /* DrawScribbleCommand.m */,
 			);
 			name = Command;
 			sourceTree = "<group>";
@@ -599,6 +604,7 @@
 				2328286A128A2DA400283F62 /* SetStrokeColorCommand.m in Sources */,
 				23C59D401298BEFA002B38A5 /* PrototypeController.m in Sources */,
 				8B3B491A12D6BBA2003BA61D /* MarkEnumerator.m in Sources */,
+				F4AFD040161DAECB009E66A3 /* DrawScribbleCommand.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
