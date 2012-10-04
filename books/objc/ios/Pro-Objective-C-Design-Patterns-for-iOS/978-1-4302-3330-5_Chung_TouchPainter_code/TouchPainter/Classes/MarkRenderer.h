@@ -12,6 +12,8 @@
 #import "Vertex.h"
 #import "Stroke.h"
 
+
+// MARK-Visitor: MarkRenderer 子类, 用于渲染 Mark, Dot 等.
 @interface MarkRenderer : NSObject <MarkVisitor>
 {
   @private

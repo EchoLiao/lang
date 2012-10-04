@@ -39,6 +39,7 @@
 - (id) copyWithZone:(NSZone *)zone;
 
 // for the Visitor pattern
+// MARK-Visitor:
 - (void) acceptMarkVisitor:(id <MarkVisitor>)visitor;
 
 // MARK-Iterator: 提供的迭代器

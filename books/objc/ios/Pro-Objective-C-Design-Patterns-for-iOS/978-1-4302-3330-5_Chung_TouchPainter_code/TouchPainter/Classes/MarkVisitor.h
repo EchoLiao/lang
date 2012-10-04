@@ -12,6 +12,7 @@
 @protocol Mark;
 @class Dot, Vertex, Stroke;
 
+// MARK-Visitor: 对 Mark, Dot 等提供访问器.
 @protocol MarkVisitor <NSObject>
 
 - (void) visitMark:(id <Mark>)mark;
