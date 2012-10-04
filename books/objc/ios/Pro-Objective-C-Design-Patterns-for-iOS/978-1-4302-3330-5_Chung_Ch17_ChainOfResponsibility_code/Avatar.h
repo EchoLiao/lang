@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "AttackHandler.h"
 
+// MARK-ChainOfResponsibility:
 @interface Avatar : AttackHandler
 {
 

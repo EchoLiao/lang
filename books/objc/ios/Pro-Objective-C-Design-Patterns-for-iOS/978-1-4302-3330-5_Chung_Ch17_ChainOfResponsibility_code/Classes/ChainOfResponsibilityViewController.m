@@ -36,6 +36,7 @@
 
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+// MARK-ChainOfResponsibility: "Client"
 - (void)viewDidLoad
 {
   [super viewDidLoad];
@@ -53,7 +54,11 @@
   AttackHandler *superAvatar = [[[CrystalShield alloc] init] autorelease];
   [superAvatar setNextAttackHandler:metalArmoredAvatar];
   
+    
+    
   // ... some other actions
+    
+    
   
   // attack the avatar with
   // a sword

@@ -9,6 +9,7 @@
 #import <Foundation/Foundation.h>
 #import "Attack.h"
 
+// MARK-ChainOfResponsibility:
 @interface AttackHandler : NSObject 
 {
   @private
@@ -17,6 +18,7 @@
 
 @property (nonatomic, retain) AttackHandler *nextAttackHandler;
 
+// Handle
 - (void) handleAttack:(Attack *)attack;
 
 @end
