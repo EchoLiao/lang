@@ -8,7 +8,9 @@
 
 #import <UIKit/UIKit.h>
 
-@interface FlyweightView : UIView 
+
+// MARK-Flyweight:
+@interface FlyweightView : UIView
 {
   @private
   NSArray *flowerList_;

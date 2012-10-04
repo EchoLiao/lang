@@ -13,7 +13,6 @@
 
 @synthesize flowerList=flowerList_;
 
-extern NSString *FlowerObjectKey, *FlowerLocationKey;
 
 // Only override drawRect: if you perform custom drawing.
 // An empty implementation adversely affects performance during animation.

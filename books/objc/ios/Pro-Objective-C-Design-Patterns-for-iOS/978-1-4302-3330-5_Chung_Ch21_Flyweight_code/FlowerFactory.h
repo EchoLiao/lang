@@ -19,7 +19,9 @@ typedef enum
   kTotalNumberOfFlowerTypes
 } FlowerType;
 
-@interface FlowerFactory : NSObject 
+
+// MARK-Flyweight: "FlyweightFactory"
+@interface FlowerFactory : NSObject
 {
   @private
   NSMutableDictionary *flowerPool_;

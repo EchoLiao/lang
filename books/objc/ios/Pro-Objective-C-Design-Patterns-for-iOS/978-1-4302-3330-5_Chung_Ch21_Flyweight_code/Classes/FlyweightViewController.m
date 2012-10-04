@@ -15,6 +15,7 @@
 
 
 // Implement viewDidLoad to do additional setup after loading the view, typically from a nib.
+// MARK-Flyweight: "Client"
 - (void)viewDidLoad 
 {
   [super viewDidLoad];
@@ -56,6 +57,7 @@
  
   // add the flower list to
   // this FlyweightView instance
+  // self.view Created by FlyweightViewController.xib !
   [(FlyweightView *)self.view setFlowerList:flowerList];
 }
 

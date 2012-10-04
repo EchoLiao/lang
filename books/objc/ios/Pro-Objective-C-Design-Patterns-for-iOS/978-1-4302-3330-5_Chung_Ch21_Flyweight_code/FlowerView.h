@@ -9,7 +9,8 @@
 #import <Foundation/Foundation.h>
 
 
-@interface FlowerView : UIImageView 
+// MARK-Flyweight: "Flyweight"
+@interface FlowerView : UIImageView
 {
   
 }
