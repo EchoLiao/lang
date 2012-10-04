@@ -80,6 +80,7 @@
 #pragma mark -
 #pragma mark UITextFieldDelegate methods
 
+// Mark-Strategy: "Clent". Validate
 - (void)textFieldDidEndEditing:(UITextField *)textField
 {
   //if (textField == numericTextField)

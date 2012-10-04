@@ -10,7 +10,8 @@
 
 static NSString * const InputValidationErrorDomain = @"InputValidationErrorDomain";
 
-@interface InputValidator : NSObject 
+// Mark-Strategy: "Strategy"
+@interface InputValidator : NSObject
 {
 
 }

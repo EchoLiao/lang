@@ -16,7 +16,7 @@
 - (BOOL) validate
 {
   NSError *error = nil;
-  BOOL validationResult = [inputValidator_ validateInput:self error:&error];
+  BOOL validationResult = [inputValidator_ validateInput:self error:&error]; // Validate
   
   if (!validationResult)
   {

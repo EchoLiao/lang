@@ -9,7 +9,9 @@
 #import <Foundation/Foundation.h>
 #import "InputValidator.h"
 
-@interface CustomTextField : UITextField 
+
+// Mark-Strategy: "Context"
+@interface CustomTextField : UITextField
 {
   @private
   InputValidator *inputValidator_;
