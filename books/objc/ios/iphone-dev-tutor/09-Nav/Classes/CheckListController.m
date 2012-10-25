@@ -67,14 +67,12 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
     
     if (newRow != oldRow)
     {
-        UITableViewCell *newCell = [tableView cellForRowAtIndexPath:
-                                    indexPath];
+        UITableViewCell *newCell = [tableView cellForRowAtIndexPath:indexPath];
         newCell.accessoryType = UITableViewCellAccessoryCheckmark;
         
-        UITableViewCell *oldCell = [tableView cellForRowAtIndexPath: 
-                                    lastIndexPath]; 
+        UITableViewCell *oldCell = [tableView cellForRowAtIndexPath:lastIndexPath]; 
         oldCell.accessoryType = UITableViewCellAccessoryNone;
-        lastIndexPath = indexPath;
+        self.lastIndexPath = indexPath;
     }
     
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
