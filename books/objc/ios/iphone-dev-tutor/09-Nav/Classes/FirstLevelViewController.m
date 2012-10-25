@@ -111,7 +111,7 @@
     SecondLevelViewController *controller =
     [controllers objectAtIndex:row];
     cell.textLabel.text = controller.title;
-    cell.image = controller.rowImage;
+    cell.imageView.image = controller.rowImage;
     cell.accessoryType = UITableViewCellAccessoryDisclosureIndicator;
     return cell;
 }

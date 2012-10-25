@@ -71,7 +71,7 @@
     }
     NSUInteger row = [indexPath row];
     NSString *rowTitle = [list objectAtIndex:row];
-    cell.text = rowTitle;
+    cell.textLabel.text = rowTitle;
     
     return cell;
 } 
