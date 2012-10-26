@@ -9,8 +9,12 @@
 #import "MoveMeController.h"
 
 @implementation MoveMeController
+
 @synthesize list;
--(IBAction)toggleMove{
+
+
+-(IBAction)toggleMove
+{
     [self.tableView setEditing:!self.tableView.editing animated:YES];
     
     if (self.tableView.editing)
@@ -18,6 +22,13 @@
     else
         [self.navigationItem.rightBarButtonItem setTitle:@"Move"];
 }
+
+-(void)goBack
+{
+    [self.navigationController popViewControllerAnimated:YES];
+}
+
+
 - (void)dealloc {
     [list release];
     [super dealloc];
@@ -31,16 +42,45 @@
         self.list = array;
         [array release];        
     }
-       
-    UIBarButtonItem *moveButton = [[UIBarButtonItem alloc]
-                                   initWithTitle:@"Move"
-                                   style:UIBarButtonItemStyleBordered
-                                   target:self
-                                   action:@selector(toggleMove)];
+    
+    
+    CGRect btnRect = CGRectMake(0, 0, 65, 28);
+    
+    UIButton * btn = [[UIButton alloc]initWithFrame:btnRect];
+    [btn setBackgroundImage:[UIImage imageNamed:@"ok"] forState:UIControlStateNormal];
+    [btn setBackgroundImage:[UIImage imageNamed:@"cancel"] forState:UIControlStateHighlighted];
+    [btn setBackgroundImage:[UIImage imageNamed:@"back"] forState:UIControlStateSelected];
+    btn.showsTouchWhenHighlighted = YES;
+    [btn setTitle:@"Test2" forState:UIControlStateNormal];
+    [btn addTarget:self action:NSSelectorFromString(@"toggleMove")
+              forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *moveButton = [[UIBarButtonItem alloc] initWithCustomView:btn];
     self.navigationItem.rightBarButtonItem = moveButton;
+    [btn release];
     [moveButton release];
+    
+    
+//    UIImageView *iconView=[[UIImageView alloc] initWithImage:[UIImage imageNamed:@"back"]];
+//    UIBarButtonItem *leftButton = [[UIBarButtonItem alloc] initWithCustomView:iconView];
+//    self.navigationItem.leftBarButtonItem = leftButton;
+    
+    btn = [[UIButton alloc]initWithFrame:btnRect];
+    [btn setBackgroundImage:[UIImage imageNamed:@"back"] forState:UIControlStateNormal];
+    [btn setBackgroundImage:[UIImage imageNamed:@"cancel"] forState:UIControlStateHighlighted];
+    [btn setBackgroundImage:[UIImage imageNamed:@"ok"] forState:UIControlStateSelected];
+//    btn.showsTouchWhenHighlighted = YES;
+    [btn setTitle:@"Test2" forState:UIControlStateNormal];
+    [btn addTarget:self action:NSSelectorFromString(@"goBack")
+              forControlEvents:UIControlEventTouchUpInside];
+    UIBarButtonItem *backButton = [[UIBarButtonItem alloc] initWithCustomView:btn];
+    self.navigationItem.leftBarButtonItem = backButton;
+    [btn release];
+    [backButton release];
+    
     [super viewDidLoad];
 }
+
+
 #pragma mark -
 #pragma mark Table Data Source Methods
 - (NSInteger)tableView:(UITableView *)tableView 

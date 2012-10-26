@@ -18,7 +18,7 @@
 @implementation FirstLevelViewController
 @synthesize controllers;
 - (void)viewDidLoad {
-    self.title = @"First Level";
+    self.title = @"First Level2";
     NSMutableArray *array = [[NSMutableArray alloc] init];
     
     // Disclosure Button
@@ -124,5 +124,6 @@ didSelectRowAtIndexPath:(NSIndexPath *)indexPath {
                                                  objectAtIndex:row];
     
     [self.navigationController pushViewController:nextController animated:YES];
+//    self.navigationController.navigationItem.leftBarButtonItem = nil;
 }
 @end
