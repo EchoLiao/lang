@@ -215,4 +215,10 @@ numberOfRowsInComponent:(NSInteger)component
     return [array objectAtIndex:row];
 }
 
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return YES;
+}
+
 @end

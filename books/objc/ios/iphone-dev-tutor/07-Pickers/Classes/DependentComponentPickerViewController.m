@@ -166,5 +166,9 @@ numberOfRowsInComponent:(NSInteger)component
 	return 205;
 }
 
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return YES;
+}
 
 @end

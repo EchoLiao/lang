@@ -142,4 +142,9 @@ numberOfRowsInComponent:(NSInteger)component
     return [self.fillingTypes objectAtIndex:row];
 }
 
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return YES;
+}
+
 @end

@@ -11,7 +11,8 @@
 @class PickersViewController;
 
 
-@interface _7_PickersAppDelegate : NSObject <UIApplicationDelegate> {
+@interface _7_PickersAppDelegate : NSObject <UIApplicationDelegate> 
+{
     UIWindow *window;
 	IBOutlet UITabBarController *rootController; // 使用标签控制类
 }

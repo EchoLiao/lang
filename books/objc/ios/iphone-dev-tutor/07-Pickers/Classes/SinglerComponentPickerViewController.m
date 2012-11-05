@@ -134,5 +134,9 @@
 	return [pickerData objectAtIndex:row];
 }
 
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return YES;
+}
 
 @end

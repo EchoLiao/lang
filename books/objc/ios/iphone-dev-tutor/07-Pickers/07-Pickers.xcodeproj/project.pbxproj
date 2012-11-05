@@ -38,6 +38,10 @@
 		8891277A158D6D1A00A3313D /* clockicon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8891276D158D6D1A00A3313D /* clockicon.png */; };
 		8891277B158D6D1A00A3313D /* singleicon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8891276E158D6D1A00A3313D /* singleicon.png */; };
 		8891282E158D87C200A3313D /* statedictionary.plist in Resources */ = {isa = PBXBuildFile; fileRef = 8891282D158D87C200A3313D /* statedictionary.plist */; };
+		F4D63D1F16475B8B00AE37AD /* CustomTabBar.m in Sources */ = {isa = PBXBuildFile; fileRef = F4D63D1E16475B8B00AE37AD /* CustomTabBar.m */; };
+		F4D63D2116475BF500AE37AD /* Title@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F4D63D2016475BF500AE37AD /* Title@2x.png */; };
+		F4D63D2A164764C500AE37AD /* tab_bar_select@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F4D63D29164764C500AE37AD /* tab_bar_select@2x.png */; };
+		F4D63D2C1647699F00AE37AD /* tab_bar_select_lan@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F4D63D2B1647699F00AE37AD /* tab_bar_select_lan@2x.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -81,6 +85,11 @@
 		8891276E158D6D1A00A3313D /* singleicon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = singleicon.png; sourceTree = "<group>"; };
 		8891282D158D87C200A3313D /* statedictionary.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = statedictionary.plist; sourceTree = "<group>"; };
 		8D1107310486CEB800E47090 /* _7_Pickers-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "_7_Pickers-Info.plist"; plistStructureDefinitionIdentifier = "com.apple.xcode.plist.structure-definition.iphone.info-plist"; sourceTree = "<group>"; };
+		F4D63D1D16475B8B00AE37AD /* CustomTabBar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CustomTabBar.h; sourceTree = "<group>"; };
+		F4D63D1E16475B8B00AE37AD /* CustomTabBar.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = CustomTabBar.m; sourceTree = "<group>"; };
+		F4D63D2016475BF500AE37AD /* Title@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "Title@2x.png"; sourceTree = "<group>"; };
+		F4D63D29164764C500AE37AD /* tab_bar_select@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tab_bar_select@2x.png"; sourceTree = "<group>"; };
+		F4D63D2B1647699F00AE37AD /* tab_bar_select_lan@2x.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = "tab_bar_select_lan@2x.png"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +110,7 @@
 		080E96DDFE201D6D7F000001 /* Classes */ = {
 			isa = PBXGroup;
 			children = (
+				F4D63D1C16475B5100AE37AD /* Custom Tab Bar */,
 				1D3623240D0F684500981E51 /* _7_PickersAppDelegate.h */,
 				1D3623250D0F684500981E51 /* _7_PickersAppDelegate.m */,
 				88912719158D656800A3313D /* CustomPickerViewController.h */,
@@ -149,12 +159,13 @@
 		29B97317FDCFA39411CA2CEA /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				8891282D158D87C200A3313D /* statedictionary.plist */,
+				F4D63D2216475BF900AE37AD /* Custom Tab Bar */,
 				8891275F158D6D1800A3313D /* Custom Picker Images */,
 				88912766158D6D1900A3313D /* Custom Picker Sounds */,
 				88912769158D6D1900A3313D /* Tab Bar Icons */,
-				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
+				8891282D158D87C200A3313D /* statedictionary.plist */,
 				8D1107310486CEB800E47090 /* _7_Pickers-Info.plist */,
+				28AD733E0D9D9553002E5188 /* MainWindow.xib */,
 				88912729158D667400A3313D /* DataPickerView.xib */,
 				8891272D158D668E00A3313D /* SinglerComponentPickerView.xib */,
 				88912731158D66AF00A3313D /* DoubleComponentPickerView.xib */,
@@ -207,6 +218,25 @@
 				8891276E158D6D1A00A3313D /* singleicon.png */,
 			);
 			path = "Tab Bar Icons";
+			sourceTree = "<group>";
+		};
+		F4D63D1C16475B5100AE37AD /* Custom Tab Bar */ = {
+			isa = PBXGroup;
+			children = (
+				F4D63D1D16475B8B00AE37AD /* CustomTabBar.h */,
+				F4D63D1E16475B8B00AE37AD /* CustomTabBar.m */,
+			);
+			name = "Custom Tab Bar";
+			sourceTree = "<group>";
+		};
+		F4D63D2216475BF900AE37AD /* Custom Tab Bar */ = {
+			isa = PBXGroup;
+			children = (
+				F4D63D29164764C500AE37AD /* tab_bar_select@2x.png */,
+				F4D63D2B1647699F00AE37AD /* tab_bar_select_lan@2x.png */,
+				F4D63D2016475BF500AE37AD /* Title@2x.png */,
+			);
+			name = "Custom Tab Bar";
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -278,6 +308,9 @@
 				8891277A158D6D1A00A3313D /* clockicon.png in Resources */,
 				8891277B158D6D1A00A3313D /* singleicon.png in Resources */,
 				8891282E158D87C200A3313D /* statedictionary.plist in Resources */,
+				F4D63D2116475BF500AE37AD /* Title@2x.png in Resources */,
+				F4D63D2A164764C500AE37AD /* tab_bar_select@2x.png in Resources */,
+				F4D63D2C1647699F00AE37AD /* tab_bar_select_lan@2x.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -295,6 +328,7 @@
 				8891271B158D656800A3313D /* CustomPickerViewController.m in Sources */,
 				88912721158D65F200A3313D /* SinglerComponentPickerViewController.m in Sources */,
 				88912726158D663A00A3313D /* DataPickerViewController.m in Sources */,
+				F4D63D1F16475B8B00AE37AD /* CustomTabBar.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -311,6 +345,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = _7_Pickers_Prefix.pch;
 				INFOPLIST_FILE = "_7_Pickers-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "07-Pickers";
 			};
 			name = Debug;
@@ -323,6 +358,7 @@
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = _7_Pickers_Prefix.pch;
 				INFOPLIST_FILE = "_7_Pickers-Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PRODUCT_NAME = "07-Pickers";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -336,6 +372,7 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				PREBINDING = NO;
 				SDKROOT = iphoneos;
 			};
@@ -349,6 +386,7 @@
 				GCC_C_LANGUAGE_STANDARD = c99;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 4.3;
 				OTHER_CFLAGS = "-DNS_BLOCK_ASSERTIONS=1";
 				PREBINDING = NO;
 				SDKROOT = iphoneos;
