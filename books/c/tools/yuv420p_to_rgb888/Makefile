@@ -21,7 +21,7 @@ OBJS = \
 
 
 all: $(PROJ)
-	./yuv420p_to_rgb888_test nal.yuv420p
+	#./yuv420p_to_rgb888_test nal.yuv420p
 
 $(PROJ): $(OBJS)
 	$(CC) $(LIBPATH) -o $@ $(OBJS) $(LDFLAGS)

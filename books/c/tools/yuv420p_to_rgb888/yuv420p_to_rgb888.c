@@ -152,7 +152,7 @@ int file_yuv420p_to_bmp24(const char *bmpFile, const char *yuvFile)
     YUV420P_to_RGB888(&stRGB, &stYUV);
 
     sbitData *bmpw;
-    bmpw = bmpCreateObjForWrite(EBMP_RGB, 1, stRGB.w, stRGB.h, 24, stRGB.rgb);
+    bmpw = bmpCreateObjForWrite(EBMP_RGB, 1, stRGB.w*3, stRGB.w, stRGB.h, 24, stRGB.rgb);
     assert( bmpw != NULL );
     ret = bmpWrite(bmpFile, bmpw);
     assert(ret);

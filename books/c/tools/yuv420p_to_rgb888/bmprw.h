@@ -97,6 +97,7 @@ enum eDataFormat
 typedef struct
 {
     enum eDataFormat edformat;
+    NALINT      linesize;   // in pixels
     NALINT      w;          // in pixels
     NALINT      h;          // in pixels
     NALINT      iBitCount;  // in bits
@@ -110,7 +111,7 @@ NALBOOL bmpRead(const char* fname, sbitData *bdata);
 NALBOOL bmpDestroyObjForRead(sbitData **bdata);
 
 sbitData* bmpCreateObjForWrite(enum eDataFormat edf, NALBOOL isRevert, 
-        NALINT w, NALINT h, NALINT bpp, NALBYTE *pd);
+        NALINT linesize, NALINT w, NALINT h, NALINT bpp, NALBYTE *pd);
 NALBOOL bmpWrite(const char* fname, sbitData *bdata);
 NALBOOL bmpDestroyObjForWrite(sbitData **bdata);
 

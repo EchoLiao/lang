@@ -142,10 +142,10 @@ void st_set_bitmap_format(sbmpInfoHeader *info, sbitData *bdata)
     }
 }
 
-NALBOOL st_format_transform(unsigned char *buf, int blen, 
+NALBOOL st_format_transform(unsigned char *buf, int w, 
         int bpp, enum eDataFormat dft)
 {
-    int i, pixelsize, w;
+    int i, pixelsize;
     unsigned char t, *p;
 
     if ( bpp != 24 && bpp != 32 )
@@ -155,7 +155,6 @@ NALBOOL st_format_transform(unsigned char *buf, int blen,
         return NALTRUE;
 
     pixelsize = (bpp >> 3);
-    w = blen / pixelsize;
 
     // bmp文件颜色分量的存储顺序是: BGR 或 BGRA
     // RGB  ==> BGR 
@@ -199,9 +198,10 @@ NALBOOL st_read_bmp_file(FILE *file, sbitData *bdata)
     }
 
     // bmp文件格式要求行以 4 字节对齐
-    linepich = ((((info.biWidth*info.biBitCount)>>3)+3)>>2)<<2;
+    linepich = (((info.biWidth*info.biBitCount)>>3)+3) & ~3;
     assert( linepich - ((info.biWidth*info.biBitCount)>>3) <= 3 );
 
+	bdata->linesize = linepich;
     bdata->w = linepich / (info.biBitCount>>3); // MUST: info.biHeight >= 8
     bdata->h = info.biHeight;   // 高度值可能是负数? QQQQQ
     bdata->iBitCount = info.biBitCount;
@@ -219,7 +219,7 @@ NALBOOL st_read_bmp_file(FILE *file, sbitData *bdata)
         {
             if ( fread(dbuf, 1, linepich, file) != linepich )
                 goto _READ_ERROR;
-            st_format_transform(dbuf, linepich, bdata->iBitCount,
+            st_format_transform(dbuf, bdata->w, bdata->iBitCount,
                     bdata->edformat);
             dbuf -= linepich;
         }
@@ -230,7 +230,7 @@ NALBOOL st_read_bmp_file(FILE *file, sbitData *bdata)
         {
             if ( fread(dbuf, 1, linepich, file) != linepich )
                 goto _READ_ERROR;
-            st_format_transform(dbuf, linepich, bdata->iBitCount,
+            st_format_transform(dbuf, bdata->w, bdata->iBitCount,
                     bdata->edformat);
             dbuf += linepich;
         }
@@ -258,8 +258,8 @@ NALBOOL st_write_bmp_file(FILE *file, sbitData *bdata)
     sbmpHeader      header;
     sbmpInfoHeader  info;
 
-    srcw = bdata->w * (bdata->iBitCount >> 3);
-    linepich = ((srcw+3)>>2)<<2;
+	srcw = bdata->linesize;
+    linepich = (srcw+3) & ~3;
     igap = linepich - srcw;
     assert(igap <= 3);
 
@@ -290,18 +290,18 @@ NALBOOL st_write_bmp_file(FILE *file, sbitData *bdata)
     fseek(file, BMP_DATA_OFFSET, SEEK_SET);
     if ( bdata->isRevert )
     {
-        sbuf = bdata->pdata + linepich * (bdata->h - 1);
+        sbuf = bdata->pdata + srcw * (bdata->h - 1);
         for ( i = 0; i < bdata->h; i++ )
         {
-            memcpy(ssbuf, sbuf, linepich);
-            st_format_transform(ssbuf, linepich, bdata->iBitCount,
+            memcpy(ssbuf, sbuf, srcw);
+            st_format_transform(ssbuf, bdata->w, bdata->iBitCount,
                     bdata->edformat);
             if ( fwrite(ssbuf, 1, srcw, file) != srcw )
                 goto _WRITE_ERROR;
             if ( igap != 0 )
                 if ( fwrite(gaps, 1, igap, file) != igap )
                     goto _WRITE_ERROR;
-            sbuf -= linepich;
+            sbuf -= srcw;
         }
     }
     else 
@@ -309,15 +309,15 @@ NALBOOL st_write_bmp_file(FILE *file, sbitData *bdata)
         sbuf = bdata->pdata;
         for ( i = 0; i < bdata->h; i++ )
         {
-            memcpy(ssbuf, sbuf, linepich);
-            st_format_transform(ssbuf, linepich, bdata->iBitCount,
+            memcpy(ssbuf, sbuf, srcw);
+            st_format_transform(ssbuf, bdata->w, bdata->iBitCount,
                     bdata->edformat);
             if ( fwrite(ssbuf, 1, srcw, file) != srcw )
                 goto _WRITE_ERROR;
             if ( igap != 0 )
                 if ( fwrite(gaps, 1, igap, file) != igap )
                     goto _WRITE_ERROR;
-            sbuf += linepich;
+            sbuf += srcw;
         }
     }
 
@@ -414,7 +414,7 @@ NALBOOL bmpDestroyObjForRead(sbitData **bdata)
 }
 
 sbitData* bmpCreateObjForWrite(enum eDataFormat edf, NALBOOL isRevert, 
-        NALINT w, NALINT h, NALINT bpp, NALBYTE *pd)
+        NALINT linesize, NALINT w, NALINT h, NALINT bpp, NALBYTE *pd)
 {
     assert(pd != NULL);
 
@@ -425,6 +425,7 @@ sbitData* bmpCreateObjForWrite(enum eDataFormat edf, NALBOOL isRevert,
 
     pbd->edformat = edf;
     pbd->isRevert = isRevert;
+	pbd->linesize = linesize;
     pbd->w = w;
     pbd->h = h;
     pbd->iBitCount = bpp;
