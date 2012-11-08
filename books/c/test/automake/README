@@ -1,0 +1,18 @@
+
+<<linux下自动产生c语言makefile操作步骤>>
+.vercol/git/rt-notes/linux/computor/tools/devel/make/automake/automake.txt
+
+    1.  $ vi main.c
+    2.  $ autosan  ==> autosan.log configure.scan
+    3.  $ mv configure.scan configure.in
+    4.  vi configure.in
+    5.  aclocal ==> aclocal.m4 autom4te.cache
+    6.  autoconf ==> configure
+    7.  autoheader ==> config.h.in
+    8.  vi Makefile.am
+    9.  automake --add-missing
+
+    10. ./configure ==> Makefile
+    11. make && make install
+
+

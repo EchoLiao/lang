@@ -1,0 +1,24 @@
+#                                               -*- Autoconf -*-
+# Process this file with autoconf to produce a configure script.
+
+AC_PREREQ(2.61)
+AC_INIT([automake_test], [0.1], [nuoerlz@gmail.com])
+AC_CONFIG_SRCDIR([main.c])
+AC_CONFIG_HEADER([config.h])
+
+AM_INIT_AUTOMAKE(automake_test,0.1)
+
+# Checks for programs.
+AC_PROG_CC
+
+# Checks for libraries.
+
+# Checks for header files.
+
+# Checks for typedefs, structures, and compiler characteristics.
+
+# Checks for library functions.
+
+#创建输出文件. 在`configure.in'的末尾调用本宏一次.
+AC_OUTPUT([Makefile])
+
