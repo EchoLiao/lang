@@ -12,7 +12,7 @@ LERP2 = lerp2
 LERP3 = lerp3
 
 # aliases
-CC = gcc
+CC = g++
 RC = windres
 RM = -rm -f
 CP = -copy
@@ -23,7 +23,8 @@ LIBPATH = -L/app/lib
 
 # compiler and linker switches
 CFLAGS = -g -fomit-frame-pointer -Wall
-LDFLAGS = -lGLU -lGL -lXmu -lXext -lX11 -lm -lglut -L/usr/lib64 -lstdc++
+#LDFLAGS = -lGLU -lGL -lXmu -lXext -lX11 -lm -lglut -L/usr/lib64 -lstdc++
+LDFLAGS = -lstdc++
 
 # add here additional object files
 OBJS = $(PROJ).o  
@@ -36,7 +37,7 @@ LERP_OBJ = $(LERP).o
 LERP_OBJ2 = $(LERP2).o
 LERP_OBJ3 = $(LERP3).o
 
-all: $(PROJ).exe $(PROJ2).exe $(ENDIAN).exe $(BMPRW).exe $(FOLD_UP).exe \
+all: $(BMPRW).exe $(PROJ).exe $(PROJ2).exe $(ENDIAN).exe $(FOLD_UP).exe \
 	$(LERP).exe $(LERP2).exe $(LERP3).exe
 
 $(LERP3).exe: $(LERP_OBJ3) $(SHARED) M3D_math3d.o M3D_plane.o $(LERP3).h
@@ -80,3 +81,5 @@ clean:
 	$(RM) *.o
 	$(RM) *.exe
 	$(RM) $(SHARED)
+	$(RM) *_dst.bmp
+

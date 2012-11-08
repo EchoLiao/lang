@@ -100,7 +100,7 @@ int main (int argc, char *argv[])
 
     // bmpw = bmpCreateObjForWrite(bmpr->edformat, 0, bmpr->w, bmpr->h,
     //         bmpr->iBitCount, bmpr->pdata);
-    bmpw = bmpCreateObjForWrite(EBMP_BGR, 0, bmpr->w, bmpr->h,
+    bmpw = bmpCreateObjForWrite(EBMP_BGR, 0, bmpr->linesize, bmpr->w, bmpr->h,
             bmpr->iBitCount, bmpr->pdata);
     assert( bmpw != NULL );
     assert( bmpWrite(dstfile, bmpw) );
