@@ -1,10 +1,10 @@
 CC = gcc
 RM = -rm -f
 
-LIBPATH =
-LIBS = -lGLU -lGL -lm -lglut -L/usr/lib64
+LIBPATH = -L"/System/Library/Frameworks/OpenGL.framework/Libraries"
+LIBS = -framework GLUT -framework OpenGL
 
-DEF = -DUSE_MAC=0
+DEF = -DUSE_MAC=1
 INCLUDE =
 CFLAGS = $(INCLUDE) $(DEF) -g -fomit-frame-pointer -Wall
 LDFLAGS = $(LIBPATH) $(LIBS)

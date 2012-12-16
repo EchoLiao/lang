@@ -23,9 +23,13 @@
 #include <unistd.h>
 #include <stdio.h>
 #include <math.h>
+#include <stdlib.h>
+
+#if USE_MAC
+#include <GLUT/glut.h>
+#else
 #include <GL/glut.h>
-
-
+#endif
 
 #define SCREEN_W        480
 #define SCREEN_H        340
