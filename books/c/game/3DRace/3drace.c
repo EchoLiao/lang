@@ -32,7 +32,7 @@
 #endif
 
 #define SCREEN_W        480
-#define SCREEN_H        340
+#define SCREEN_H        320
 #define TEXTURES_NUM    1
 #define NUM_PENTS       50
 
@@ -42,7 +42,7 @@ int     g_gamemode;
 int     g_fullscreen;
 float   g_rand[NUM_PENTS][3];
 float   g_deltaZ;
-float   g_cenZ = 0.009;
+float   g_cenZ = 0.004;
 float   g_handX;
 float   g_cenX = 0.05;
 float   g_accX = 1.0;
@@ -62,15 +62,29 @@ void resetRandPos()
 }
 
 
-int  init(void)
+int init(void)
 {
     glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-
     glClearDepth(1.0f);
+
     glDepthFunc(GL_LEQUAL);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_TEXTURE_2D);
+
+    glEnable(GL_LINE_SMOOTH);
+    glEnable(GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_BLEND_SRC);
+    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+    glLineWidth(0.1);
+
+#if 1
+    GLfloat values[2];
+    glGetFloatv (GL_LINE_WIDTH_GRANULARITY, values); // 线条的精确度
+    printf ("GL_LINE_WIDTH_GRANULARITY %3.1f\n", values[0]);
+    glGetFloatv (GL_LINE_WIDTH_RANGE, values);
+    printf ("GL_LINE_WIDTH_RANGE %3.1f - %3.1f\n", values[0], values[1]);
+#endif
 
     glShadeModel(GL_SMOOTH);
     glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
@@ -139,7 +153,7 @@ static void drawRoute()
 
     for ( curX = sx1; curX <= sx2; curX += cenX )
     {
-        glBegin(GL_LINE); {
+        glBegin(GL_LINES); {
             glVertex3f(curX, sy2, sz2);
             glVertex3f(curX, ey2, ez2);
         } glEnd();
@@ -152,8 +166,8 @@ void render(void)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glLoadIdentity();
-    gluLookAt(1.0, 0.0, 0.0,
-            0.0, 0.0, -100.0, 
+    gluLookAt(0.0, 0.0, 0.0,
+            0.0, 0.0, -100.0,
             0.0, 1.0, 0.0);
     glTranslatef(0.0f, 0.0f, -0.0f);
 
@@ -166,8 +180,9 @@ void render(void)
     glPushMatrix(); {
         glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
         glColor4f(0.0, 0.0, 1.0, 1.0);
+        glTranslatef(0.0, 0.0, -2.0);
         glScalef(0.99, 0.99, 0.99);
-        glRectf(-0.01, -0.01, 0.01, 0.01);
+        glRectf(-0.02, -0.02, 0.02, 0.02);
         glRectf(-1.0, -1.0, 1.0, 1.0);
     } glPopMatrix();
 
@@ -195,7 +210,7 @@ void render(void)
     for ( i = 0; i < NUM_PENTS; i++ )
     {
         if ( g_rand[i][2] > 0.0 &&
-                fabs(g_rand[i][1] + g_deltaZ - sCubeZ) < sAccuracy && 
+                fabs(g_rand[i][1] + g_deltaZ - sCubeZ) < sAccuracy &&
                 fabs(g_rand[i][0] - g_handX) < sAccuracy )
         {
             g_rand[i][2] = -1.0;
