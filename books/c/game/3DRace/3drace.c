@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
+#include <sys/time.h>
 
 #if __APPLE__
 #include <GLUT/glut.h>
@@ -42,11 +43,19 @@ int     g_gamemode;
 int     g_fullscreen;
 float   g_rand[NUM_PENTS][3];
 float   g_deltaZ;
-float   g_cenZ = 0.004;
+float   g_cenZ = 5.18;
 float   g_handX;
 float   g_cenX = 0.05;
 float   g_accX = 1.0;
+int64_t g_startTime;
 
+
+static inline int64_t getTimeInUsec()
+{
+    struct timeval tv;
+    gettimeofday(&tv, NULL);
+    return (int64_t)tv.tv_sec * 1000000 + tv.tv_usec;
+}
 
 void resetRandPos()
 {
@@ -74,9 +83,9 @@ int init(void)
 
     glEnable(GL_LINE_SMOOTH);
     glEnable(GL_BLEND);
-    glBlendFunc (GL_SRC_ALPHA, GL_BLEND_SRC);
+    glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
     glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-    glLineWidth(0.1);
+    glLineWidth(0.5);
 
 #if 1
     GLfloat values[2];
@@ -93,6 +102,7 @@ int init(void)
     glEnableClientState(GL_TEXTURE_COORD_ARRAY);
 
     resetRandPos();
+    g_startTime = getTimeInUsec();
 
     return 1;
 }
@@ -163,6 +173,15 @@ static void drawRoute()
 // Our Rendering Is Done Here
 void render(void)
 {
+    int64_t nowTime = getTimeInUsec();
+    g_deltaZ += g_cenZ * (nowTime - g_startTime) / (float)1000000;
+    // printf("NAL FPS=%.1f\n",  1.0/((nowTime-g_startTime)/1000000.0));
+    g_startTime = nowTime;
+    if ( g_deltaZ > 90.0 ) {
+        g_deltaZ = 0.0;
+        resetRandPos();
+    }
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glLoadIdentity();
@@ -194,11 +213,11 @@ void render(void)
         drawRandPentahedrals();
     } glPopMatrix();
 
-    const float sCubeZ = -2.0;
+    const float sCubeZ = -1.3;
     glPushMatrix(); {
         glTranslatef(g_handX, -0.3, sCubeZ);
         // glTranslatef(0.0, 0.0, g_deltaZ);
-        glScalef(0.125, 0.125, 0.125);
+        glScalef(0.065, 0.065, 0.065);
         glColor4f(1.0, 1.0, 1.0, 1.0);
         drawCube();
     } glPopMatrix();
@@ -207,24 +226,16 @@ void render(void)
 
     int i;
     const float sAccuracy = 0.1100;
-    for ( i = 0; i < NUM_PENTS; i++ )
-    {
+    for ( i = 0; i < NUM_PENTS; i++ ) {
         if ( g_rand[i][2] > 0.0 &&
                 fabs(g_rand[i][1] + g_deltaZ - sCubeZ) < sAccuracy &&
-                fabs(g_rand[i][0] - g_handX) < sAccuracy )
-        {
+                fabs(g_rand[i][0] - g_handX) < sAccuracy
+           ) {
             g_rand[i][2] = -1.0;
             printf("NAL rand[%d]=(%f,%f), handX=%f, deltaZ=%f\n", i,
                     g_rand[i][0], g_rand[i][1], g_handX, g_deltaZ);
             break;
         }
-    }
-
-    g_deltaZ += g_cenZ;
-    if ( g_deltaZ > 70.0 )
-    {
-        g_deltaZ = 0.0;
-        resetRandPos();
     }
 }
 
@@ -297,12 +308,12 @@ void special_keys(int a_keys, int x, int y)
             }
             break;
         case GLUT_KEY_UP:
-            g_deltaZ += g_cenZ;
-            printf("g_deltaZ = %f\n", g_deltaZ);
+            g_cenZ *= 1.1;
+            printf("g_cenZ = %f\n", g_cenZ);
             break;
         case GLUT_KEY_DOWN:
-            g_deltaZ -= g_cenZ;
-            printf("g_deltaZ = %f\n", g_deltaZ);
+            g_cenZ *= 0.9;
+            printf("g_cenZ = %f\n", g_cenZ);
             break;
         case GLUT_KEY_LEFT:
             g_handX -= g_cenX * g_accX;
