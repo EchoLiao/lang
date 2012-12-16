@@ -4,7 +4,7 @@ RM = -rm -f
 LIBPATH =
 LIBS = -lGLU -lGL -lm -lglut -L/usr/lib64
 
-DEF = -DUSE_MAC=0
+DEF =
 INCLUDE =
 CFLAGS = $(INCLUDE) $(DEF) -g -fomit-frame-pointer -Wall
 LDFLAGS = $(LIBPATH) $(LIBS)

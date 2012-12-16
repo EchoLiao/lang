@@ -25,7 +25,7 @@
 #include <math.h>
 #include <stdlib.h>
 
-#if USE_MAC
+#if __APPLE__
 #include <GLUT/glut.h>
 #else
 #include <GL/glut.h>
