@@ -88,7 +88,7 @@ class Tetrisblok extends JPanel implements KeyListener {
             {   { 0, 1, 0, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
                 { 0, 1, 0, 0, 1, 1, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0 },
                 { 1, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 },
-                { 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0 } } 
+                { 0, 1, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0 } }
     };
 
     // 生成新方块的方法
@@ -139,44 +139,37 @@ class Tetrisblok extends JPanel implements KeyListener {
         int tempturnState = turnState;
         turnState = (turnState + 1) % 4;
         if (blow(x, y, blockType, turnState) == 1) {
-        }
-        if (blow(x, y, blockType, turnState) == 0) {
+            repaint();
+        } else {
             turnState = tempturnState;
         }
-        repaint();
     }
 
     // 左移的方法
     public void left() {
         if (blow(x - 1, y, blockType, turnState) == 1) {
             x = x - 1;
+            repaint();
         }
-        ;
-        repaint();
     }
 
     // 右移的方法
     public void right() {
         if (blow(x + 1, y, blockType, turnState) == 1) {
             x = x + 1;
+            repaint();
         }
-        ;
-        repaint();
     }
 
     // 下落的方法
     public void down() {
         if (blow(x, y + 1, blockType, turnState) == 1) {
             y = y + 1;
-            delline();
-        }
-        ;
-        if (blow(x, y + 1, blockType, turnState) == 0) {
+        } else {
             add(x, y, blockType, turnState);
             newblock();
-            delline();
         }
-        ;
+        delline();
         repaint();
     }
 
@@ -184,10 +177,10 @@ class Tetrisblok extends JPanel implements KeyListener {
     public int blow(int x, int y, int blockType, int turnState) {
         for (int a = 0; a < 4; a++) {
             for (int b = 0; b < 4; b++) {
-                if (((shapes[blockType][turnState][a * 4 + b] == 1) && (map[x
-                                + b + 1][y + a] == 1))
-                        || ((shapes[blockType][turnState][a * 4 + b] == 1) && (map[x
-                                + b + 1][y + a] == 2))) 
+                System.out.printf("NAL x+b+1=%d\n", x+b+1);
+                if ( (shapes[blockType][turnState][a * 4 + b] == 1) &&
+                        ((map[x + b + 1][y + a] == 1) ||
+                         (map[x + b + 1][y + a] == 2)) ) // map[0][X] 是围墙!
                 {
                     return 0;
                 }
@@ -233,7 +226,6 @@ class Tetrisblok extends JPanel implements KeyListener {
                 if (map[x + b + 1][y + a] == 0) {
                     map[x + b + 1][y + a] = shapes[blockType][turnState][j];
                 }
-                ;
                 j++;
             }
         }
@@ -302,15 +294,12 @@ class Tetrisblok extends JPanel implements KeyListener {
     // 定时器监听
     class TimerListener implements ActionListener {
         public void actionPerformed(ActionEvent e) {
-
             repaint();
             if (blow(x, y + 1, blockType, turnState) == 1) {
                 y = y + 1;
                 delline();
             }
-            ;
             if (blow(x, y + 1, blockType, turnState) == 0) {
-
                 if (flag == 1) {
                     add(x, y, blockType, turnState);
                     delline();
@@ -319,7 +308,6 @@ class Tetrisblok extends JPanel implements KeyListener {
                 }
                 flag = 1;
             }
-            ;
         }
     }
 }
