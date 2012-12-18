@@ -50,7 +50,7 @@ class Tetrisblok extends JPanel implements KeyListener {
     int j = 0;
     int flag = 0;
     // 定义已经放下的方块x=0-11,y=0-21;
-    int[][] map = new int[13][23];
+    int[][] map = new int[12][22];
 
     // 方块的形状 第一组代表方块类型有S,Z,L,J,I,O,T 7种 第二组 代表旋转几次 第三四组为 方块矩阵
     private final int shapes[][][] = new int[][][] {
@@ -177,10 +177,10 @@ class Tetrisblok extends JPanel implements KeyListener {
     public int blow(int x, int y, int blockType, int turnState) {
         for (int a = 0; a < 4; a++) {
             for (int b = 0; b < 4; b++) {
-                System.out.printf("NAL x+b+1=%d\n", x+b+1);
                 if ( (shapes[blockType][turnState][a * 4 + b] == 1) &&
-                        ((map[x + b + 1][y + a] == 1) ||
-                         (map[x + b + 1][y + a] == 2)) ) // map[0][X] 是围墙!
+                        (x + b + 1 < 12) && (y + a < 22) &&
+                        ((map[x + b + 1][y + a] == 1)
+                         || (map[x + b + 1][y + a] == 2)) ) // map[0][X] 是围墙!
                 {
                     return 0;
                 }
@@ -223,7 +223,8 @@ class Tetrisblok extends JPanel implements KeyListener {
         int j = 0;
         for (int a = 0; a < 4; a++) {
             for (int b = 0; b < 4; b++) {
-                if (map[x + b + 1][y + a] == 0) {
+                if (x + b + 1 < 12 && y + a < 22 &&
+                        map[x + b + 1][y + a] == 0) {
                     map[x + b + 1][y + a] = shapes[blockType][turnState][j];
                 }
                 j++;
