@@ -28,7 +28,7 @@ public class Tetris extends JFrame {
         menu.add(help);
         frame.setLocationRelativeTo(null);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(220, 275);
+        frame.setSize(420, 475);
         frame.setTitle("Tetris内测版");
         // frame.setUndecorated(true);
         frame.setVisible(true);
@@ -49,8 +49,18 @@ class Tetrisblok extends JPanel implements KeyListener {
     private int i = 0;
     int j = 0;
     int flag = 0;
+
+    final private int kMapW = 14;
+    final private int kMapH = 26;
+    final private int kWallW = kMapW + 2;
+    final private int kWallH = kMapH + 1;
+    final private int kShapeW = 4;
+    final private int kShapeH = 4;
+    final private int kNShapes = 7;
+    final private int kNState = 4;
+
     // 定义已经放下的方块x=0-11,y=0-21;
-    int[][] map = new int[12][22];
+    int[][] map = new int[kWallW][kWallH];
 
     // 方块的形状 第一组代表方块类型有S,Z,L,J,I,O,T 7种 第二组 代表旋转几次 第三四组为 方块矩阵
     private final int shapes[][][] = new int[][][] {
@@ -93,9 +103,9 @@ class Tetrisblok extends JPanel implements KeyListener {
 
     // 生成新方块的方法
     public void newblock() {
-        blockType = (int) (Math.random() * 1000) % 7;
-        turnState = (int) (Math.random() * 1000) % 4;
-        x = 4;
+        blockType = (int) (Math.random() * 1000) % kNShapes;
+        turnState = (int) (Math.random() * 1000) % kNState;
+        x = kWallW / 2 - kShapeW / 2;
         y = 0;
         if (gameover(x, y) == 1) {
             newmap();
@@ -107,19 +117,19 @@ class Tetrisblok extends JPanel implements KeyListener {
 
     // 画围墙
     public void drawwall() {
-        for (i = 0; i < 12; i++) {
-            map[i][21] = 2;
+        for (i = 0; i < kWallW; i++) {
+            map[i][kWallH - 1] = 2;
         }
-        for (j = 0; j < 22; j++) {
-            map[11][j] = 2;
+        for (j = 0; j < kWallH; j++) {
             map[0][j] = 2;
+            map[kWallW - 1][j] = 2;
         }
     }
 
     // 初始化地图
     public void newmap() {
-        for (i = 0; i < 12; i++) {
-            for (j = 0; j < 22; j++) {
+        for (i = 0; i < kWallW; i++) {
+            for (j = 0; j < kWallH; j++) {
                 map[i][j] = 0;
             }
         }
@@ -137,7 +147,7 @@ class Tetrisblok extends JPanel implements KeyListener {
     // 旋转的方法
     public void turn() {
         int tempturnState = turnState;
-        turnState = (turnState + 1) % 4;
+        turnState = (turnState + 1) % kNState;
         if (blow(x, y, blockType, turnState) == 1) {
             repaint();
         } else {
@@ -175,10 +185,10 @@ class Tetrisblok extends JPanel implements KeyListener {
 
     // 是否合法的方法
     public int blow(int x, int y, int blockType, int turnState) {
-        for (int a = 0; a < 4; a++) {
-            for (int b = 0; b < 4; b++) {
-                if ( (shapes[blockType][turnState][a * 4 + b] == 1) &&
-                        (x + b + 1 < 12) && (y + a < 22) &&
+        for (int a = 0; a < kShapeH; a++) {
+            for (int b = 0; b < kShapeW; b++) {
+                if ( (shapes[blockType][turnState][a * kShapeH + b] == 1) &&
+                        (x + b + 1 < kWallW) && (y + a < kWallH) &&
                         ((map[x + b + 1][y + a] == 1)
                          || (map[x + b + 1][y + a] == 2)) ) // map[0][X] 是围墙!
                 {
@@ -192,14 +202,14 @@ class Tetrisblok extends JPanel implements KeyListener {
     // 消行的方法
     public void delline() {
         int c = 0;
-        for (int b = 0; b < 22; b++) {
-            for (int a = 0; a < 12; a++) {
+        for (int b = 0; b < kWallH; b++) {
+            for (int a = 0; a < kWallW; a++) {
                 if (map[a][b] == 1) {
                     c = c + 1;
-                    if (c == 10) {
+                    if (c == kMapW) {
                         score += 10;
                         for (int d = b; d > 0; d--) {
-                            for (int e = 0; e < 11; e++) {
+                            for (int e = 1; e <= kMapW; e++) {
                                 map[e][d] = map[e][d - 1];
                             }
                         }
@@ -221,9 +231,9 @@ class Tetrisblok extends JPanel implements KeyListener {
     // 把当前添加map
     public void add(int x, int y, int blockType, int turnState) {
         int j = 0;
-        for (int a = 0; a < 4; a++) {
-            for (int b = 0; b < 4; b++) {
-                if (x + b + 1 < 12 && y + a < 22 &&
+        for (int a = 0; a < kShapeH; a++) {
+            for (int b = 0; b < kShapeW; b++) {
+                if (x + b + 1 < kWallW && y + a < kWallH &&
                         map[x + b + 1][y + a] == 0) {
                     map[x + b + 1][y + a] = shapes[blockType][turnState][j];
                 }
@@ -236,19 +246,18 @@ class Tetrisblok extends JPanel implements KeyListener {
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
         // 画当前方块
-        for (j = 0; j < 16; j++) {
+        for (j = 0; j < kShapeW * kShapeH; j++) {
             if (shapes[blockType][turnState][j] == 1) {
-                g.fillRect((j % 4 + x + 1) * 10, (j / 4 + y) * 10, 10, 10);
+                g.fillRect((j % kShapeH + x + 1) * 10, (j / kShapeH + y) * 10, 10, 10);
             }
         }
         // 画已经固定的方块
-        for (j = 0; j < 22; j++) {
-            for (i = 0; i < 12; i++) {
+        for (j = 0; j < kWallH; j++) {
+            for (i = 0; i < kWallW; i++) {
                 if (map[i][j] == 1) {
                     g.fillRect(i * 10, j * 10, 10, 10);
 
-                }
-                if (map[i][j] == 2) {
+                } else if (map[i][j] == 2) {
                     g.drawRect(i * 10, j * 10, 10, 10);
 
                 }
