@@ -26,6 +26,7 @@
 
 - (BOOL)initOpenGL;
 - (BOOL)unInitOpenGL;
+
 - (void)render;
 
 @end

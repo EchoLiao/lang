@@ -53,6 +53,13 @@
     }
 }
 
+- (void)dealloc
+{
+    assert(context == nil);
+	[super dealloc];
+}
+
+
 #pragma mark -
 
 - (BOOL)initOpenGL
@@ -76,9 +83,9 @@
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrthof(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
+    float asp = (float) backingHeight / backingWidth;
+    glOrthof(-0.5, 0.5, -asp, asp, -1.0, 1.0);
     glMatrixMode(GL_MODELVIEW);
-
 
     glDisable(GL_DEPTH_TEST);
     glDisable(GL_STENCIL_TEST);
@@ -89,7 +96,7 @@
     glDisable(GL_POLYGON_OFFSET_FILL);
     glDisable(GL_SAMPLE_ALPHA_TO_COVERAGE);
     glDisable(GL_SAMPLE_COVERAGE);
-    glEnable(GL_TEXTURE_2D);
+    glDisable(GL_TEXTURE_2D);
 
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_COLOR_ARRAY);
@@ -113,6 +120,9 @@
     return YES;
 }
 
+#pragma mark -
+
+
 - (void)render
 {
     glClear(GL_COLOR_BUFFER_BIT);
@@ -126,23 +136,35 @@
         0.0,   1.0, 0.0, 1.0,
         0.0,   0.0, 1.0, 1.0, };
 
+    float x1 = -0.5;
+    float x2 = -x1;
+    float y1 = -(float)backingHeight / backingWidth;
+    float y2 = -y1;
+    GLfloat	rect[] = {
+        x1, y1, 0.0,
+        x1, y2, 0.0,
+        x2, y1, 0.0,
+        x2, y2, 0.0,
+    };
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glDisableClientState(GL_COLOR_ARRAY);
+    glColor4f(1.0, 0.0, 0.0, 1.0);
+    glVertexPointer(3, GL_FLOAT, 0, rect);
+    glPushMatrix(); {
+        glScalef(0.95, 0.95, 1.0);
+        glDrawArrays(GL_TRIANGLE_STRIP, 0, sizeof(rect)/sizeof(rect[0])/3);
+    } glPopMatrix();
+
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_COLOR_ARRAY);
     glVertexPointer(3, GL_FLOAT, 0, vertices);
     glColorPointer(4, GL_FLOAT, 0, colors);
-
-	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDrawArrays(GL_TRIANGLES, 0, sizeof(vertices)/sizeof(vertices[0])/3);
 
     glBindRenderbufferOES(GL_RENDERBUFFER_OES, viewRenderbuffer);
     [context presentRenderbuffer:GL_RENDERBUFFER_OES];
 }
 
-
-#pragma mark -
-
-
-- (void)dealloc 
-{
-    assert(context == nil);
-	[super dealloc];
-}
 
 @end

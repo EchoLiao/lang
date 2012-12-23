@@ -23,7 +23,9 @@
 
     int ret = [self.renderView initOpenGL];
     assert(ret);
-    [self.renderView render];
+
+    [[UIApplication sharedApplication] setStatusBarHidden:YES];
+     [self.renderView render];
 }
 
 - (void)viewDidUnload
@@ -49,7 +51,8 @@
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
 {
-    return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
+//    return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
+    return YES;
 }
 
 
