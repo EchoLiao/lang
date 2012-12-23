@@ -1,13 +1,12 @@
 CC = gcc
 RM = -rm -f
 
-LIBPATH = -L"/System/Library/Frameworks/OpenGL.framework/Libraries"
 LIBS = -framework GLUT -framework OpenGL
 
 DEF =
 INCLUDE =
 CFLAGS = $(INCLUDE) $(DEF) -g -fomit-frame-pointer -Wall
-LDFLAGS = $(LIBPATH) $(LIBS)
+LDFLAGS = $(LIBS)
 
 TARGETS = 3drace
 OBJECTS = $(TARGETS).o
