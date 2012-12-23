@@ -25,14 +25,21 @@
     assert(ret);
 
     [[UIApplication sharedApplication] setStatusBarHidden:YES];
-     [self.renderView render];
+//    [self.renderView render];
+//    [self.renderView renderRectInIosCoorWithX1:0 withY1:0 withX2:300 withY2:460];
+
+    [self.renderView OVDisplayClear];
+    [self.renderView OVDisplaySetColorWithR:1.0 withG:0 withB:0 withA:0];
+    [self.renderView OVDisplayDrawRectWithX1:1 withY1:1 withX2:300 withY2:460];
+//    [self.renderView OVDisplayFillRectWithX1:0 withY1:0 withX2:300 withY2:460];
+    [self.renderView OVDisplayShow];
 }
 
 - (void)viewDidUnload
 {
     [super viewDidUnload];
 
-    [(OpenGLView *)self.view unInitOpenGL];
+    [self.renderView unInitOpenGL];
 }
 
 
