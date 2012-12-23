@@ -6,7 +6,10 @@
 //  Copyright (c) 2012年 erlz nuo. All rights reserved.
 //
 
+#import <assert.h>
 #import "ViewController.h"
+#import "OpenGLView.h"
+
 
 @interface ViewController ()
 
@@ -17,11 +20,37 @@
 - (void)viewDidLoad
 {
     [super viewDidLoad];
+
+    int ret = [self.renderView initOpenGL];
+    assert(ret);
+    [self.renderView render];
 }
+
+- (void)viewDidUnload
+{
+    [super viewDidUnload];
+
+    [(OpenGLView *)self.view unInitOpenGL];
+}
+
 
 - (void)didReceiveMemoryWarning
 {
     [super didReceiveMemoryWarning];
 }
+
+- (void)dealloc
+{
+    [_renderView release];
+    [super dealloc];
+}
+
+
+
+- (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)interfaceOrientation
+{
+    return (interfaceOrientation != UIInterfaceOrientationPortraitUpsideDown);
+}
+
 
 @end
