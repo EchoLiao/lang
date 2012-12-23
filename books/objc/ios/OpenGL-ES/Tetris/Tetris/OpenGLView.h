@@ -21,7 +21,7 @@
 	GLuint          viewFramebuffer;
 	GLint           backingWidth;
 	GLint           backingHeight;
-	GLint           backingDatum;
+	GLfloat         backingDatum;
 }
 
 - (BOOL)initOpenGL;

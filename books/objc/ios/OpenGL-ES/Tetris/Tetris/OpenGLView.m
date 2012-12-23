@@ -260,14 +260,14 @@
 {
     float x2 = x + w;
     float y2 = y + h;
-    [self OVDisplayDrawRectWithX:x withY:y withW:x2 withH:y2];
+    [self OVDisplayDrawRectWithX1:x withY1:y withX2:x2 withY2:y2];
 }
 
 - (void)OVDisplayFillRectWithX:(float)x withY:(float)y withW:(float)w withH:(float)h
 {
     float x2 = x + w;
     float y2 = y + h;
-    [self OVDisplayFillRectWithX:x withY:y withW:x2 withH:y2];
+    [self OVDisplayFillRectWithX1:x withY1:y withX2:x2 withY2:y2];
 }
 
 
