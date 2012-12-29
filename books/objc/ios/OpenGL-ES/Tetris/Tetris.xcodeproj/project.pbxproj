@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F4C25730168E931100459968 /* Tetris.c in Sources */ = {isa = PBXBuildFile; fileRef = F4C2572E168E931100459968 /* Tetris.c */; };
+		F4C25738168EFC3C00459968 /* ViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = F4C25736168EFC3B00459968 /* ViewController_iPad.xib */; };
 		F4F470A81686CECA00ADED02 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4F470A71686CECA00ADED02 /* UIKit.framework */; };
 		F4F470AA1686CECA00ADED02 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4F470A91686CECA00ADED02 /* Foundation.framework */; };
 		F4F470AC1686CECA00ADED02 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4F470AB1686CECA00ADED02 /* CoreGraphics.framework */; };
@@ -18,13 +20,15 @@
 		F4F470BE1686CECB00ADED02 /* Default-568h@2x.png in Resources */ = {isa = PBXBuildFile; fileRef = F4F470BD1686CECB00ADED02 /* Default-568h@2x.png */; };
 		F4F470C11686CECB00ADED02 /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = F4F470C01686CECB00ADED02 /* ViewController.m */; };
 		F4F470C41686CECB00ADED02 /* ViewController_iPhone.xib in Resources */ = {isa = PBXBuildFile; fileRef = F4F470C21686CECB00ADED02 /* ViewController_iPhone.xib */; };
-		F4F470C71686CECB00ADED02 /* ViewController_iPad.xib in Resources */ = {isa = PBXBuildFile; fileRef = F4F470C51686CECB00ADED02 /* ViewController_iPad.xib */; };
 		F4F470D71686D12E00ADED02 /* OpenGLView.m in Sources */ = {isa = PBXBuildFile; fileRef = F4F470D61686D12E00ADED02 /* OpenGLView.m */; };
 		F4F470DA1686D33400ADED02 /* OpenGLES.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4F470D91686D33400ADED02 /* OpenGLES.framework */; };
 		F4F470DC1686D35500ADED02 /* QuartzCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F4F470DB1686D35500ADED02 /* QuartzCore.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		F4C2572E168E931100459968 /* Tetris.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = Tetris.c; sourceTree = "<group>"; };
+		F4C2572F168E931100459968 /* Tetris.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Tetris.h; sourceTree = "<group>"; };
+		F4C25737168EFC3C00459968 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPad.xib; sourceTree = "<group>"; };
 		F4F470A31686CECA00ADED02 /* Tetris.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Tetris.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F4F470A71686CECA00ADED02 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		F4F470A91686CECA00ADED02 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -41,7 +45,6 @@
 		F4F470BF1686CECB00ADED02 /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
 		F4F470C01686CECB00ADED02 /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
 		F4F470C31686CECB00ADED02 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPhone.xib; sourceTree = "<group>"; };
-		F4F470C61686CECB00ADED02 /* en */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = en; path = en.lproj/ViewController_iPad.xib; sourceTree = "<group>"; };
 		F4F470D61686D12E00ADED02 /* OpenGLView.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = OpenGLView.m; sourceTree = "<group>"; };
 		F4F470D81686D2D600ADED02 /* OpenGLView.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = OpenGLView.h; sourceTree = "<group>"; };
 		F4F470D91686D33400ADED02 /* OpenGLES.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGLES.framework; path = System/Library/Frameworks/OpenGLES.framework; sourceTree = SDKROOT; };
@@ -64,6 +67,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F4C2572C168E8F6C00459968 /* Tetris */ = {
+			isa = PBXGroup;
+			children = (
+				F4C2572E168E931100459968 /* Tetris.c */,
+				F4C2572F168E931100459968 /* Tetris.h */,
+			);
+			name = Tetris;
+			sourceTree = "<group>";
+		};
 		F4F470981686CECA00ADED02 = {
 			isa = PBXGroup;
 			children = (
@@ -96,13 +108,14 @@
 		F4F470AD1686CECA00ADED02 /* Tetris */ = {
 			isa = PBXGroup;
 			children = (
+				F4C2572C168E8F6C00459968 /* Tetris */,
 				F4F470D41686D10900ADED02 /* OpenGL */,
 				F4F470B61686CECB00ADED02 /* AppDelegate.h */,
 				F4F470B71686CECB00ADED02 /* AppDelegate.m */,
 				F4F470BF1686CECB00ADED02 /* ViewController.h */,
 				F4F470C01686CECB00ADED02 /* ViewController.m */,
+				F4C25736168EFC3B00459968 /* ViewController_iPad.xib */,
 				F4F470C21686CECB00ADED02 /* ViewController_iPhone.xib */,
-				F4F470C51686CECB00ADED02 /* ViewController_iPad.xib */,
 				F4F470AE1686CECA00ADED02 /* Supporting Files */,
 			);
 			path = Tetris;
@@ -187,7 +200,7 @@
 				F4F470BC1686CECB00ADED02 /* Default@2x.png in Resources */,
 				F4F470BE1686CECB00ADED02 /* Default-568h@2x.png in Resources */,
 				F4F470C41686CECB00ADED02 /* ViewController_iPhone.xib in Resources */,
-				F4F470C71686CECB00ADED02 /* ViewController_iPad.xib in Resources */,
+				F4C25738168EFC3C00459968 /* ViewController_iPad.xib in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -202,12 +215,21 @@
 				F4F470B81686CECB00ADED02 /* AppDelegate.m in Sources */,
 				F4F470C11686CECB00ADED02 /* ViewController.m in Sources */,
 				F4F470D71686D12E00ADED02 /* OpenGLView.m in Sources */,
+				F4C25730168E931100459968 /* Tetris.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXVariantGroup section */
+		F4C25736168EFC3B00459968 /* ViewController_iPad.xib */ = {
+			isa = PBXVariantGroup;
+			children = (
+				F4C25737168EFC3C00459968 /* en */,
+			);
+			name = ViewController_iPad.xib;
+			sourceTree = "<group>";
+		};
 		F4F470B01686CECA00ADED02 /* InfoPlist.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
@@ -222,14 +244,6 @@
 				F4F470C31686CECB00ADED02 /* en */,
 			);
 			name = ViewController_iPhone.xib;
-			sourceTree = "<group>";
-		};
-		F4F470C51686CECB00ADED02 /* ViewController_iPad.xib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				F4F470C61686CECB00ADED02 /* en */,
-			);
-			name = ViewController_iPad.xib;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
