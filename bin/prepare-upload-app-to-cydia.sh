@@ -4,6 +4,31 @@ wdir=`pwd -P`
 pname=VPlayer
 
 
+function control_file_example()
+{
+    echo ""
+    echo "control file example:"
+    echo "
+    Package: com.yixia.VPlayer
+    Version: 0.0.5
+    Name: VPlayer Video Player
+    Section: [Utilities]
+    Architecture: iphoneos-arm
+    Author: VPlayer<VPlayer-ios@yixia.com>
+    Maintainer: VPlayer<www.VPlayer.net>
+    Homepage: www.VPlayer.net
+    Icon: file:///Applications/VPlayer.app/Icon.png
+    Installed-Size: 9102
+    Priority: Optional
+    Essential: no
+    Description: hello VPlayer!
+    tag: purpose:: uikit, role::enduser
+    "
+}
+
+
+
+
 rm -rf Payload deb
 
 [[ ! -e "`ls $pname*.ipa`" ]] && {
@@ -12,6 +37,7 @@ rm -rf Payload deb
 }
 [[ ! -e control ]] && {
     echo "no control file!"
+    control_file_example
     exit 1
 }
 
