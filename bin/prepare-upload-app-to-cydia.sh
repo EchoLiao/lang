@@ -16,6 +16,8 @@ rm -rf Payload deb
 }
 
 
+. /sw/bin/init.sh
+
 unzip $pname*.ipa
 
 mkdir -p deb
